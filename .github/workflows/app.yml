@@ -1,6 +1,6 @@
 name: App
 
-# Jeder Push: im Simulator bauen (ohne Geheimnisse).
+# Jeder Push: im Simulator bauen und testen (ohne Geheimnisse).
 # Tag beta-*: zusätzlich signieren und zu TestFlight hochladen. Geheimnisse nur hier, nie bei Pull Requests.
 on:
   push:
@@ -27,12 +27,16 @@ jobs:
       - name: Projekt erzeugen
         run: xcodegen generate
 
-      - name: Im Simulator bauen
+      - name: Im Simulator bauen und testen
         run: |
-          xcodebuild -project PersonalAPI.xcodeproj -scheme PersonalAPI \
-            -destination 'generic/platform=iOS Simulator' \
-            CODE_SIGNING_ALLOWED=NO build | tail -n 40
-          exit ${PIPESTATUS[0]}
+          ziel=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          geraete = json.load(sys.stdin)['devices']
+          print(next(g['udid'] for laufzeit in sorted(geraete, reverse=True) if 'iOS' in laufzeit
+                     for g in geraete[laufzeit] if g['name'].startswith('iPhone')))")
+          echo "Simulator: $ziel"
+          set -o pipefail
+          xcodebuild test -project PersonalAPI.xcodeproj -scheme PersonalAPI             -destination "id=$ziel" | grep -E "error:|warning: unre|Test Case|Executed|\*\* TEST|BUILD" | tail -n 60
 
       - name: Signieren und zu TestFlight hochladen
         if: startsWith(github.ref, 'refs/tags/beta-')

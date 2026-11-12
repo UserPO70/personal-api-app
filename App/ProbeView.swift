@@ -9,8 +9,7 @@ struct ProbeView: View {
     @State private var laeuft = false
 
     var body: some View {
-        NavigationStack {
-            Form {
+        Form {
                 Section("Server") {
                     TextField("http://192.168.0.10:8000", text: $adresse)
                         .keyboardType(.URL)
@@ -55,9 +54,8 @@ struct ProbeView: View {
                     .font(.caption)
                 }
             }
-            .navigationTitle("Probe")
-            .overlay { if laeuft { ProgressView() } }
-        }
+        .navigationTitle("Probe")
+        .overlay { if laeuft { ProgressView() } }
     }
 
     private func ausfuehren(_ schritt: @escaping () async -> Void) {

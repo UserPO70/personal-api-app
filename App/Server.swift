@@ -12,6 +12,11 @@ struct Info: Decodable {
     let version: String
     let schema: Int?
     let https: Https?
+    var claude: Claude? = nil
+
+    struct Claude: Decodable {
+        let bereit: Bool
+    }
 }
 
 struct ProbeAntwort: Decodable {

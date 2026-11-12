@@ -37,7 +37,7 @@ xcodebuild -project PersonalAPI.xcodeproj -scheme PersonalAPI -configuration Rel
   -destination 'generic/platform=iOS' -archivePath build/PersonalAPI.xcarchive \
   DEVELOPMENT_TEAM="$TEAM_ID" CURRENT_PROJECT_VERSION="$baunummer" \
   CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="-" CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO \
-  PROVISIONING_PROFILE_SPECIFIER="" PROVISIONING_PROFILE="" \
+  AD_HOC_CODE_SIGNING_ALLOWED=YES PROVISIONING_PROFILE_SPECIFIER="" PROVISIONING_PROFILE="" \
   "${anmeldung[@]}" archive | tail -n 60
 test "${PIPESTATUS[0]}" -eq 0
 

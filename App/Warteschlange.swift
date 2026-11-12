@@ -1,4 +1,5 @@
 import Foundation
+import Network
 import UIKit
 
 /// Foto oder Text, das der Server angenommen hat und Claude noch schätzt.
@@ -202,6 +203,27 @@ final class Warteschlange: ObservableObject {
             }
         }
         meldung = nil
+    }
+
+    // MARK: Netz beobachten
+
+    private let netz = NWPathMonitor()
+    private var beobachtet = false
+
+    /// Sendet, sobald das iPhone wieder Netz hat, etwa wenn das WLAN bei geöffneter App dazukommt.
+    /// Ob es das Heimnetz ist, zeigt erst der Versuch: Nur der eigene Server besteht die Prüfung des Fingerabdrucks.
+    func netzBeobachten() {
+        guard !beobachtet else { return }
+        beobachtet = true
+        netz.pathUpdateHandler = { [weak self] pfad in
+            guard pfad.status == .satisfied else { return }
+            Task { @MainActor in
+                // Kurz warten, bis das neue Netz eine Adresse hat.
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                await self?.senden(alle: true)
+            }
+        }
+        netz.start(queue: DispatchQueue(label: "io.github.userpo70.personalapi.netz"))
     }
 
     private var hintergrund = UIBackgroundTaskIdentifier.invalid

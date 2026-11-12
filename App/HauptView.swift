@@ -23,6 +23,15 @@ struct HauptView: View {
         }
         .onAppear {
             if zustand.zustimmung == .offen { fragtZustimmung = true }
+            Warteschlange.shared.netzBeobachten()
+        }
+        // Solange die App offen ist: regelmäßig nachsehen, ob der Server inzwischen erreichbar ist.
+        // Die Wartezeit je Eintrag gilt dabei weiter, es wird also nicht alle 20 Sekunden gesendet.
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 20_000_000_000)
+                await Warteschlange.shared.senden()
+            }
         }
         .sheet(isPresented: $fragtZustimmung) {
             ZustimmungView()

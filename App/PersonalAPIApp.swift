@@ -29,6 +29,13 @@ struct PersonalAPIApp: App {
 }
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        // Auch wenn iOS die App im Hintergrund weckt, weil Health neue Werte hat.
+        Gesundheit.shared.starten()
+        return true
+    }
+
     /// iOS weckt die App, wenn ein Hintergrund-Upload fertig ist.
     func application(_ application: UIApplication,
                      handleEventsForBackgroundURLSession identifier: String,

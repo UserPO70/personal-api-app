@@ -5,7 +5,7 @@ name: App
 on:
   push:
     branches: [main]
-    tags: ["beta-*"]
+    tags: ["beta-*", "probe-*"]
   pull_request:
   workflow_dispatch:
 
@@ -39,10 +39,11 @@ jobs:
           xcodebuild test -project PersonalAPI.xcodeproj -scheme PersonalAPI             -destination "id=$ziel" | grep -E "error:|warning: unre|Test Case|Executed|\*\* TEST|BUILD" | tail -n 60
 
       - name: Signieren und zu TestFlight hochladen
-        if: startsWith(github.ref, 'refs/tags/beta-')
+        if: startsWith(github.ref, 'refs/tags/beta-') || startsWith(github.ref, 'refs/tags/probe-')
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          NUR_PRUEFEN: ${{ startsWith(github.ref, 'refs/tags/probe-') && '1' || '' }}
         run: ci/testflight.sh

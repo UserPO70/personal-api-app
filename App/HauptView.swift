@@ -18,7 +18,10 @@ struct HauptView: View {
         // Verlässlichster Zeitpunkt zum Nachsenden: wenn die App geöffnet wird.
         .onChange(of: phase) { _, neu in
             if neu == .active {
-                Task { await Warteschlange.shared.senden() }
+                Task {
+                    await Warteschlange.shared.senden()
+                    await Gesundheit.shared.senden()
+                }
             }
         }
         .onAppear {
@@ -122,6 +125,7 @@ struct UebersichtView: View {
 struct EinstellungenView: View {
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
+    @ObservedObject private var gesundheit = Gesundheit.shared
     @State private var abmeldenFragen = false
     @State private var abmeldenLaeuft = false
 
@@ -156,6 +160,42 @@ struct EinstellungenView: View {
                     Text("Essen")
                 } footer: {
                     Text("Eingeschaltet schickt dein Server Fotos und Texte zur Schätzung der Nährwerte an Claude von Anthropic, über dein eigenes Claude-Konto. Ausgeschaltet bleiben Barcode und Favoriten.")
+                }
+                if Gesundheit.verfuegbar && !zustand.demo && zustand.verbindung != nil {
+                    Section {
+                        Toggle("Apple Health senden", isOn: Binding(
+                            get: { gesundheit.an },
+                            set: { an in
+                                if an {
+                                    Task { await gesundheit.einschalten() }
+                                } else {
+                                    gesundheit.ausschalten()
+                                }
+                            }))
+                        if gesundheit.an {
+                            if let zuletzt = gesundheit.zuletzt {
+                                LabeledContent("Zuletzt gesendet", value: zuletzt.formatted(date: .abbreviated, time: .shortened))
+                            }
+                            if let stand = gesundheit.stand {
+                                Text(stand)
+                                    .font(.footnote)
+                                    .foregroundStyle(Color.secondary)
+                            }
+                            if let fehler = gesundheit.fehler {
+                                Label(fehler, systemImage: "exclamationmark.triangle")
+                                    .font(.footnote)
+                                    .foregroundStyle(Color.orange)
+                            }
+                            Button(gesundheit.laeuft ? "Sendet …" : "Jetzt senden") {
+                                Task { await gesundheit.senden() }
+                            }
+                            .disabled(gesundheit.laeuft)
+                        }
+                    } header: {
+                        Text("Gesundheit")
+                    } footer: {
+                        Text("Schritte, Strecke, Stockwerke, Gehtempo, Schrittlänge und Schlaf gehen an deinen eigenen Server, nie an Claude. Das ersetzt den Health-Kurzbefehl: Schalte dessen Automation aus, sonst können Stunden doppelt zählen.")
+                    }
                 }
                 Section("Entwicklung") {
                     NavigationLink("Probe") { ProbeView() }

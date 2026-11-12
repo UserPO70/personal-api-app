@@ -6,7 +6,7 @@ options:
   createIntermediateGroups: true
 settings:
   base:
-    MARKETING_VERSION: "0.3.0"
+    MARKETING_VERSION: "0.4.0"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
 targets:
@@ -28,6 +28,7 @@ targets:
           NSAllowsLocalNetworking: true
         NSLocalNetworkUsageDescription: Die App spricht mit deinem eigenen Server im Heimnetz.
         NSCameraUsageDescription: Die Kamera fotografiert dein Essen und liest Barcodes sowie den QR-Code zum Koppeln.
+        NSHealthShareUsageDescription: Die App liest Schritte, Strecke, Stockwerke, Gehtempo, Schrittlänge und Schlaf und schickt sie an deinen eigenen Server.
         CFBundleURLTypes:
           - CFBundleURLName: io.github.userpo70.personalapi
             CFBundleURLSchemes: [personal-api]
@@ -39,6 +40,7 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: PersonalAPI.entitlements
         ENABLE_PREVIEWS: YES
     scheme:
       testTargets: [PersonalAPITests]

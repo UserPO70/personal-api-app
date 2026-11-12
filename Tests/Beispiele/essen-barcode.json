@@ -1,0 +1,33 @@
+{
+ "adresse": "POST /api/essen/barcode",
+ "anfrage": {
+  "pfad": "/api/essen/barcode",
+  "mit_schluessel": true,
+  "json": {
+   "barcode": "4000000000013",
+   "menge": 80,
+   "einheit": "g",
+   "zeit": "2026-03-15T08:00:00+01:00",
+   "extern_id": "app-1"
+  }
+ },
+ "status": 201,
+ "medientyp": "application/json",
+ "antwort": {
+  "id": 177,
+  "doppelt": false,
+  "gefunden": true,
+  "bestandteil": {
+   "lebensmittel": "Test-Müsli Beere (Testmarke)",
+   "menge": 80.0,
+   "einheit": "g",
+   "barcode": "4000000000013",
+   "kcal": 304.0,
+   "eiweiss_g": 8.0,
+   "kohlenhydrate_g": 48.0,
+   "fett_g": 6.8
+  },
+  "hinzugefuegt": false,
+  "hinweis": null
+ }
+}

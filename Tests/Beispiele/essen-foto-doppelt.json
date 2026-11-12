@@ -1,0 +1,23 @@
+{
+ "adresse": "POST /api/essen/foto",
+ "anfrage": {
+  "pfad": "/api/essen/foto",
+  "mit_schluessel": true,
+  "formular": {
+   "foto": "<Binärdaten>",
+   "zeit": "2026-03-15T12:30:00+01:00",
+   "notiz": "große Portion",
+   "gramm": "350",
+   "extern_id": "app-2"
+  }
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "id": 1,
+  "doppelt": true,
+  "status": "wartet",
+  "mahlzeit_id": null,
+  "warten_vor": 0
+ }
+}

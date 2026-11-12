@@ -1,0 +1,109 @@
+{
+ "adresse": "GET /api/essen/foto/{auftrag_id}",
+ "anfrage": {
+  "pfad": "/api/essen/foto/1",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "id": 1,
+  "foto_pfad": "2026/03/9ceed8e5d583444bb0bd.jpg",
+  "sha256": "9ceed8e5d583444bb0bd5ca4ba2de249ff58c3212f3eaf1f4a691726b8f4fc04",
+  "medientyp": "image/jpeg",
+  "zeit": "2026-03-15T11:30:00.000000Z",
+  "notiz": "große Portion",
+  "geraet": "iphone",
+  "extern_id": "app-2",
+  "status": "fertig",
+  "versuche": 1,
+  "fehler": null,
+  "nutzung": {
+   "dauer_ms": 1000,
+   "notiz": "große Portion",
+   "medientyp": "image/jpeg"
+  },
+  "mahlzeit_id": 178,
+  "erstellt_am": "2026-03-15T17:00:00.000000Z",
+  "bearbeitet_am": "2026-03-15T17:00:00.000000Z",
+  "gramm": 350.0,
+  "gehoert_zu": null,
+  "warten_vor": 0,
+  "mahlzeit": {
+   "id": 178,
+   "zeit": "2026-03-15T11:30:00.000000Z",
+   "quelle": "foto",
+   "geraet": "iphone",
+   "notiz": "große Portion",
+   "foto_pfad": "2026/03/9ceed8e5d583444bb0bd.jpg",
+   "daten": {
+    "auftrag_id": 1,
+    "sicherheit": "mittel",
+    "hinweis": "Portion auf normalem Teller geschätzt",
+    "nutzung": {
+     "dauer_ms": 1000,
+     "notiz": "große Portion",
+     "medientyp": "image/jpeg"
+    },
+    "analyse": {
+     "essen_erkannt": true,
+     "bestandteile": [
+      {
+       "lebensmittel": "Spaghetti",
+       "menge": 250,
+       "einheit": "g",
+       "kcal": 395,
+       "eiweiss_g": 14,
+       "kohlenhydrate_g": 77,
+       "fett_g": 2.3
+      },
+      {
+       "lebensmittel": "Tomatensoße",
+       "menge": 150,
+       "einheit": "ml",
+       "kcal": 90,
+       "eiweiss_g": 2.5,
+       "kohlenhydrate_g": 12,
+       "fett_g": 3.6
+      }
+     ],
+     "sicherheit": "mittel",
+     "hinweis": "Portion auf normalem Teller geschätzt"
+    },
+    "gewogen_g": 350.0
+   },
+   "extern_id": "foto-auftrag-1",
+   "erfasst_am": "2026-03-15T17:00:00.000000Z",
+   "gehoert_zu": null,
+   "art": null,
+   "bestandteile": [
+    {
+     "lebensmittel": "Spaghetti",
+     "menge": 250.0,
+     "einheit": "g",
+     "kcal": 395.0,
+     "eiweiss_g": 14.0,
+     "kohlenhydrate_g": 77.0,
+     "fett_g": 2.3,
+     "barcode": null
+    },
+    {
+     "lebensmittel": "Tomatensoße",
+     "menge": 150.0,
+     "einheit": "ml",
+     "kcal": 90.0,
+     "eiweiss_g": 2.5,
+     "kohlenhydrate_g": 12.0,
+     "fett_g": 3.6,
+     "barcode": null
+    }
+   ],
+   "summe": {
+    "kcal": 485.0,
+    "eiweiss_g": 16.5,
+    "kohlenhydrate_g": 89.0,
+    "fett_g": 5.9
+   }
+  }
+ }
+}

@@ -6,7 +6,7 @@ options:
   createIntermediateGroups: true
 settings:
   base:
-    MARKETING_VERSION: "0.2.0"
+    MARKETING_VERSION: "0.3.0"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
 targets:
@@ -27,7 +27,7 @@ targets:
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         NSLocalNetworkUsageDescription: Die App spricht mit deinem eigenen Server im Heimnetz.
-        NSCameraUsageDescription: Die Kamera liest den QR-Code, mit dem du die App mit deinem Server koppelst.
+        NSCameraUsageDescription: Die Kamera fotografiert dein Essen und liest Barcodes sowie den QR-Code zum Koppeln.
         CFBundleURLTypes:
           - CFBundleURLName: io.github.userpo70.personalapi
             CFBundleURLSchemes: [personal-api]

@@ -1,0 +1,21 @@
+{
+ "adresse": "POST /api/essen/text",
+ "anfrage": {
+  "pfad": "/api/essen/text",
+  "mit_schluessel": true,
+  "json": {
+   "text": "Kaffee mit Milch",
+   "zeit": "2026-03-15T15:00:00+01:00",
+   "extern_id": "app-3"
+  }
+ },
+ "status": 202,
+ "medientyp": "application/json",
+ "antwort": {
+  "id": 3,
+  "doppelt": false,
+  "status": "wartet",
+  "mahlzeit_id": null,
+  "warten_vor": 1
+ }
+}

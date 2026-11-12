@@ -1,4 +1,5 @@
 import SwiftUI
+import Vision
 import VisionKit
 
 /// Koppeln: QR-Code scannen oder Adresse und Code eintippen, dann die Prüfzahl vergleichen.
@@ -139,9 +140,11 @@ struct KoppelnView: View {
 /// Kamera-Scanner für QR-Codes (VisionKit).
 struct QRScanner: UIViewControllerRepresentable {
     let gefunden: (String) -> Void
+    /// Welche Codes gelesen werden: QR zum Koppeln, Strichcodes beim Essen.
+    var arten: [VNBarcodeSymbology] = [.qr]
 
     func makeUIViewController(context: Context) -> DataScannerViewController {
-        let scanner = DataScannerViewController(recognizedDataTypes: [.barcode(symbologies: [.qr])],
+        let scanner = DataScannerViewController(recognizedDataTypes: [.barcode(symbologies: arten)],
                                                 qualityLevel: .balanced,
                                                 recognizesMultipleItems: false,
                                                 isHighFrameRateTrackingEnabled: false,

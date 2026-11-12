@@ -46,22 +46,46 @@ enum Schluesselbund {
     }
 }
 
+enum Zustimmung: String {
+    case offen, ja, nein
+
+    static let ablage = "zustimmung-fotoanalyse"
+
+    static var gespeichert: Zustimmung {
+        Zustimmung(rawValue: UserDefaults.standard.string(forKey: ablage) ?? "") ?? .offen
+    }
+}
+
 /// Was die ganze App wissen muss: gekoppelt, Demo oder noch nichts.
 @MainActor
 final class AppZustand: ObservableObject {
-    private static let ablage = "verbindung"
+    nonisolated private static let ablage = "verbindung"
 
     @Published private(set) var verbindung: Verbindung?
     @Published var demo = false
     /// Einladung aus einem QR-Code, der mit der Kamera-App gescannt wurde (personal-api://koppeln?...).
     @Published var einladung: Einladung?
+    /// Darf der Server Fotos und Texte zur Schätzung an Claude geben? Vorher geht davon nichts raus.
+    @Published var zustimmung: Zustimmung = Zustimmung.gespeichert {
+        didSet { UserDefaults.standard.set(zustimmung.rawValue, forKey: Zustimmung.ablage) }
+    }
 
     init() {
-        if let daten = UserDefaults.standard.data(forKey: Self.ablage),
-           let alt = try? JSONDecoder().decode(Verbindung.self, from: daten),
-           Schluesselbund.lesen() != nil {
-            verbindung = alt
-        }
+        verbindung = Self.gespeichert()
+    }
+
+    /// Auch ohne Oberfläche lesbar, etwa aus einem Kurzbefehl.
+    nonisolated static func gespeichert() -> Verbindung? {
+        guard let daten = UserDefaults.standard.data(forKey: ablage),
+              let alt = try? JSONDecoder().decode(Verbindung.self, from: daten),
+              Schluesselbund.lesen() != nil else { return nil }
+        return alt
+    }
+
+    nonisolated static func gespeicherteApi() -> Api? {
+        guard let verbindung = gespeichert() else { return nil }
+        return try? Api(adresse: verbindung.adresse, fingerabdruck: verbindung.fingerabdruck,
+                        schluessel: Schluesselbund.lesen())
     }
 
     func gekoppelt(_ neu: Verbindung, schluessel: String) {

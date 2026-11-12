@@ -1,0 +1,20 @@
+{
+ "adresse": "POST /api/essen/favorit",
+ "anfrage": {
+  "pfad": "/api/essen/favorit",
+  "mit_schluessel": true,
+  "json": {
+   "name": "Müsli",
+   "faktor": 0.5,
+   "zeit": "2026-03-15T16:00:00+01:00",
+   "extern_id": "app-4"
+  }
+ },
+ "status": 201,
+ "medientyp": "application/json",
+ "antwort": {
+  "id": 179,
+  "doppelt": false,
+  "name": "Müsli"
+ }
+}

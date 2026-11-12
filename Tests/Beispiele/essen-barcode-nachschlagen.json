@@ -1,0 +1,28 @@
+{
+ "adresse": "GET /api/essen/barcode/{code}",
+ "anfrage": {
+  "pfad": "/api/essen/barcode/4000000000013",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "barcode": "4000000000013",
+  "gefunden": true,
+  "produkt": {
+   "barcode": "4000000000013",
+   "name": "Test-Müsli Beere",
+   "marke": "Testmarke",
+   "packungsgroesse": "500 g",
+   "portion_g": 50.0,
+   "je_100": {
+    "kcal": 380.0,
+    "eiweiss_g": 10.0,
+    "kohlenhydrate_g": 60.0,
+    "fett_g": 8.5
+   },
+   "stueck_g": null,
+   "bezeichnung": "Test-Müsli Beere (Testmarke)"
+  }
+ }
+}

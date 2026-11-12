@@ -1,0 +1,36 @@
+{
+ "adresse": "GET /api/essen/favoriten",
+ "anfrage": {
+  "pfad": "/api/essen/favoriten",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "anzahl": 1,
+  "favoriten": [
+   {
+    "id": 1,
+    "name": "Müsli",
+    "bestandteile": [
+     {
+      "lebensmittel": "Test-Müsli Beere (Testmarke)",
+      "menge": 80.0,
+      "einheit": "g",
+      "kcal": 304.0,
+      "eiweiss_g": 8.0,
+      "kohlenhydrate_g": 48.0,
+      "fett_g": 6.8,
+      "barcode": "4000000000013"
+     }
+    ],
+    "summe": {
+     "kcal": 304.0,
+     "eiweiss_g": 8.0,
+     "kohlenhydrate_g": 48.0,
+     "fett_g": 6.8
+    }
+   }
+  ]
+ }
+}

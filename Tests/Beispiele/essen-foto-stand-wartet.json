@@ -1,0 +1,30 @@
+{
+ "adresse": "GET /api/essen/foto/{auftrag_id}",
+ "anfrage": {
+  "pfad": "/api/essen/foto/1",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "id": 1,
+  "foto_pfad": "2026/03/9ceed8e5d583444bb0bd.jpg",
+  "sha256": "9ceed8e5d583444bb0bd5ca4ba2de249ff58c3212f3eaf1f4a691726b8f4fc04",
+  "medientyp": "image/jpeg",
+  "zeit": "2026-03-15T11:30:00.000000Z",
+  "notiz": "große Portion",
+  "geraet": "iphone",
+  "extern_id": "app-2",
+  "status": "wartet",
+  "versuche": 0,
+  "fehler": null,
+  "nutzung": null,
+  "mahlzeit_id": null,
+  "erstellt_am": "2026-03-15T17:00:00.000000Z",
+  "bearbeitet_am": null,
+  "gramm": 350.0,
+  "gehoert_zu": null,
+  "warten_vor": 0,
+  "mahlzeit": null
+ }
+}

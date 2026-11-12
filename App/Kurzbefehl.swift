@@ -15,8 +15,30 @@ struct TestbildSenden: AppIntent {
     }
 }
 
+/// Für eine Automation „Mit WLAN verbunden“: schickt nach, was unterwegs erfasst wurde.
+struct WarteschlangeSenden: AppIntent {
+    static var title: LocalizedStringResource = "Warteschlange senden"
+    static var description = IntentDescription("Schickt unterwegs erfasstes Essen an deinen Server.")
+    static var openAppWhenRun = false
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        let schlange = Warteschlange.shared
+        let vorher = schlange.eintraege.count
+        await schlange.senden(alle: true)
+        let offen = schlange.eintraege.count
+        if vorher == 0 { return .result(dialog: "Die Warteschlange ist leer.") }
+        if offen == 0 { return .result(dialog: "\(vorher) gesendet.") }
+        return .result(dialog: "\(vorher - offen) gesendet, \(offen) noch offen.")
+    }
+}
+
 struct Kurzbefehle: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
+        AppShortcut(intent: WarteschlangeSenden(),
+                    phrases: ["Warteschlange mit \(.applicationName) senden"],
+                    shortTitle: "Warteschlange senden",
+                    systemImageName: "tray.and.arrow.up")
         AppShortcut(intent: TestbildSenden(),
                     phrases: ["Testbild mit \(.applicationName) senden"],
                     shortTitle: "Testbild senden",

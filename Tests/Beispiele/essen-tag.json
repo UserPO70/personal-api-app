@@ -1,0 +1,284 @@
+{
+ "adresse": "GET /api/essen/tag",
+ "anfrage": {
+  "pfad": "/api/essen/tag?tag=2026-03-15",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "tag": "2026-03-15",
+  "anzahl": 4,
+  "essensfenster": {
+   "erste": "08:00",
+   "letzte": "17:00",
+   "dauer_minuten": 540
+  },
+  "summe": {
+   "kcal": 1549.0,
+   "eiweiss_g": 44.5,
+   "kohlenhydrate_g": 257.0,
+   "fett_g": 29.7
+  },
+  "mahlzeiten": [
+   {
+    "id": 177,
+    "zeit": "2026-03-15T07:00:00.000000Z",
+    "quelle": "barcode",
+    "geraet": "iphone",
+    "notiz": null,
+    "foto_pfad": null,
+    "daten": {
+     "open_food_facts": true,
+     "je_100": {
+      "kcal": 380.0,
+      "eiweiss_g": 10.0,
+      "kohlenhydrate_g": 60.0,
+      "fett_g": 8.5
+     },
+     "portion_g": 50.0,
+     "stueck_g": null,
+     "hinweis": null
+    },
+    "extern_id": "app-1",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "gehoert_zu": null,
+    "art": "Frühstück",
+    "bestandteile": [
+     {
+      "lebensmittel": "Test-Müsli Beere (Testmarke)",
+      "menge": 80.0,
+      "einheit": "g",
+      "kcal": 304.0,
+      "eiweiss_g": 8.0,
+      "kohlenhydrate_g": 48.0,
+      "fett_g": 6.8,
+      "barcode": "4000000000013"
+     }
+    ],
+    "summe": {
+     "kcal": 304.0,
+     "eiweiss_g": 8.0,
+     "kohlenhydrate_g": 48.0,
+     "fett_g": 6.8
+    },
+    "uhrzeit": "08:00",
+    "nach_mitternacht": false,
+    "foto_auftrag_ids": [],
+    "foto_auftrag_id": null,
+    "art_geschaetzt": true,
+    "korrigiert": false,
+    "aenderbar": true
+   },
+   {
+    "id": 178,
+    "zeit": "2026-03-15T11:30:00.000000Z",
+    "quelle": "foto",
+    "geraet": "iphone",
+    "notiz": "große Portion",
+    "foto_pfad": "2026/03/9ceed8e5d583444bb0bd.jpg",
+    "daten": {
+     "auftrag_id": 1,
+     "sicherheit": "mittel",
+     "hinweis": "Portion auf normalem Teller geschätzt",
+     "nutzung": {
+      "dauer_ms": 1000,
+      "notiz": "große Portion",
+      "medientyp": "image/jpeg"
+     },
+     "analyse": {
+      "essen_erkannt": true,
+      "bestandteile": [
+       {
+        "lebensmittel": "Spaghetti",
+        "menge": 250,
+        "einheit": "g",
+        "kcal": 395,
+        "eiweiss_g": 14,
+        "kohlenhydrate_g": 77,
+        "fett_g": 2.3
+       },
+       {
+        "lebensmittel": "Tomatensoße",
+        "menge": 150,
+        "einheit": "ml",
+        "kcal": 90,
+        "eiweiss_g": 2.5,
+        "kohlenhydrate_g": 12,
+        "fett_g": 3.6
+       }
+      ],
+      "sicherheit": "mittel",
+      "hinweis": "Portion auf normalem Teller geschätzt"
+     },
+     "gewogen_g": 350.0
+    },
+    "extern_id": "foto-auftrag-1",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "gehoert_zu": null,
+    "art": "Mittag",
+    "bestandteile": [
+     {
+      "lebensmittel": "Spaghetti",
+      "menge": 250.0,
+      "einheit": "g",
+      "kcal": 395.0,
+      "eiweiss_g": 14.0,
+      "kohlenhydrate_g": 77.0,
+      "fett_g": 2.3,
+      "barcode": null
+     },
+     {
+      "lebensmittel": "Tomatensoße",
+      "menge": 150.0,
+      "einheit": "ml",
+      "kcal": 90.0,
+      "eiweiss_g": 2.5,
+      "kohlenhydrate_g": 12.0,
+      "fett_g": 3.6,
+      "barcode": null
+     }
+    ],
+    "summe": {
+     "kcal": 485.0,
+     "eiweiss_g": 16.5,
+     "kohlenhydrate_g": 89.0,
+     "fett_g": 5.9
+    },
+    "uhrzeit": "12:30",
+    "nach_mitternacht": false,
+    "foto_auftrag_ids": [
+     1
+    ],
+    "foto_auftrag_id": 1,
+    "art_geschaetzt": true,
+    "korrigiert": false,
+    "aenderbar": true
+   },
+   {
+    "id": 179,
+    "zeit": "2026-03-15T15:00:00.000000Z",
+    "quelle": "manuell",
+    "geraet": "iphone",
+    "notiz": null,
+    "foto_pfad": null,
+    "daten": {
+     "favorit": {
+      "id": 1,
+      "name": "Müsli",
+      "faktor": 0.5
+     }
+    },
+    "extern_id": "app-4",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "gehoert_zu": null,
+    "art": "Snack",
+    "bestandteile": [
+     {
+      "lebensmittel": "Test-Müsli Beere (Testmarke)",
+      "menge": 40.0,
+      "einheit": "g",
+      "kcal": 152.0,
+      "eiweiss_g": 4.0,
+      "kohlenhydrate_g": 24.0,
+      "fett_g": 3.4,
+      "barcode": "4000000000013"
+     }
+    ],
+    "summe": {
+     "kcal": 152.0,
+     "eiweiss_g": 4.0,
+     "kohlenhydrate_g": 24.0,
+     "fett_g": 3.4
+    },
+    "uhrzeit": "16:00",
+    "nach_mitternacht": false,
+    "foto_auftrag_ids": [],
+    "foto_auftrag_id": null,
+    "art_geschaetzt": true,
+    "korrigiert": false,
+    "aenderbar": true
+   },
+   {
+    "id": 180,
+    "zeit": "2026-03-15T16:00:00.000000Z",
+    "quelle": "manuell",
+    "geraet": "iphone",
+    "notiz": null,
+    "foto_pfad": null,
+    "daten": {
+     "favorit": {
+      "id": 1,
+      "name": "Müsli",
+      "faktor": 2.0
+     }
+    },
+    "extern_id": "app-5",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "gehoert_zu": null,
+    "art": "Abend",
+    "bestandteile": [
+     {
+      "lebensmittel": "Test-Müsli Beere (Testmarke)",
+      "menge": 160.0,
+      "einheit": "g",
+      "kcal": 608.0,
+      "eiweiss_g": 16.0,
+      "kohlenhydrate_g": 96.0,
+      "fett_g": 13.6,
+      "barcode": "4000000000013"
+     }
+    ],
+    "summe": {
+     "kcal": 608.0,
+     "eiweiss_g": 16.0,
+     "kohlenhydrate_g": 96.0,
+     "fett_g": 13.6
+    },
+    "uhrzeit": "17:00",
+    "nach_mitternacht": false,
+    "foto_auftrag_ids": [],
+    "foto_auftrag_id": null,
+    "art_geschaetzt": true,
+    "korrigiert": false,
+    "aenderbar": true
+   }
+  ],
+  "warteschlange": {
+   "anzahl": {
+    "wartet": 2,
+    "laeuft": 0,
+    "fehler": 0,
+    "kein_essen": 0,
+    "fertig": 1,
+    "geloescht": 0
+   },
+   "auftraege": [
+    {
+     "id": 3,
+     "hat_foto": false,
+     "zeit": "2026-03-15T14:00:00.000000Z",
+     "notiz": "Kaffee mit Milch",
+     "status": "wartet",
+     "versuche": 0,
+     "fehler": null,
+     "erstellt_am": "2026-03-15T17:00:00.000000Z",
+     "bearbeitet_am": null,
+     "automatisch": false
+    },
+    {
+     "id": 2,
+     "hat_foto": true,
+     "zeit": "2026-03-15T12:00:00.000000Z",
+     "notiz": null,
+     "status": "wartet",
+     "versuche": 0,
+     "fehler": "Nur ein Hund",
+     "erstellt_am": "2026-03-15T17:00:00.000000Z",
+     "bearbeitet_am": "2026-03-15T17:00:00.000000Z",
+     "automatisch": false
+    }
+   ]
+  }
+ }
+}

@@ -2,12 +2,30 @@ import SwiftUI
 
 /// Nach der Kopplung (oder in der Demo): Übersicht und Einstellungen.
 struct HauptView: View {
+    @EnvironmentObject private var zustand: AppZustand
+    @Environment(\.scenePhase) private var phase
+    @State private var fragtZustimmung = false
+
     var body: some View {
         TabView {
             UebersichtView()
                 .tabItem { Label("Heute", systemImage: "sun.max") }
+            EssenView()
+                .tabItem { Label("Essen", systemImage: "fork.knife") }
             EinstellungenView()
                 .tabItem { Label("Einstellungen", systemImage: "gearshape") }
+        }
+        // Verlässlichster Zeitpunkt zum Nachsenden: wenn die App geöffnet wird.
+        .onChange(of: phase) { _, neu in
+            if neu == .active {
+                Task { await Warteschlange.shared.senden() }
+            }
+        }
+        .onAppear {
+            if zustand.zustimmung == .offen { fragtZustimmung = true }
+        }
+        .sheet(isPresented: $fragtZustimmung) {
+            ZustimmungView()
         }
     }
 }
@@ -94,6 +112,7 @@ struct UebersichtView: View {
 
 struct EinstellungenView: View {
     @EnvironmentObject private var zustand: AppZustand
+    @ObservedObject private var schlange = Warteschlange.shared
     @State private var abmeldenFragen = false
     @State private var abmeldenLaeuft = false
 
@@ -118,6 +137,16 @@ struct EinstellungenView: View {
                     } footer: {
                         Text("Der Server vergisst diese App. Deine Daten auf dem Server bleiben erhalten.")
                     }
+                }
+                Section {
+                    Toggle("Fotoanalyse mit Claude", isOn: Binding(
+                        get: { zustand.zustimmung == .ja },
+                        set: { zustand.zustimmung = $0 ? .ja : .nein }))
+                    LabeledContent("Warteschlange", value: schlange.eintraege.isEmpty ? "leer" : "\(schlange.eintraege.count) offen")
+                } header: {
+                    Text("Essen")
+                } footer: {
+                    Text("Eingeschaltet schickt dein Server Fotos und Texte zur Schätzung der Nährwerte an Claude von Anthropic, über dein eigenes Claude-Konto. Ausgeschaltet bleiben Barcode und Favoriten.")
                 }
                 Section("Entwicklung") {
                     NavigationLink("Probe") { ProbeView() }

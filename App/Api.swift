@@ -51,6 +51,23 @@ final class Api {
         return daten
     }
 
+    /// Für die Warteschlange: gibt auch Fehlerantworten zurück, damit sie nach dem Status entscheiden kann.
+    func senden(_ anfrage: Anfrage) async throws -> (Int, Data) {
+        var auftrag = URLRequest(url: try Server.url(adresse, anfrage.pfad))
+        auftrag.httpMethod = "POST"
+        auftrag.timeoutInterval = 60
+        if let schluessel {
+            auftrag.setValue("Bearer \(schluessel)", forHTTPHeaderField: "Authorization")
+        }
+        auftrag.setValue(anfrage.typ, forHTTPHeaderField: "Content-Type")
+        let (daten, antwort) = try await session.upload(for: auftrag, from: anfrage.koerper)
+        return ((antwort as? HTTPURLResponse)?.statusCode ?? 0, daten)
+    }
+
+    static func fehlertext(_ daten: Data) -> String {
+        detail(daten)
+    }
+
     func lesen<T: Decodable>(_ typ: T.Type, _ methode: String, _ pfad: String, json: [String: String]? = nil,
                              mit eigener: String? = nil) async throws -> T {
         try JSONDecoder().decode(typ, from: try await daten(methode, pfad, json: json, mit: eigener))

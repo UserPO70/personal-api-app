@@ -1,6 +1,8 @@
 #!/bin/bash
 # Signieren ohne Mac: Xcode holt Zertifikat und Profil selbst über den App-Store-Connect-API-Schlüssel
 # ("cloud-managed" Zertifikat, -allowProvisioningUpdates). Kein Zertifikats-Repository nötig.
+# Archiviert wird unsigniert (eine Entwickler-Signatur bräuchte ein registriertes Gerät),
+# signiert wird erst beim Export für den App Store.
 # Der Schlüssel liegt nur für die Dauer des Laufs in einer Datei und wird danach gelöscht.
 set -euo pipefail
 
@@ -32,7 +34,8 @@ baunummer="${GITHUB_RUN_NUMBER:-1}"
 
 xcodebuild -project PersonalAPI.xcodeproj -scheme PersonalAPI -configuration Release \
   -destination 'generic/platform=iOS' -archivePath build/PersonalAPI.xcarchive \
-  DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Automatic CURRENT_PROJECT_VERSION="$baunummer" \
+  DEVELOPMENT_TEAM="$TEAM_ID" CURRENT_PROJECT_VERSION="$baunummer" \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
   "${anmeldung[@]}" archive | tail -n 60
 test "${PIPESTATUS[0]}" -eq 0
 

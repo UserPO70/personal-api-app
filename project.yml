@@ -29,6 +29,7 @@ targets:
         NSLocalNetworkUsageDescription: Die App spricht mit deinem eigenen Server im Heimnetz.
         NSCameraUsageDescription: Die Kamera fotografiert dein Essen und liest Barcodes sowie den QR-Code zum Koppeln.
         NSHealthShareUsageDescription: Die App liest Schritte, Strecke, Stockwerke, Gehtempo, Schrittlänge und Schlaf und schickt sie an deinen eigenen Server.
+        NSHealthUpdateUsageDescription: Die App schreibt nichts in Apple Health. Apple verlangt diesen Hinweis trotzdem.
         CFBundleURLTypes:
           - CFBundleURLName: io.github.userpo70.personalapi
             CFBundleURLSchemes: [personal-api]

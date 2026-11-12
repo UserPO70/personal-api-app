@@ -32,7 +32,7 @@ Im Heim-WLAN:
 - [ ] Beim ersten Tippen auf **1** fragt iOS nach dem lokalen Netzwerk → Erlauben. Klappt **1**?
 - [ ] **2** (geht nur, wenn am Server HTTPS läuft)
 - [ ] **3**: Wie viele Millisekunden?
-- [ ] **4** tippen und die App sofort verlassen. Nach einer Minute zurück: Steht „angekommen“ im Protokoll?
+- [ ] **4** tippen und die App sofort verlassen. Der Server antwortet absichtlich erst nach 30 Sekunden. Nach einer Minute zurück: Steht „angekommen“ im Protokoll?
 - [ ] **4** tippen und die App im App-Umschalter ganz wegwischen. Kommt der Upload trotzdem an?
 - [ ] Kurzbefehle-App → Automation → „Bei Ankunft“ (Zuhause) oder „WLAN“ → Aktion „Testbild senden“, „Sofort ausführen“. Kommt beim nächsten Heimkommen ein Eintrag?
 

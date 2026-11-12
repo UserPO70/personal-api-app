@@ -17,10 +17,12 @@ final class Hintergrund: NSObject, URLSessionDataDelegate {
     }()
 
     /// Hintergrund-Uploads gehen nur aus einer Datei.
-    func starten(adresse: String, bild: Data) throws {
+    /// `warten`: Der Server hält die Antwort so viele Sekunden zurück (zum Testen von App-Wegwischen).
+    func starten(adresse: String, bild: Data, warten: Int = 0) throws {
         let datei = FileManager.default.temporaryDirectory.appendingPathComponent("probe-\(UUID().uuidString).jpg")
         try bild.write(to: datei)
-        var anfrage = URLRequest(url: try Server.url(adresse, "/api/app/probe"))
+        let pfad = warten > 0 ? "/api/app/probe?warten=\(warten)" : "/api/app/probe"
+        var anfrage = URLRequest(url: try Server.url(adresse, pfad))
         anfrage.httpMethod = "POST"
         anfrage.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
         let aufgabe = session.uploadTask(with: anfrage, fromFile: datei)

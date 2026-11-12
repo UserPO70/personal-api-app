@@ -103,8 +103,9 @@ struct ProbeView: View {
 
     private func hintergrund() async {
         do {
-            try Hintergrund.shared.starten(adresse: adresse, bild: Server.testbild())
-            protokoll.neu("Hintergrund-Upload gestartet. Jetzt die App verlassen, das Ergebnis erscheint hier.", ok: true)
+            try Hintergrund.shared.starten(adresse: adresse, bild: Server.testbild(), warten: 30)
+            protokoll.neu("Hintergrund-Upload gestartet, der Server antwortet erst nach 30 s. Jetzt die App verlassen "
+                          + "oder wegwischen, das Ergebnis erscheint hier.", ok: true)
         } catch {
             protokoll.neu("Hintergrund-Upload: \(Server.beschreibung(error))", ok: false)
         }

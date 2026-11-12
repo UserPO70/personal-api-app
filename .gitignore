@@ -1,0 +1,7 @@
+# erzeugt von XcodeGen bzw. beim Bauen
+*.xcodeproj/
+App/Info.plist
+build/
+DerivedData/
+.DS_Store
+*.p8

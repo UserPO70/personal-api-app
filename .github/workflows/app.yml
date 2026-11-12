@@ -1,0 +1,44 @@
+name: App
+
+# Jeder Push: im Simulator bauen (ohne Geheimnisse).
+# Tag beta-*: zusätzlich signieren und zu TestFlight hochladen. Geheimnisse nur hier, nie bei Pull Requests.
+on:
+  push:
+    branches: [main]
+    tags: ["beta-*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bauen:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Werkzeuge
+        run: |
+          brew install xcodegen
+          xcodebuild -version
+
+      - name: Projekt erzeugen
+        run: xcodegen generate
+
+      - name: Im Simulator bauen
+        run: |
+          xcodebuild -project PersonalAPI.xcodeproj -scheme PersonalAPI \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build | tail -n 40
+          exit ${PIPESTATUS[0]}
+
+      - name: Signieren und zu TestFlight hochladen
+        if: startsWith(github.ref, 'refs/tags/beta-')
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: ci/testflight.sh

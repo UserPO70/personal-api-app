@@ -11,6 +11,11 @@ for name in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8 TEAM_ID; do
   fi
 done
 
+# Beim Kopieren am iPhone rutschen leicht Leerzeichen oder Zeilenumbrüche mit hinein.
+ASC_KEY_ID="$(printf '%s' "$ASC_KEY_ID" | tr -d '[:space:]')"
+ASC_ISSUER_ID="$(printf '%s' "$ASC_ISSUER_ID" | tr -d '[:space:]')"
+TEAM_ID="$(printf '%s' "$TEAM_ID" | tr -d '[:space:]')"
+
 ordner="$RUNNER_TEMP/asc"
 mkdir -p "$ordner"
 schluessel="$ordner/AuthKey_$ASC_KEY_ID.p8"

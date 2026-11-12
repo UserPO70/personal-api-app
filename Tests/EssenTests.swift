@@ -62,6 +62,33 @@ final class EssenTests: XCTestCase {
         XCTAssertEqual(favoriten.first?.summe?.kcal, 304)
     }
 
+    func testEinheitenJeProdukt() throws {
+        // Das Beispielprodukt nennt eine Portion (50 g), aber kein Stückgewicht.
+        var produkt = try XCTUnwrap(beispiel("essen-barcode-nachschlagen", BarcodeAuskunft.self).antwort.produkt)
+        XCTAssertEqual(produkt.einheiten, ["g", "ml", "Portion", "Stück"])
+        XCTAssertEqual(produkt.kcal(menge: nil, einheit: nil), 190)       // Standard: eine Portion
+        XCTAssertEqual(produkt.kcal(menge: 80, einheit: "g"), 304)        // wie in essen-barcode.json
+        XCTAssertEqual(produkt.kcal(menge: 2, einheit: "Portion"), 380)
+        XCTAssertEqual(produkt.kcal(menge: 3, einheit: "Stück"), 570)     // Stück zählt wie eine Portion
+        XCTAssertNil(produkt.kcal(menge: nil, einheit: "g"))
+
+        produkt.stueck = 12
+        XCTAssertEqual(produkt.kcal(menge: 10, einheit: "Stück"), 456)
+
+        produkt.stueck = nil
+        produkt.portion = nil
+        XCTAssertEqual(produkt.einheiten, ["g", "ml"])
+        XCTAssertEqual(produkt.kcal(menge: nil, einheit: nil), 380)       // Standard: 100 g
+        XCTAssertNil(produkt.kcal(menge: 1, einheit: "Portion"))
+    }
+
+    func testBarcodeMitNotiz() throws {
+        var scan = eintrag(.barcode)
+        scan.barcode = "40000013"
+        scan.notiz = "zum Abendbrot"
+        XCTAssertEqual(try json(scan.anfrage(bild: nil))["notiz"] as? String, "zum Abendbrot")
+    }
+
     // MARK: Anfragen bauen
 
     func testBarcodeAnfrage() throws {

@@ -168,6 +168,7 @@ struct BarcodeBlatt: View {
     @State private var suchhinweis: String?
     @State private var einheit = "Standard"
     @State private var menge = ""
+    @State private var notiz = ""
     @State private var zurLetzten = false
     @State private var fehler: String?
 
@@ -225,16 +226,24 @@ struct BarcodeBlatt: View {
                 }
                 Section {
                     Picker("Einheit", selection: $einheit) {
-                        ForEach(Self.einheiten, id: \.self) { Text($0) }
+                        ForEach(waehlbar, id: \.self) { Text($0) }
                     }
                     if einheit != "Standard" {
                         TextField("Menge", text: $menge)
                             .keyboardType(.decimalPad)
                     }
+                    if let produkt = auskunft?.produkt {
+                        LabeledContent("Ergibt", value: vorschau(produkt))
+                    }
                 } header: {
                     Text("Menge")
                 } footer: {
-                    Text("Standard: eine Portion laut Packung, sonst 100 g.")
+                    Text(mengenhinweis)
+                }
+                Section {
+                    TextField("Notiz, z. B. zum Abendbrot", text: $notiz)
+                } footer: {
+                    Text("Wird nur dazugeschrieben und ändert die Nährwerte nicht.")
                 }
                 LetzteSchalter(an: $zurLetzten)
                 Fehlerzeile(text: fehler)
@@ -253,6 +262,37 @@ struct BarcodeBlatt: View {
         }
     }
 
+    /// Nur Einheiten, mit denen der Server für dieses Produkt rechnen kann. Ohne Auskunft alle.
+    private var waehlbar: [String] {
+        guard let produkt = auskunft?.produkt else { return Self.einheiten }
+        return ["Standard"] + produkt.einheiten
+    }
+
+    private var mengenhinweis: String {
+        guard let auskunft else {
+            return "Standard: eine Portion laut Packung, sonst 100 g. Ob Portion und Stück für dieses Produkt gehen, zeigt sich erst beim Nachschlagen."
+        }
+        guard let produkt = auskunft.produkt else {
+            return "Für ein unbekanntes Produkt gibt es keine Nährwerte, egal mit welcher Einheit."
+        }
+        var teile = ["Standard: \(produkt.portion == nil ? "100 g" : "eine Portion (\(Zahl.text(produkt.standardGramm)) g)")."]
+        let fehlt = ["Portion", "Stück"].filter { produkt.groesse($0) == nil }
+        if !fehlt.isEmpty {
+            teile.append("\(fehlt.joined(separator: " und ")) fehlt, weil die Packung dafür keine Größe nennt.")
+        } else if produkt.stueck == nil {
+            teile.append("Ein Stück zählt wie eine Portion, weil die Packung kein Stückgewicht nennt.")
+        }
+        return teile.joined(separator: " ")
+    }
+
+    private func vorschau(_ produkt: BarcodeAuskunft.Produkt) -> String {
+        let gewaehlt = einheit == "Standard" ? nil : einheit
+        guard let kcal = produkt.kcal(menge: Zahl.lesen(menge), einheit: gewaehlt) else {
+            return gewaehlt == nil ? "keine Nährwerte bekannt" : "–"
+        }
+        return Zahl.kcal(kcal)
+    }
+
     /// Wie am Server: 8, 12, 13 oder 14 Ziffern.
     static func gueltig(_ code: String) -> Bool {
         let sauber = code.trimmingCharacters(in: .whitespaces)
@@ -268,8 +308,13 @@ struct BarcodeBlatt: View {
         sucht = true
         defer { sucht = false }
         do {
-            auskunft = try await zustand.api().lesen(BarcodeAuskunft.self, "GET", "/api/essen/barcode/\(gesucht)")
+            let neu = try await zustand.api().lesen(BarcodeAuskunft.self, "GET", "/api/essen/barcode/\(gesucht)")
+            auskunft = neu
             suchhinweis = nil
+            // Eine Einheit, die es für dieses Produkt nicht gibt, bleibt nicht gewählt.
+            if let produkt = neu.produkt, einheit != "Standard", !produkt.einheiten.contains(einheit) {
+                einheit = "Standard"
+            }
         } catch {
             auskunft = nil
             suchhinweis = "Der Server ist gerade nicht erreichbar. Das Produkt wird beim Senden nachgeschlagen."
@@ -287,8 +332,9 @@ struct BarcodeBlatt: View {
             anzahl = wert
         }
         let name = auskunft?.produkt?.bezeichnung ?? auskunft?.produkt?.name ?? "Barcode \(sauber)"
+        let bemerkung = notiz.trimmingCharacters(in: .whitespacesAndNewlines)
         let eintrag = Eintrag(id: Eintrag.neueKennung(), art: .barcode, zeit: Date(), titel: name,
-                              barcode: sauber, menge: anzahl, einheit: einheit == "Standard" ? nil : einheit)
+                              notiz: bemerkung.isEmpty ? nil : bemerkung, barcode: sauber, menge: anzahl, einheit: einheit == "Standard" ? nil : einheit)
         do {
             try einreihen(eintrag, zurLetzten: zurLetzten)
             schliessen()

@@ -89,6 +89,35 @@ struct BarcodeAuskunft: Codable, Equatable {
     var produkt: Produkt?
 }
 
+extension BarcodeAuskunft.Produkt {
+    /// Gramm bzw. Milliliter je Einheit, wie der Server rechnet: Stück ohne eigenes Gewicht zählt wie eine Portion.
+    /// `nil`: Für diese Einheit nennt die Packung keine Größe, der Server könnte keine Nährwerte berechnen.
+    func groesse(_ einheit: String) -> Double? {
+        switch einheit {
+        case "g", "ml": return 1
+        case "Portion": return portion
+        case "Stück": return stueck ?? portion
+        default: return nil
+        }
+    }
+
+    /// Einheiten, mit denen der Server Nährwerte berechnen kann.
+    var einheiten: [String] {
+        ["g", "ml", "Portion", "Stück"].filter { groesse($0) != nil }
+    }
+
+    /// Was „Standard“ für dieses Produkt heißt: eine Portion laut Packung, sonst 100 g.
+    var standardGramm: Double { portion ?? 100 }
+
+    /// Kalorien für die gewählte Menge; `einheit` nil heißt Standard.
+    func kcal(menge: Double?, einheit: String?) -> Double? {
+        guard let je100 = je100?.kcal else { return nil }
+        guard let einheit else { return je100 * standardGramm / 100 }
+        guard let menge, let groesse = groesse(einheit) else { return nil }
+        return je100 * menge * groesse / 100
+    }
+}
+
 /// GET /api/essen/favoriten
 struct Favoritenliste: Codable, Equatable {
     struct Favorit: Codable, Equatable, Identifiable {

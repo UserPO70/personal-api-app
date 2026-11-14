@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Warteschlange, laufende Schätzungen und die Mahlzeiten des Essenstags. Erfasst wird auf dem Heute-Bildschirm.
+/// Erfassen per Barcode, Text, Favorit und Mediathek, die Warteschlange und die Mahlzeiten des Essenstags. Der Foto-Knopf steht auf „Heute“.
 struct EssenView: View {
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
@@ -15,6 +15,11 @@ struct EssenView: View {
                         Label("Demo: ausgedachte Daten, kein Server", systemImage: "theatermasks")
                             .foregroundStyle(.secondary)
                     }
+                }
+                Section {
+                    Erfassen(umfang: .uebrige)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
                 }
                 if let meldung = schlange.meldung {
                     Section {

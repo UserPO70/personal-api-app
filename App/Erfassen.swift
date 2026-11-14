@@ -1,7 +1,7 @@
 import PhotosUI
 import SwiftUI
 
-/// Die Knöpfe zum Erfassen von Essen: Foto vorn, daneben Barcode, Text, Favorit und die Mediathek.
+/// Die Knöpfe zum Erfassen von Essen: der Foto-Knopf für „Heute“, Barcode, Text, Favorit und Mediathek für „Essen“.
 /// Bringt Kamera, Eingabeblätter und die Frage nach der Zustimmung selbst mit und lässt sich deshalb
 /// auf jedem Bildschirm einsetzen.
 struct Erfassen: View {
@@ -25,6 +25,16 @@ struct Erfassen: View {
         }
     }
 
+    /// Was dieser Einsatz zeigt. Jeder Knopf steht nur an einer Stelle der App.
+    enum Umfang {
+        /// Nur der Foto-Knopf, breit: unten auf „Heute“, in Daumenreichweite.
+        case foto
+        /// Barcode, Text, Favorit und Mediathek: oben im Tab „Essen“.
+        case uebrige
+    }
+
+    let umfang: Umfang
+
     @EnvironmentObject private var zustand: AppZustand
     @State private var blatt: Blatt?
     @State private var kamera = false
@@ -34,38 +44,36 @@ struct Erfassen: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Button {
-                if claudeErlaubt() {
-                    if Kamera.vorhanden {
-                        kamera = true
-                    } else {
-                        hinweis = "Dieses Gerät hat keine Kamera. Nimm ein Foto aus der Mediathek."
+            if umfang == .foto {
+                Button {
+                    if claudeErlaubt() {
+                        if Kamera.vorhanden {
+                            kamera = true
+                        } else {
+                            hinweis = "Dieses Gerät hat keine Kamera. Nimm im Tab Essen ein Foto aus der Mediathek."
+                        }
                     }
+                } label: {
+                    Label("Essen fotografieren", systemImage: "camera.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, minHeight: 36)
                 }
-            } label: {
-                VStack(spacing: 4) {
-                    Image(systemName: "camera.fill")
-                        .font(.title2)
-                    Text("Foto")
-                        .font(.subheadline.weight(.semibold))
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+            } else {
+                knopf("Barcode", "barcode.viewfinder") { blatt = .barcode }
+                knopf("Text", "text.cursor") {
+                    if claudeErlaubt() { blatt = .text }
                 }
-                .frame(maxWidth: .infinity, minHeight: 52)
-            }
-            .buttonStyle(.borderedProminent)
-            .accessibilityLabel("Essen fotografieren")
+                knopf("Favorit", "star") { blatt = .favoriten }
 
-            knopf("Barcode", "barcode.viewfinder") { blatt = .barcode }
-            knopf("Text", "text.cursor") {
-                if claudeErlaubt() { blatt = .text }
-            }
-            knopf("Favorit", "star") { blatt = .favoriten }
-
-            if zustand.zustimmung == .ja {
-                PhotosPicker(selection: $auswahl, matching: .images) {
-                    beschriftung("Mediathek", "photo.on.rectangle")
+                if zustand.zustimmung == .ja {
+                    PhotosPicker(selection: $auswahl, matching: .images) {
+                        beschriftung("Mediathek", "photo.on.rectangle")
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityLabel("Foto aus der Mediathek")
                 }
-                .buttonStyle(.bordered)
-                .accessibilityLabel("Foto aus der Mediathek")
             }
         }
         .disabled(zustand.demo)

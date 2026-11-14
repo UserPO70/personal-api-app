@@ -198,7 +198,7 @@ struct HeuteView: View {
             .background(Color(uiColor: .systemGroupedBackground))
             // Erfassen sitzt unten direkt über der Tab-Leiste, damit der Daumen den Foto-Knopf mit einer Hand erreicht.
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Erfassen()
+                Erfassen(umfang: .foto)
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
                     .padding(.bottom, 10)

@@ -5,15 +5,25 @@ struct HauptView: View {
     @EnvironmentObject private var zustand: AppZustand
     @Environment(\.scenePhase) private var phase
     @State private var fragtZustimmung = false
+    @State private var tab = 0
 
     var body: some View {
-        TabView {
+        TabView(selection: $tab) {
             HeuteView()
                 .tabItem { Label("Heute", systemImage: "sun.max") }
+                .tag(0)
             EssenView()
                 .tabItem { Label("Essen", systemImage: "fork.knife") }
+                .tag(1)
             EinstellungenView()
                 .tabItem { Label("Einstellungen", systemImage: "gearshape") }
+                .tag(2)
+        }
+        // Wischen nach links und rechts wechselt den Tab (auf dem obersten Bildschirm jedes Tabs).
+        .environment(\.tabWechsel) { richtung in
+            withAnimation {
+                tab = Wischen.ziel(aktuell: tab, richtung: richtung, anzahl: 3)
+            }
         }
         // Verlässlichster Zeitpunkt zum Nachsenden: wenn die App geöffnet wird.
         .onChange(of: phase) { _, neu in
@@ -182,6 +192,7 @@ struct EinstellungenView: View {
                 }
             }
             .navigationTitle("Einstellungen")
+            .wischtZwischenTabs()
             .confirmationDialog("Diese App vom Server abmelden?", isPresented: $abmeldenFragen, titleVisibility: .visible) {
                 Button("Abmelden", role: .destructive) { abmelden() }
             }

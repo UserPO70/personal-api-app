@@ -36,6 +36,7 @@ struct EssenView: View {
                 essenstag
             }
             .navigationTitle("Essen")
+            .wischtZwischenTabs()
             .refreshable {
                 await schlange.senden(alle: true)
                 await schlange.analysenPruefen()
@@ -67,15 +68,22 @@ struct EssenView: View {
                             .font(.footnote)
                             .foregroundStyle(Color.secondary)
                     }
-                }
-                .swipeActions(edge: .trailing) {
-                    Button("Löschen", role: .destructive) { schlange.loeschen(eintrag.id) }
-                    if eintrag.stand == .fehlgeschlagen {
-                        Button("Erneut") {
-                            schlange.erneut(eintrag.id)
-                            Task { await schlange.senden(alle: true) }
+                    Spacer(minLength: 0)
+                    // Ein sichtbares Menü statt Wischen: Wischen wechselt zwischen den Tabs.
+                    Menu {
+                        if eintrag.stand == .fehlgeschlagen {
+                            Button("Erneut senden", systemImage: "arrow.clockwise") {
+                                schlange.erneut(eintrag.id)
+                                Task { await schlange.senden(alle: true) }
+                            }
                         }
+                        Button("Löschen", systemImage: "trash", role: .destructive) { schlange.loeschen(eintrag.id) }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.title3)
+                            .foregroundStyle(Color.secondary)
                     }
+                    .accessibilityLabel("Aktionen für \(eintrag.titel)")
                 }
             }
             Button(schlange.sendet ? "Sendet …" : "Jetzt senden") {
@@ -85,7 +93,7 @@ struct EssenView: View {
         } header: {
             Text("Warteschlange")
         } footer: {
-            Text("Wird gesendet, sobald dein Server erreichbar ist. Zum Löschen nach links wischen.")
+            Text("Wird gesendet, sobald dein Server erreichbar ist.")
         }
     }
 
@@ -119,9 +127,18 @@ struct EssenView: View {
                             .font(.footnote)
                             .foregroundStyle(Color.secondary)
                     }
-                }
-                .swipeActions(edge: .trailing) {
-                    Button("Ausblenden") { schlange.analyseAusblenden(analyse.auftrag) }
+                    Spacer(minLength: 0)
+                    if !analyse.laeuft {
+                        Button {
+                            schlange.analyseAusblenden(analyse.auftrag)
+                        } label: {
+                            Image(systemName: "xmark.circle")
+                                .font(.title3)
+                                .foregroundStyle(Color.secondary)
+                        }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel("Ausblenden")
+                    }
                 }
             }
         } header: {

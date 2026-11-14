@@ -5,26 +5,30 @@ struct HauptView: View {
     @EnvironmentObject private var zustand: AppZustand
     @Environment(\.scenePhase) private var phase
     @State private var fragtZustimmung = false
-    @State private var tab = 0
+    @State private var tab = Reiter.heute
+    @StateObject private var lage = Seitenlage()
 
     var body: some View {
+        // Seiten nebeneinander: Beim Wischen gleitet der Nachbar-Tab mit dem Finger herein.
         TabView(selection: $tab) {
             HeuteView()
-                .tabItem { Label("Heute", systemImage: "sun.max") }
-                .tag(0)
+                .tag(Reiter.heute)
             EssenView()
-                .tabItem { Label("Essen", systemImage: "fork.knife") }
-                .tag(1)
+                .tag(Reiter.essen)
             EinstellungenView()
-                .tabItem { Label("Einstellungen", systemImage: "gearshape") }
-                .tag(2)
+                .tag(Reiter.einstellungen)
         }
-        // Wischen nach links und rechts wechselt den Tab (auf dem obersten Bildschirm jedes Tabs).
-        .environment(\.tabWechsel) { richtung in
-            withAnimation {
-                tab = Wischen.ziel(aktuell: tab, richtung: richtung, anzahl: 3)
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        // Auf einer Unterseite nicht zwischen den Tabs wischen: Dort heißt Wischen vom Rand „zurück“.
+        .scrollDisabled(lage.aufUnterseite)
+        .background(Color(uiColor: .systemGroupedBackground))
+        .ignoresSafeArea(.keyboard)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if !lage.aufUnterseite {
+                Tableiste(tab: $tab)
             }
         }
+        .environmentObject(lage)
         // Verlässlichster Zeitpunkt zum Nachsenden: wenn die App geöffnet wird.
         .onChange(of: phase) { _, neu in
             if neu == .active {
@@ -185,14 +189,13 @@ struct EinstellungenView: View {
                     }
                 }
                 Section("Entwicklung") {
-                    NavigationLink("Probe") { ProbeView() }
+                    NavigationLink("Probe") { ProbeView().alsUnterseite() }
                 }
                 Section {
                     LabeledContent("App-Version", value: version)
                 }
             }
             .navigationTitle("Einstellungen")
-            .wischtZwischenTabs()
             .confirmationDialog("Diese App vom Server abmelden?", isPresented: $abmeldenFragen, titleVisibility: .visible) {
                 Button("Abmelden", role: .destructive) { abmelden() }
             }

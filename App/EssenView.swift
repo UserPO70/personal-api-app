@@ -36,7 +36,6 @@ struct EssenView: View {
                 essenstag
             }
             .navigationTitle("Essen")
-            .wischtZwischenTabs()
             .refreshable {
                 await schlange.senden(alle: true)
                 await schlange.analysenPruefen()
@@ -174,6 +173,7 @@ struct EssenView: View {
                 ForEach(tag.mahlzeiten) { mahlzeit in
                     NavigationLink {
                         MahlzeitView(mahlzeit: mahlzeit)
+                            .alsUnterseite()
                     } label: {
                     HStack(alignment: .top, spacing: 12) {
                         Text(mahlzeit.uhrzeit ?? "")

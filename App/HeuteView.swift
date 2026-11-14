@@ -169,6 +169,7 @@ struct HeuteView: View {
                             if !zustand.demo {
                                 NavigationLink {
                                     KalorienView()
+                                        .alsUnterseite()
                                 } label: {
                                     Kachel(name: "Gewicht und Ziel",
                                            wert: tag.koerper?.gewicht.map { Gewichtstext.kg($0.kg) } ?? "eintragen",
@@ -196,7 +197,6 @@ struct HeuteView: View {
                 .padding(.vertical, 12)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .wischtZwischenTabs()
             // Erfassen sitzt unten direkt über der Tab-Leiste, damit der Daumen den Foto-Knopf mit einer Hand erreicht.
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 Erfassen(umfang: .foto)

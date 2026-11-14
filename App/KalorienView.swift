@@ -29,6 +29,7 @@ struct KalorienView: View {
                 Section {
                     NavigationLink {
                         GewichtView()
+                            .alsUnterseite()
                     } label: {
                         LabeledContent("Gewicht", value: stand?.rechnung?.gewicht.map(Gewichtstext.kg) ?? "eintragen")
                     }

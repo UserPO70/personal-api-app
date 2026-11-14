@@ -33,6 +33,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         // Auch wenn iOS die App im Hintergrund weckt, weil Health neue Werte hat.
         Gesundheit.shared.starten()
+        // Auch wenn iOS die App wegen eines Ortswechsels im Hintergrund weckt.
+        Standort.shared.starten()
         return true
     }
 

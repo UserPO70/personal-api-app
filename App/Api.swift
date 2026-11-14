@@ -52,10 +52,10 @@ final class Api {
     }
 
     /// Für die Warteschlange: gibt auch Fehlerantworten zurück, damit sie nach dem Status entscheiden kann.
-    func senden(_ anfrage: Anfrage) async throws -> (Int, Data) {
+    func senden(_ anfrage: Anfrage, zeitlimit: TimeInterval = 60) async throws -> (Int, Data) {
         var auftrag = URLRequest(url: try Server.url(adresse, anfrage.pfad))
         auftrag.httpMethod = "POST"
-        auftrag.timeoutInterval = 60
+        auftrag.timeoutInterval = zeitlimit
         if let schluessel {
             auftrag.setValue("Bearer \(schluessel)", forHTTPHeaderField: "Authorization")
         }

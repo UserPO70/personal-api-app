@@ -21,6 +21,7 @@ struct HauptView: View {
                 Task {
                     await Warteschlange.shared.senden()
                     await Gesundheit.shared.senden()
+                    await Standort.shared.senden(sofort: true)
                 }
             }
         }
@@ -135,6 +136,7 @@ struct EinstellungenView: View {
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
     @ObservedObject private var gesundheit = Gesundheit.shared
+    @ObservedObject private var standort = Standort.shared
     @State private var abmeldenFragen = false
     @State private var abmeldenLaeuft = false
 
@@ -206,6 +208,47 @@ struct EinstellungenView: View {
                         Text("Schritte, Strecke, Stockwerke, Gehtempo, Schrittlänge und Schlaf gehen an deinen eigenen Server, nie an Claude. Das ersetzt den Health-Kurzbefehl: Schalte dessen Automation aus, sonst können Stunden doppelt zählen.")
                     }
                 }
+                if !zustand.demo && zustand.verbindung != nil {
+                    Section {
+                        Toggle("Standort aufzeichnen", isOn: Binding(
+                            get: { standort.an },
+                            set: { an in
+                                if an {
+                                    standort.einschalten()
+                                } else {
+                                    standort.ausschalten()
+                                }
+                            }))
+                        if standort.an {
+                            LabeledContent("Erlaubnis", value: erlaubnisText)
+                            Toggle("Fahrt aufzeichnen", isOn: Binding(
+                                get: { standort.fahrtSeit != nil },
+                                set: { an in
+                                    if an {
+                                        standort.fahrtStarten()
+                                    } else {
+                                        standort.fahrtBeenden()
+                                    }
+                                }))
+                            if let seit = standort.fahrtSeit {
+                                LabeledContent("Fahrt läuft seit", value: seit.formatted(date: .omitted, time: .shortened))
+                            }
+                            LabeledContent("Noch nicht gesendet", value: standort.wartend == 0 ? "nichts" : "\(standort.wartend) Punkte")
+                            if let zuletzt = standort.zuletztGesendet {
+                                LabeledContent("Zuletzt gesendet", value: zuletzt.formatted(date: .abbreviated, time: .shortened))
+                            }
+                            if let fehler = standort.fehler {
+                                Label(fehler, systemImage: "exclamationmark.triangle")
+                                    .font(.footnote)
+                                    .foregroundStyle(Color.orange)
+                            }
+                        }
+                    } header: {
+                        Text("Standort")
+                    } footer: {
+                        Text("Im Alltag meldet iOS größere Ortswechsel und Aufenthalte, das kostet kaum Akku. Während einer Fahrt zeichnet die App genau auf; sie endet von selbst nach 10 Minuten Stillstand. Automatisch geht es mit zwei Automationen in der Kurzbefehle-App: Bluetooth des Autos verbunden → „Fahrt aufzeichnen“, getrennt → „Fahrt beenden“. Die Punkte gehen an deinen eigenen Server, nie an Claude. Das ersetzt OwnTracks: Schalte es dort aus, sonst läuft beides doppelt.")
+                    }
+                }
                 Section("Entwicklung") {
                     NavigationLink("Probe") { ProbeView() }
                 }
@@ -217,6 +260,15 @@ struct EinstellungenView: View {
             .confirmationDialog("Diese App vom Server abmelden?", isPresented: $abmeldenFragen, titleVisibility: .visible) {
                 Button("Abmelden", role: .destructive) { abmelden() }
             }
+        }
+    }
+
+    private var erlaubnisText: String {
+        switch standort.erlaubnis {
+        case .immer: return "immer"
+        case .nurBeimVerwenden: return "nur bei offener App"
+        case .abgelehnt: return "abgelehnt"
+        case .offen: return "noch nicht gefragt"
         }
     }
 

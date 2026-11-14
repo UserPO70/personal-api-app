@@ -33,8 +33,46 @@ struct WarteschlangeSenden: AppIntent {
     }
 }
 
+/// Für eine Automation „Bluetooth: mit dem Auto verbunden“.
+struct FahrtAufzeichnen: AppIntent {
+    static var title: LocalizedStringResource = "Fahrt aufzeichnen"
+    static var description = IntentDescription("Zeichnet den Standort genau auf, bis die Fahrt endet.")
+    static var openAppWhenRun = false
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        let standort = Standort.shared
+        guard standort.an else {
+            return .result(dialog: "Die Standortaufzeichnung ist in der App ausgeschaltet.")
+        }
+        standort.fahrtStarten()
+        return .result(dialog: "Die Fahrt wird aufgezeichnet.")
+    }
+}
+
+/// Für eine Automation „Bluetooth: vom Auto getrennt“.
+struct FahrtBeenden: AppIntent {
+    static var title: LocalizedStringResource = "Fahrt beenden"
+    static var description = IntentDescription("Beendet die genaue Aufzeichnung und schickt die Punkte an deinen Server.")
+    static var openAppWhenRun = false
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        Standort.shared.fahrtBeenden()
+        return .result(dialog: "Die Fahrt ist beendet.")
+    }
+}
+
 struct Kurzbefehle: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
+        AppShortcut(intent: FahrtAufzeichnen(),
+                    phrases: ["Fahrt mit \(.applicationName) aufzeichnen"],
+                    shortTitle: "Fahrt aufzeichnen",
+                    systemImageName: "car")
+        AppShortcut(intent: FahrtBeenden(),
+                    phrases: ["Fahrt mit \(.applicationName) beenden"],
+                    shortTitle: "Fahrt beenden",
+                    systemImageName: "car.fill")
         AppShortcut(intent: WarteschlangeSenden(),
                     phrases: ["Warteschlange mit \(.applicationName) senden"],
                     shortTitle: "Warteschlange senden",

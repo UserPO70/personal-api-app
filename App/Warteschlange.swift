@@ -223,6 +223,7 @@ final class Warteschlange: ObservableObject {
                 // Kurz warten, bis das neue Netz eine Adresse hat.
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 await self?.senden(alle: true)
+                await Standort.shared.senden(sofort: true)
             }
         }
         netz.start(queue: DispatchQueue(label: "io.github.userpo70.personalapi.netz"))

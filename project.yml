@@ -7,7 +7,7 @@ options:
   developmentLanguage: de
 settings:
   base:
-    MARKETING_VERSION: "0.5.0"
+    MARKETING_VERSION: "0.6.0"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
 targets:
@@ -31,6 +31,9 @@ targets:
           NSAllowsLocalNetworking: true
         NSLocalNetworkUsageDescription: Die App spricht mit deinem eigenen Server im Heimnetz.
         NSCameraUsageDescription: Die Kamera fotografiert dein Essen und liest Barcodes sowie den QR-Code zum Koppeln.
+        NSLocationWhenInUseUsageDescription: Die App zeichnet deinen Standort auf und schickt ihn an deinen eigenen Server, damit du Orte und Fahrten siehst.
+        NSLocationAlwaysAndWhenInUseUsageDescription: Damit Wege und Fahrten auch aufgezeichnet werden, wenn die App nicht offen ist. Die Daten gehen nur an deinen eigenen Server.
+        UIBackgroundModes: [location]
         NSHealthShareUsageDescription: Die App liest Schritte, Strecke, Stockwerke, Gehtempo, Schrittlänge und Schlaf und schickt sie an deinen eigenen Server.
         NSHealthUpdateUsageDescription: Die App schreibt nichts in Apple Health. Apple verlangt diesen Hinweis trotzdem.
         CFBundleURLTypes:

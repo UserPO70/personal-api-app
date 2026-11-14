@@ -123,7 +123,7 @@ extension Color {
     })
 }
 
-/// Der Hauptbildschirm: oben Essen erfassen, darunter der Tag auf einen Blick, möglichst ohne Scrollen.
+/// Der Hauptbildschirm: der Tag auf einen Blick, möglichst ohne Scrollen, und unten in Daumenreichweite Essen erfassen.
 struct HeuteView: View {
     /// Ein Wert des Tages für eine Kachel.
     private struct Wert: Identifiable {
@@ -152,7 +152,6 @@ struct HeuteView: View {
                             .font(.footnote)
                             .foregroundStyle(Color.secondary)
                     }
-                    Erfassen()
                     if !schlange.eintraege.isEmpty || schlange.analysen.contains(where: \.laeuft) {
                         Label(Dauertext.wartend(eintraege: schlange.eintraege.count,
                                                 analysen: schlange.analysen.filter(\.laeuft).count),
@@ -197,6 +196,14 @@ struct HeuteView: View {
                 .padding(.vertical, 12)
             }
             .background(Color(uiColor: .systemGroupedBackground))
+            // Erfassen sitzt unten direkt über der Tab-Leiste, damit der Daumen den Foto-Knopf mit einer Hand erreicht.
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                Erfassen()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    .padding(.bottom, 10)
+                    .background(Color(uiColor: .systemGroupedBackground))
+            }
             .navigationTitle("Heute")
             .navigationBarTitleDisplayMode(.inline)
             .refreshable {

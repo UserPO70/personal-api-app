@@ -221,6 +221,12 @@ struct EinstellungenView: View {
                             }))
                         if standort.an {
                             LabeledContent("Erlaubnis", value: erlaubnisText)
+                            Toggle("Fahrten selbst erkennen", isOn: $standort.automatisch)
+                            if standort.probeSeit != nil {
+                                Text("Prüft gerade, ob du losfährst …")
+                                    .font(.footnote)
+                                    .foregroundStyle(Color.secondary)
+                            }
                             Toggle("Fahrt aufzeichnen", isOn: Binding(
                                 get: { standort.fahrtSeit != nil },
                                 set: { an in
@@ -246,7 +252,7 @@ struct EinstellungenView: View {
                     } header: {
                         Text("Standort")
                     } footer: {
-                        Text("Im Alltag meldet iOS größere Ortswechsel und Aufenthalte, das kostet kaum Akku. Während einer Fahrt zeichnet die App genau auf; sie endet von selbst nach 10 Minuten Stillstand. Automatisch geht es mit zwei Automationen in der Kurzbefehle-App: Bluetooth des Autos verbunden → „Fahrt aufzeichnen“, getrennt → „Fahrt beenden“. Die Punkte gehen an deinen eigenen Server, nie an Claude. Das ersetzt OwnTracks: Schalte es dort aus, sonst läuft beides doppelt.")
+                        Text("Im Alltag meldet iOS größere Ortswechsel und Aufenthalte, das kostet kaum Akku. Mit „Fahrten selbst erkennen“ misst die App nach jedem Aufbruch drei Minuten lang genau; ab etwa 20 km/h wird daraus eine Fahrt, die genau aufgezeichnet wird und nach 10 Minuten Stillstand endet. Fahrrad und Bahn zählen dabei auch. Dafür braucht die App die Erlaubnis „Immer“. Die Punkte gehen an deinen eigenen Server, nie an Claude. Das ersetzt OwnTracks: Schalte es dort aus, sonst läuft beides doppelt.")
                     }
                 }
                 Section("Entwicklung") {

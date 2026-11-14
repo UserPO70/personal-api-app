@@ -59,6 +59,42 @@ enum Standortregel {
         return true
     }
 
+    /// Ab diesem Tempo gilt eine Bewegung als Fahrt (Auto, aber auch Fahrrad und Bahn).
+    static let fahrtempoKmh = 20.0
+    /// Schneller ist ein Messfehler.
+    static let hoechsttempoKmh = 250.0
+    /// Kreis um den letzten Aufenthaltsort; beim Verlassen weckt iOS die App.
+    static let zaunMeter = 150.0
+    /// So lange misst die App nach dem Verlassen genau, ob daraus eine Fahrt wird.
+    static let probeDauer: TimeInterval = 3 * 60
+    /// Nach einer Probe ohne Fahrt frühestens dann die nächste, sonst liefe beim Spazieren dauernd das GPS.
+    static let probePause: TimeInterval = 15 * 60
+
+    /// Tempo in km/h: gemessen, wenn das iPhone eines liefert und der Ort genau genug ist, sonst aus zwei Punkten
+    /// gerechnet. `nil`, wenn sich nichts Verlässliches sagen lässt.
+    static func tempo(gemessen: Double, genauigkeit: Double, meter: Double?, sekunden: Double?) -> Double? {
+        if gemessen >= 0, genauigkeit >= 0, genauigkeit <= fahrtGenauigkeit {
+            return gemessen * 3.6
+        }
+        // Aus zwei Punkten nur, wenn sie weit genug auseinanderliegen, dass Messfehler keine Rolle spielen.
+        guard let meter, let sekunden, sekunden >= 10, sekunden <= 900,
+              genauigkeit >= 0, meter >= max(300, 2 * genauigkeit) else { return nil }
+        return meter / sekunden * 3.6
+    }
+
+    static func istFahrtempo(_ kmh: Double?) -> Bool {
+        guard let kmh else { return false }
+        return kmh >= fahrtempoKmh && kmh <= hoechsttempoKmh
+    }
+
+    static func probeVorbei(seitBeginn: TimeInterval) -> Bool {
+        seitBeginn >= probeDauer
+    }
+
+    static func probeErlaubt(seitLetzter: TimeInterval) -> Bool {
+        seitLetzter >= probePause
+    }
+
     static func fahrtZuEnde(seitBewegung: TimeInterval, seitBeginn: TimeInterval) -> Bool {
         seitBewegung >= stillstand || seitBeginn >= fahrtHoechstens
     }
@@ -83,7 +119,10 @@ final class Standort: NSObject, ObservableObject {
     private enum Ablage {
         static let an = "standort-an"
         static let fahrtSeit = "standort-fahrt-seit"
+        static let ohneAutomatik = "standort-ohne-automatik"
     }
+
+    private static let zaun = "letzter-ort"
 
     /// Was iOS erlaubt hat, für die Anzeige.
     enum Erlaubnis {
@@ -93,6 +132,15 @@ final class Standort: NSObject, ObservableObject {
     @Published private(set) var an = UserDefaults.standard.bool(forKey: Ablage.an)
     @Published private(set) var erlaubnis = Erlaubnis.offen
     @Published private(set) var fahrtSeit: Date?
+    /// Fahrten selbst erkennen (ohne Kurzbefehl-Automation).
+    @Published var automatisch = !UserDefaults.standard.bool(forKey: Ablage.ohneAutomatik) {
+        didSet {
+            UserDefaults.standard.set(!automatisch, forKey: Ablage.ohneAutomatik)
+            if !automatisch { probeBeenden() }
+        }
+    }
+    /// Läuft gerade die kurze genaue Messung, ob aus dem Aufbruch eine Fahrt wird?
+    @Published private(set) var probeSeit: Date?
     @Published private(set) var wartend = 0
     @Published private(set) var zuletztGesendet: Date?
     @Published private(set) var fehler: String?
@@ -102,6 +150,9 @@ final class Standort: NSObject, ObservableObject {
     private var puffer: [Standortpunkt] = []
     private var ungesichert = 0
     private var letzterOrt: CLLocation?
+    /// Der vorige Ort von iOS, auch wenn er nicht gespeichert wurde: für das Tempo.
+    private var vorigerOrt: CLLocation?
+    private var letzteProbe = Date.distantPast
     private var anker: CLLocation?
     private var letzteBewegung = Date()
     private var sendet = false
@@ -150,10 +201,12 @@ final class Standort: NSObject, ObservableObject {
 
     func ausschalten() {
         fahrtBeenden()
+        probeBeenden()
         an = false
         UserDefaults.standard.set(false, forKey: Ablage.an)
         dienst.stopMonitoringSignificantLocationChanges()
         dienst.stopMonitoringVisits()
+        for region in dienst.monitoredRegions { dienst.stopMonitoring(for: region) }
         sichern()
     }
 
@@ -179,11 +232,45 @@ final class Standort: NSObject, ObservableObject {
     func fahrtStarten() {
         guard an else { return }
         if fahrtSeit == nil {
-            let jetzt = Date()
-            fahrtSeit = jetzt
-            UserDefaults.standard.set(jetzt.timeIntervalSince1970, forKey: Ablage.fahrtSeit)
+            // Aus einer Probe wird eine Fahrt: Sie zählt ab dem Beginn der Probe.
+            let beginn = probeSeit ?? Date()
+            probeSeit = nil
+            fahrtSeit = beginn
+            UserDefaults.standard.set(beginn.timeIntervalSince1970, forKey: Ablage.fahrtSeit)
         }
         genauAufzeichnen()
+    }
+
+    // MARK: Fahrten selbst erkennen
+
+    /// iOS weckt die App, wenn das iPhone den Kreis um den letzten Aufenthaltsort verlässt.
+    private func zaunSetzen(_ ort: CLLocation?) {
+        guard an, automatisch, erlaubnis == .immer, let ort,
+              CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) else { return }
+        let region = CLCircularRegion(center: ort.coordinate, radius: Standortregel.zaunMeter, identifier: Self.zaun)
+        region.notifyOnExit = true
+        region.notifyOnEntry = false
+        dienst.startMonitoring(for: region)
+    }
+
+    /// Kurz genau messen: Wird daraus Fahrtempo, beginnt eine Fahrt, sonst endet die Probe von selbst.
+    private func probeStarten() {
+        guard an, automatisch, fahrtSeit == nil, probeSeit == nil,
+              Standortregel.probeErlaubt(seitLetzter: Date().timeIntervalSince(letzteProbe)) else { return }
+        probeSeit = Date()
+        genauAufzeichnen()
+    }
+
+    private func probeBeenden() {
+        guard probeSeit != nil else { return }
+        probeSeit = nil
+        letzteProbe = Date()
+        if fahrtSeit == nil {
+            dienst.stopUpdatingLocation()
+            dienst.showsBackgroundLocationIndicator = false
+        }
+        sichern()
+        zaunSetzen(vorigerOrt)
     }
 
     private func genauAufzeichnen() {
@@ -203,6 +290,7 @@ final class Standort: NSObject, ObservableObject {
         dienst.stopUpdatingLocation()
         dienst.showsBackgroundLocationIndicator = false
         sichern()
+        zaunSetzen(vorigerOrt)
         Task { await senden(sofort: true) }
     }
 
@@ -210,6 +298,20 @@ final class Standort: NSObject, ObservableObject {
 
     private func neuerOrt(_ ort: CLLocation) {
         guard an else { return }
+        // Tempo gegen den vorigen Ort von iOS, nicht gegen den zuletzt gespeicherten.
+        let kmh = Standortregel.tempo(
+            gemessen: ort.speed, genauigkeit: ort.horizontalAccuracy,
+            meter: vorigerOrt.map { ort.distance(from: $0) },
+            sekunden: vorigerOrt.map { ort.timestamp.timeIntervalSince($0.timestamp) })
+        if ort.horizontalAccuracy >= 0 { vorigerOrt = ort }
+        if fahrtSeit == nil, automatisch {
+            if Standortregel.istFahrtempo(kmh) {
+                fahrtStarten()
+            } else if let probeSeit, Standortregel.probeVorbei(seitBeginn: ort.timestamp.timeIntervalSince(probeSeit)) {
+                probeBeenden()
+            }
+        }
+        let genau = fahrtSeit != nil || probeSeit != nil
         let fahrt = fahrtSeit != nil
         if fahrt {
             // Bewegung erkennen, damit eine vergessene Fahrt von selbst endet.
@@ -227,8 +329,10 @@ final class Standort: NSObject, ObservableObject {
         let sekunden = letzterOrt.map { ort.timestamp.timeIntervalSince($0.timestamp) }
         let meter = letzterOrt.map { ort.distance(from: $0) }
         guard Standortregel.aufnehmen(genauigkeit: ort.horizontalAccuracy, sekundenSeitLetztem: sekunden,
-                                      meterSeitLetztem: meter, fahrt: fahrt) else { return }
+                                      meterSeitLetztem: meter, fahrt: genau) else { return }
         letzterOrt = ort
+        // Im sparsamen Betrieb liegt der Kreis immer um den letzten bekannten Ort.
+        if !genau { zaunSetzen(ort) }
         aufnehmen(Standortpunkt(
             lat: ort.coordinate.latitude, lon: ort.coordinate.longitude,
             tst: Int(ort.timestamp.timeIntervalSince1970),
@@ -236,7 +340,7 @@ final class Standort: NSObject, ObservableObject {
             vel: ort.speed >= 0 ? Int((ort.speed * 3.6).rounded()) : nil,
             alt: ort.verticalAccuracy >= 0 ? Int(ort.altitude.rounded()) : nil,
             cog: ort.course >= 0 ? Int(ort.course.rounded()) : nil,
-            t: nil, m: fahrt ? 2 : 1))
+            t: nil, m: genau ? 2 : 1))
     }
 
     private func neuerBesuch(lat: Double, lon: Double, genauigkeit: Double, zeit: Date) {
@@ -254,7 +358,7 @@ final class Standort: NSObject, ObservableObject {
         wartend = puffer.count
         ungesichert += 1
         // Während einer Fahrt nicht bei jedem Punkt auf die Platte schreiben.
-        if fahrtSeit == nil || ungesichert >= 15 { sichern() }
+        if (fahrtSeit == nil && probeSeit == nil) || ungesichert >= 15 { sichern() }
         Task { await senden() }
     }
 
@@ -336,6 +440,13 @@ extension Standort: CLLocationManagerDelegate {
                 dienst.dienst.requestAlwaysAuthorization()
             }
             dienst.starten()
+        }
+    }
+
+    nonisolated func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        guard region.identifier == "letzter-ort" else { return }
+        Task { @MainActor in
+            Standort.shared.probeStarten()
         }
     }
 

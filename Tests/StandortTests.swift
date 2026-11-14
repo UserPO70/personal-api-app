@@ -43,6 +43,35 @@ final class StandortTests: XCTestCase {
         XCTAssertTrue(Standortregel.fahrtZuEnde(seitBewegung: 5, seitBeginn: 8 * 3600))      // läuft schon 8 Stunden
     }
 
+    func testTempoGemessenOderGerechnet() throws {
+        // Das iPhone liefert ein Tempo und der Ort ist genau: 10 m/s sind 36 km/h.
+        XCTAssertEqual(try XCTUnwrap(Standortregel.tempo(gemessen: 10, genauigkeit: 8, meter: nil, sekunden: nil)), 36, accuracy: 0.001)
+        // Kein Tempo (grober Punkt aus dem Mobilfunknetz): aus zwei Punkten, 1000 m in 60 s sind 60 km/h.
+        XCTAssertEqual(try XCTUnwrap(Standortregel.tempo(gemessen: -1, genauigkeit: 65, meter: 1000, sekunden: 60)), 60, accuracy: 0.001)
+        // Zu nah beieinander für die Genauigkeit, zu kurz oder zu lange her: lieber keine Aussage.
+        XCTAssertNil(Standortregel.tempo(gemessen: -1, genauigkeit: 800, meter: 1000, sekunden: 60))
+        XCTAssertNil(Standortregel.tempo(gemessen: -1, genauigkeit: 65, meter: 200, sekunden: 30))
+        XCTAssertNil(Standortregel.tempo(gemessen: -1, genauigkeit: 65, meter: 1000, sekunden: 3))
+        XCTAssertNil(Standortregel.tempo(gemessen: -1, genauigkeit: 65, meter: 5000, sekunden: 7200))
+        XCTAssertNil(Standortregel.tempo(gemessen: -1, genauigkeit: 65, meter: nil, sekunden: nil))
+        // Ein gemessenes Tempo bei ungenauem Ort zählt nicht.
+        XCTAssertNil(Standortregel.tempo(gemessen: 30, genauigkeit: 500, meter: nil, sekunden: nil))
+    }
+
+    func testFahrtenSelbstErkennen() {
+        XCTAssertFalse(Standortregel.istFahrtempo(nil))
+        XCTAssertFalse(Standortregel.istFahrtempo(5))       // zu Fuß
+        XCTAssertFalse(Standortregel.istFahrtempo(19.9))
+        XCTAssertTrue(Standortregel.istFahrtempo(20))
+        XCTAssertTrue(Standortregel.istFahrtempo(130))
+        XCTAssertFalse(Standortregel.istFahrtempo(900))     // Messfehler
+        // Die Probe nach dem Aufbruch dauert drei Minuten, die nächste gibt es frühestens nach 15.
+        XCTAssertFalse(Standortregel.probeVorbei(seitBeginn: 120))
+        XCTAssertTrue(Standortregel.probeVorbei(seitBeginn: 180))
+        XCTAssertFalse(Standortregel.probeErlaubt(seitLetzter: 600))
+        XCTAssertTrue(Standortregel.probeErlaubt(seitLetzter: 900))
+    }
+
     func testWartezeitNachFehlversuchen() {
         XCTAssertEqual(Standortregel.wartezeit(fehlversuche: 0), 0)
         XCTAssertEqual(Standortregel.wartezeit(fehlversuche: 1), 300)

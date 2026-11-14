@@ -8,17 +8,17 @@
  "medientyp": "application/json",
  "antwort": {
   "tag": "2026-03-15",
-  "anzahl": 4,
+  "anzahl": 5,
   "essensfenster": {
    "erste": "08:00",
    "letzte": "17:00",
    "dauer_minuten": 540
   },
   "summe": {
-   "kcal": 1549.0,
-   "eiweiss_g": 44.5,
-   "kohlenhydrate_g": 257.0,
-   "fett_g": 29.7
+   "kcal": 1777.0,
+   "eiweiss_g": 50.5,
+   "kohlenhydrate_g": 293.0,
+   "fett_g": 34.8
   },
   "mahlzeiten": [
    {
@@ -63,6 +63,66 @@
      "fett_g": 6.8
     },
     "uhrzeit": "08:00",
+    "nach_mitternacht": false,
+    "foto_auftrag_ids": [],
+    "foto_auftrag_id": null,
+    "art_geschaetzt": true,
+    "korrigiert": false,
+    "aenderbar": true
+   },
+   {
+    "id": 179,
+    "zeit": "2026-03-15T09:00:00.000000Z",
+    "quelle": "barcode",
+    "geraet": "iphone",
+    "notiz": "zwei Hände voll",
+    "foto_pfad": null,
+    "daten": {
+     "auftrag_id": 2,
+     "open_food_facts": true,
+     "je_100": {
+      "kcal": 380.0,
+      "eiweiss_g": 10.0,
+      "kohlenhydrate_g": 60.0,
+      "fett_g": 8.5
+     },
+     "portion_g": 50.0,
+     "stueck_g": null,
+     "menge_geschaetzt": true,
+     "sicherheit": "mittel",
+     "nutzung": {},
+     "analyse": {
+      "menge_erkannt": true,
+      "menge": 60,
+      "einheit": "g",
+      "sicherheit": "mittel",
+      "hinweis": "eine Hand voll Müsli etwa 30 g"
+     },
+     "hinweis": "eine Hand voll Müsli etwa 30 g"
+    },
+    "extern_id": "barcode-auftrag-2",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "gehoert_zu": null,
+    "art": "Frühstück",
+    "bestandteile": [
+     {
+      "lebensmittel": "Test-Müsli Beere (Testmarke)",
+      "menge": 60.0,
+      "einheit": "g",
+      "kcal": 228.0,
+      "eiweiss_g": 6.0,
+      "kohlenhydrate_g": 36.0,
+      "fett_g": 5.1,
+      "barcode": "4000000000013"
+     }
+    ],
+    "summe": {
+     "kcal": 228.0,
+     "eiweiss_g": 6.0,
+     "kohlenhydrate_g": 36.0,
+     "fett_g": 5.1
+    },
+    "uhrzeit": "10:00",
     "nach_mitternacht": false,
     "foto_auftrag_ids": [],
     "foto_auftrag_id": null,
@@ -156,7 +216,7 @@
     "aenderbar": true
    },
    {
-    "id": 179,
+    "id": 180,
     "zeit": "2026-03-15T15:00:00.000000Z",
     "quelle": "manuell",
     "geraet": "iphone",
@@ -200,7 +260,7 @@
     "aenderbar": true
    },
    {
-    "id": 180,
+    "id": 181,
     "zeit": "2026-03-15T16:00:00.000000Z",
     "quelle": "manuell",
     "geraet": "iphone",
@@ -250,13 +310,14 @@
     "laeuft": 0,
     "fehler": 0,
     "kein_essen": 0,
-    "fertig": 1,
+    "fertig": 2,
     "geloescht": 0
    },
    "auftraege": [
     {
-     "id": 3,
+     "id": 4,
      "hat_foto": false,
+     "barcode": null,
      "zeit": "2026-03-15T14:00:00.000000Z",
      "notiz": "Kaffee mit Milch",
      "status": "wartet",
@@ -267,8 +328,9 @@
      "automatisch": false
     },
     {
-     "id": 2,
+     "id": 3,
      "hat_foto": true,
+     "barcode": null,
      "zeit": "2026-03-15T12:00:00.000000Z",
      "notiz": null,
      "status": "wartet",

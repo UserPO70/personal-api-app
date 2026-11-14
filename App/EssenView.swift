@@ -316,7 +316,7 @@ struct EssenView: View {
                     NavigationLink {
                         KalorienView()
                     } label: {
-                        Label(ziel == nil ? "Kalorienziel festlegen" : "Kalorienrechner", systemImage: "target")
+                        Label(ziel == nil ? "Gewicht und Kalorienziel festlegen" : "Gewicht und Ziel", systemImage: "target")
                     }
                 }
                 if tag.mahlzeiten.isEmpty {
@@ -324,6 +324,9 @@ struct EssenView: View {
                         .foregroundStyle(Color.secondary)
                 }
                 ForEach(tag.mahlzeiten) { mahlzeit in
+                    NavigationLink {
+                        MahlzeitView(mahlzeit: mahlzeit)
+                    } label: {
                     HStack(alignment: .top, spacing: 12) {
                         Text(mahlzeit.uhrzeit ?? "")
                             .font(.footnote.monospacedDigit())
@@ -339,10 +342,12 @@ struct EssenView: View {
                             }
                         }
                         Spacer()
-                        Text(Zahl.kcal(mahlzeit.summe?.kcal))
+                        Text((mahlzeit.geschaetzt ? "≈ " : "") + Zahl.kcal(mahlzeit.summe?.kcal))
                             .font(.subheadline.monospacedDigit())
                             .foregroundStyle(Color.secondary)
                     }
+                    }
+                    .disabled(zustand.demo)
                 }
             } else {
                 Text("Der Tag lässt sich gerade nicht laden.")

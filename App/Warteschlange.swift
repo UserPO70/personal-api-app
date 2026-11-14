@@ -146,6 +146,11 @@ final class Warteschlange: ObservableObject {
 
     var wartend: Int { eintraege.filter { $0.stand == .wartet }.count }
 
+    /// Am Server wurde etwas geändert oder gelöscht: Die Anzeigen laden neu.
+    func geaendert() {
+        neuesAmServer += 1
+    }
+
     // MARK: Senden
 
     /// Sendet, was dran ist. `alle`: auch Einträge, deren Wartezeit noch läuft (Knopf „Jetzt senden“).

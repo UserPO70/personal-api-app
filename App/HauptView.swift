@@ -8,7 +8,7 @@ struct HauptView: View {
 
     var body: some View {
         TabView {
-            UebersichtView()
+            HeuteView()
                 .tabItem { Label("Heute", systemImage: "sun.max") }
             EssenView()
                 .tabItem { Label("Essen", systemImage: "fork.knife") }
@@ -43,95 +43,6 @@ struct HauptView: View {
     }
 }
 
-private struct Wartend: Decodable {
-    struct App: Decodable, Identifiable {
-        let id: String
-        let name: String?
-        let pruefzahl: String?
-    }
-    let wartend: [App]
-}
-
-/// Vorläufig: zeigt, ob die Verbindung steht. Die Tagesübersicht folgt in einem späteren Schritt.
-struct UebersichtView: View {
-    @EnvironmentObject private var zustand: AppZustand
-    @State private var info: Info?
-    @State private var fehler: String?
-    @State private var laedt = false
-
-    var body: some View {
-        NavigationStack {
-            List {
-                if zustand.demo {
-                    Section {
-                        Label("Demo: ausgedachte Daten, kein Server", systemImage: "theatermasks")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                Section("Server") {
-                    if let info {
-                        zeile("Name", info.name)
-                        zeile("Version", info.version)
-                        zeile("Verbindung", verschluesselt ? "verschlüsselt" : "unverschlüsselt")
-                        zeile("Fotoanalyse", info.claude?.bereit == true ? "bereit" : "nicht bereit")
-                    } else if let fehler {
-                        Label(fehler, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(.orange)
-                    } else {
-                        ProgressView()
-                    }
-                }
-                if !zustand.demo {
-                    Section {
-                        NavigationLink {
-                            GewichtView()
-                        } label: {
-                            Label("Gewicht", systemImage: "scalemass")
-                        }
-                    }
-                }
-                Section {
-                    Text("Hier erscheint bald dein Tag: Essen, Schritte, Wege und PC-Zeit.")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .navigationTitle("Heute")
-            .refreshable { await laden() }
-            .task { await laden() }
-        }
-    }
-
-    private var verschluesselt: Bool {
-        zustand.demo ? true : zustand.verbindung?.verschluesselt == true
-    }
-
-    private func zeile(_ name: String, _ wert: String) -> some View {
-        LabeledContent(name, value: wert)
-    }
-
-    private func laden() async {
-        if zustand.demo {
-            info = Info(name: "mein-server", version: "0.1.0", schema: nil, https: nil, claude: Info.Claude(bereit: true))
-            return
-        }
-        guard !laedt else { return }
-        laedt = true
-        defer { laedt = false }
-        do {
-            let api = try zustand.api()
-            let neu = try await api.lesen(Info.self, "GET", "/api/info")
-            // Prüft zugleich, ob der Schlüssel noch gilt.
-            _ = try await api.lesen(Wartend.self, "GET", "/api/app/wartend")
-            info = neu
-            fehler = nil
-        } catch {
-            if (error as? URLError)?.code == .cancelled, Task.isCancelled { return }
-            info = nil
-            fehler = Api.text(error)
-        }
-    }
-}
-
 struct EinstellungenView: View {
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
@@ -154,6 +65,7 @@ struct EinstellungenView: View {
                         LabeledContent("Adresse", value: verbindung.adresse)
                         LabeledContent("Verbindung", value: verbindung.verschluesselt ? "verschlüsselt" : "unverschlüsselt")
                         LabeledContent("Dieses Gerät", value: verbindung.geraetName)
+                        ServerAuskunft()
                     }
                     Section {
                         Button("Vom Server abmelden", role: .destructive) { abmeldenFragen = true }

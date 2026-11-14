@@ -26,6 +26,15 @@ struct KalorienView: View {
             if !geladen {
                 Section { ProgressView() }
             } else {
+                Section {
+                    NavigationLink {
+                        GewichtView()
+                    } label: {
+                        LabeledContent("Gewicht", value: stand?.rechnung?.gewicht.map(Gewichtstext.kg) ?? "eintragen")
+                    }
+                } footer: {
+                    Text("Messungen eintragen und den Verlauf ansehen. Gerechnet wird mit dem Mittel der letzten 7 Tage.")
+                }
                 richtwert
                 angaben
                 if let verlauf, stand?.angaben != nil {
@@ -41,7 +50,7 @@ struct KalorienView: View {
                 }
             }
         }
-        .navigationTitle("Kalorienrechner")
+        .navigationTitle("Gewicht und Ziel")
         .navigationBarTitleDisplayMode(.inline)
         .refreshable { await laden() }
         .task { await laden() }

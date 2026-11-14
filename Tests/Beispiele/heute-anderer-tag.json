@@ -1,0 +1,909 @@
+{
+ "adresse": "GET /api/app/heute",
+ "anfrage": {
+  "pfad": "/api/app/heute?tag=2026-03-14",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "tag": "2026-03-14",
+  "ist_heute": false,
+  "daten_bis": "2026-03-15",
+  "uebersicht": {
+   "tag": "2026-03-14",
+   "bereiche": {
+    "schritte": {
+     "name": "Schritte",
+     "jemals_daten": true,
+     "daten_heute": true,
+     "leer_text": "keine Schritte erfasst"
+    },
+    "strecke": {
+     "name": "Strecke",
+     "jemals_daten": true,
+     "daten_heute": true,
+     "leer_text": "keine Strecke erfasst"
+    },
+    "gehen": {
+     "name": "Gehen",
+     "jemals_daten": true,
+     "daten_heute": true,
+     "leer_text": "keine Gehwerte erfasst"
+    },
+    "schlaf": {
+     "name": "Schlaf",
+     "jemals_daten": true,
+     "daten_heute": true,
+     "leer_text": "kein Schlaf erfasst"
+    },
+    "essen": {
+     "name": "Ernährung",
+     "jemals_daten": true,
+     "daten_heute": true,
+     "leer_text": "kein Essen erfasst"
+    },
+    "pc": {
+     "name": "Zeit am PC",
+     "jemals_daten": true,
+     "daten_heute": false,
+     "leer_text": "kein PC-Tag"
+    },
+    "standort": {
+     "name": "Orte und Wege",
+     "jemals_daten": true,
+     "daten_heute": true,
+     "leer_text": "kein Standort erfasst"
+    },
+    "wetter": {
+     "name": "Wetter",
+     "jemals_daten": true,
+     "daten_heute": true,
+     "leer_text": "kein Wetter erfasst"
+    },
+    "internet": {
+     "name": "Internet",
+     "jemals_daten": true,
+     "daten_heute": true,
+     "leer_text": "keine FritzBox-Daten"
+    }
+   },
+   "schritte": 9151,
+   "schritte_pro_stunde": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    487,
+    648,
+    325,
+    234,
+    812,
+    2545,
+    1261,
+    240,
+    282,
+    389,
+    593,
+    555,
+    252,
+    325,
+    112,
+    91,
+    0
+   ],
+   "pc_minuten": 0,
+   "pc_geraete": [],
+   "apps": [],
+   "pc_kategorien": [],
+   "orte": [
+    {
+     "name": "Zuhause",
+     "minuten": 1250
+    },
+    {
+     "name": "Ort 4",
+     "minuten": 117
+    },
+    {
+     "name": "Ort 3",
+     "minuten": 60
+    }
+   ],
+   "standort_luecken": {
+    "anzahl": 0,
+    "minuten": 0
+   },
+   "temperatur": {
+    "min": -1.2,
+    "max": 4.4,
+    "mittel": 1.6
+   },
+   "temperatur_verlauf": [
+    {
+     "zeit": "2026-03-13T23:00:00.000000Z",
+     "wert": -0.4
+    },
+    {
+     "zeit": "2026-03-14T00:00:00.000000Z",
+     "wert": -1.1
+    },
+    {
+     "zeit": "2026-03-14T01:00:00.000000Z",
+     "wert": -0.8
+    },
+    {
+     "zeit": "2026-03-14T02:00:00.000000Z",
+     "wert": -1.2
+    },
+    {
+     "zeit": "2026-03-14T03:00:00.000000Z",
+     "wert": -1.1
+    },
+    {
+     "zeit": "2026-03-14T04:00:00.000000Z",
+     "wert": -0.5
+    },
+    {
+     "zeit": "2026-03-14T05:00:00.000000Z",
+     "wert": 0.0
+    },
+    {
+     "zeit": "2026-03-14T06:00:00.000000Z",
+     "wert": 1.0
+    },
+    {
+     "zeit": "2026-03-14T07:00:00.000000Z",
+     "wert": 1.2
+    },
+    {
+     "zeit": "2026-03-14T08:00:00.000000Z",
+     "wert": 1.4
+    },
+    {
+     "zeit": "2026-03-14T09:00:00.000000Z",
+     "wert": 2.0
+    },
+    {
+     "zeit": "2026-03-14T10:00:00.000000Z",
+     "wert": 2.4
+    },
+    {
+     "zeit": "2026-03-14T11:00:00.000000Z",
+     "wert": 3.5
+    },
+    {
+     "zeit": "2026-03-14T12:00:00.000000Z",
+     "wert": 3.9
+    },
+    {
+     "zeit": "2026-03-14T13:00:00.000000Z",
+     "wert": 4.4
+    },
+    {
+     "zeit": "2026-03-14T14:00:00.000000Z",
+     "wert": 4.2
+    },
+    {
+     "zeit": "2026-03-14T15:00:00.000000Z",
+     "wert": 4.3
+    },
+    {
+     "zeit": "2026-03-14T16:00:00.000000Z",
+     "wert": 4.1
+    },
+    {
+     "zeit": "2026-03-14T17:00:00.000000Z",
+     "wert": 3.6
+    },
+    {
+     "zeit": "2026-03-14T18:00:00.000000Z",
+     "wert": 2.4
+    },
+    {
+     "zeit": "2026-03-14T19:00:00.000000Z",
+     "wert": 2.3
+    },
+    {
+     "zeit": "2026-03-14T20:00:00.000000Z",
+     "wert": 1.2
+    },
+    {
+     "zeit": "2026-03-14T21:00:00.000000Z",
+     "wert": 0.6
+    },
+    {
+     "zeit": "2026-03-14T22:00:00.000000Z",
+     "wert": 1.1
+    }
+   ],
+   "niederschlag_mm": 14.8,
+   "zuhause": {
+    "tag": "2026-03-14",
+    "beginn": "2026-03-13T23:00:00.000000Z",
+    "ende": "2026-03-14T23:00:00.000000Z",
+    "zuhause_minuten": 1250,
+    "ausser_haus_minuten": 190,
+    "unbekannt_minuten": 0,
+    "verlassen": 1,
+    "erstes_verlassen": "10:56",
+    "letzte_rueckkehr": "14:07",
+    "lueckenhaft": false,
+    "wlan_minuten": 1231,
+    "zeitleiste": [
+     {
+      "art": "zuhause",
+      "ort": "Zuhause",
+      "von": "2026-03-13T23:00:00.000000Z",
+      "bis": "2026-03-14T09:56:59.000000Z"
+     },
+     {
+      "art": "weg",
+      "ort": "Ort 3",
+      "von": "2026-03-14T09:56:59.000000Z",
+      "bis": "2026-03-14T10:57:08.000000Z"
+     },
+     {
+      "art": "weg",
+      "ort": null,
+      "von": "2026-03-14T10:57:08.000000Z",
+      "bis": "2026-03-14T11:05:55.000000Z"
+     },
+     {
+      "art": "weg",
+      "ort": "Ort 4",
+      "von": "2026-03-14T11:05:55.000000Z",
+      "bis": "2026-03-14T13:02:30.000000Z"
+     },
+     {
+      "art": "weg",
+      "ort": null,
+      "von": "2026-03-14T13:02:30.000000Z",
+      "bis": "2026-03-14T13:07:22.000000Z"
+     },
+     {
+      "art": "zuhause",
+      "ort": "Zuhause",
+      "von": "2026-03-14T13:07:22.000000Z",
+      "bis": "2026-03-14T23:00:00.000000Z"
+     }
+    ],
+    "hinweis": null
+   },
+   "datenvolumen": {
+    "empfangen_mb": 6730.8,
+    "gesendet_mb": 690.1,
+    "gesamt_mb": 7420.9,
+    "messungen": 24,
+    "neustart": false
+   },
+   "strecke_km": 6.54,
+   "stockwerke": 16,
+   "gehtempo_kmh": 5.0,
+   "schrittlaenge_cm": 72,
+   "schlaf": {
+    "minuten": 580,
+    "art": "schlafend",
+    "beginn": "2026-03-13T23:18:23.347280Z",
+    "ende": "2026-03-14T09:02:38.959860Z"
+   },
+   "ernaehrung": {
+    "mahlzeiten": 5,
+    "kcal": 2174,
+    "eiweiss_g": 124.1,
+    "kohlenhydrate_g": 253.3,
+    "fett_g": 73.8,
+    "essensfenster": {
+     "erste": "09:36",
+     "letzte": "23:36",
+     "dauer_minuten": 840
+    }
+   }
+  },
+  "essen": {
+   "tag": "2026-03-14",
+   "anzahl": 5,
+   "essensfenster": {
+    "erste": "09:36",
+    "letzte": "23:36",
+    "dauer_minuten": 840
+   },
+   "summe": {
+    "kcal": 2174.0,
+    "eiweiss_g": 124.1,
+    "kohlenhydrate_g": 253.3,
+    "fett_g": 73.8
+   },
+   "mahlzeiten": [
+    {
+     "id": 172,
+     "zeit": "2026-03-14T08:36:13.565987Z",
+     "quelle": "health",
+     "geraet": "iphone",
+     "notiz": null,
+     "foto_pfad": null,
+     "daten": {
+      "test": "Frühstück"
+     },
+     "extern_id": "test-mahlzeit-2026-03-14T08:36:13.565987Z",
+     "erfasst_am": "2026-03-15T17:00:00.000000Z",
+     "gehoert_zu": null,
+     "art": "Frühstück",
+     "bestandteile": [
+      {
+       "lebensmittel": "Ernährung (Apple Health)",
+       "menge": null,
+       "einheit": null,
+       "kcal": 407.0,
+       "eiweiss_g": 22.8,
+       "kohlenhydrate_g": 45.1,
+       "fett_g": 15.0,
+       "barcode": null
+      }
+     ],
+     "summe": {
+      "kcal": 407.0,
+      "eiweiss_g": 22.8,
+      "kohlenhydrate_g": 45.1,
+      "fett_g": 15.0
+     },
+     "uhrzeit": "09:36",
+     "nach_mitternacht": false,
+     "foto_auftrag_ids": [],
+     "foto_auftrag_id": null,
+     "art_geschaetzt": true,
+     "korrigiert": false,
+     "aenderbar": false
+    },
+    {
+     "id": 173,
+     "zeit": "2026-03-14T11:34:13.931928Z",
+     "quelle": "health",
+     "geraet": "iphone",
+     "notiz": null,
+     "foto_pfad": null,
+     "daten": {
+      "test": "Mittagessen"
+     },
+     "extern_id": "test-mahlzeit-2026-03-14T11:34:13.931928Z",
+     "erfasst_am": "2026-03-15T17:00:00.000000Z",
+     "gehoert_zu": null,
+     "art": "Mittag",
+     "bestandteile": [
+      {
+       "lebensmittel": "Ernährung (Apple Health)",
+       "menge": null,
+       "einheit": null,
+       "kcal": 547.0,
+       "eiweiss_g": 32.7,
+       "kohlenhydrate_g": 56.7,
+       "fett_g": 21.1,
+       "barcode": null
+      }
+     ],
+     "summe": {
+      "kcal": 547.0,
+      "eiweiss_g": 32.7,
+      "kohlenhydrate_g": 56.7,
+      "fett_g": 21.1
+     },
+     "uhrzeit": "12:34",
+     "nach_mitternacht": false,
+     "foto_auftrag_ids": [],
+     "foto_auftrag_id": null,
+     "art_geschaetzt": true,
+     "korrigiert": false,
+     "aenderbar": false
+    },
+    {
+     "id": 174,
+     "zeit": "2026-03-14T15:04:55.389439Z",
+     "quelle": "health",
+     "geraet": "iphone",
+     "notiz": null,
+     "foto_pfad": null,
+     "daten": {
+      "test": "Snack"
+     },
+     "extern_id": "test-mahlzeit-2026-03-14T15:04:55.389439Z",
+     "erfasst_am": "2026-03-15T17:00:00.000000Z",
+     "gehoert_zu": null,
+     "art": "Snack",
+     "bestandteile": [
+      {
+       "lebensmittel": "Ernährung (Apple Health)",
+       "menge": null,
+       "einheit": null,
+       "kcal": 151.0,
+       "eiweiss_g": 6.4,
+       "kohlenhydrate_g": 18.8,
+       "fett_g": 5.6,
+       "barcode": null
+      }
+     ],
+     "summe": {
+      "kcal": 151.0,
+      "eiweiss_g": 6.4,
+      "kohlenhydrate_g": 18.8,
+      "fett_g": 5.6
+     },
+     "uhrzeit": "16:04",
+     "nach_mitternacht": false,
+     "foto_auftrag_ids": [],
+     "foto_auftrag_id": null,
+     "art_geschaetzt": true,
+     "korrigiert": false,
+     "aenderbar": false
+    },
+    {
+     "id": 175,
+     "zeit": "2026-03-14T18:25:51.499085Z",
+     "quelle": "health",
+     "geraet": "iphone",
+     "notiz": null,
+     "foto_pfad": null,
+     "daten": {
+      "test": "Abendessen"
+     },
+     "extern_id": "test-mahlzeit-2026-03-14T18:25:51.499085Z",
+     "erfasst_am": "2026-03-15T17:00:00.000000Z",
+     "gehoert_zu": null,
+     "art": "Abend",
+     "bestandteile": [
+      {
+       "lebensmittel": "Ernährung (Apple Health)",
+       "menge": null,
+       "einheit": null,
+       "kcal": 832.0,
+       "eiweiss_g": 50.3,
+       "kohlenhydrate_g": 103.1,
+       "fett_g": 24.2,
+       "barcode": null
+      }
+     ],
+     "summe": {
+      "kcal": 832.0,
+      "eiweiss_g": 50.3,
+      "kohlenhydrate_g": 103.1,
+      "fett_g": 24.2
+     },
+     "uhrzeit": "19:25",
+     "nach_mitternacht": false,
+     "foto_auftrag_ids": [],
+     "foto_auftrag_id": null,
+     "art_geschaetzt": true,
+     "korrigiert": false,
+     "aenderbar": false
+    },
+    {
+     "id": 176,
+     "zeit": "2026-03-14T22:36:07.522152Z",
+     "quelle": "health",
+     "geraet": "iphone",
+     "notiz": null,
+     "foto_pfad": null,
+     "daten": {
+      "test": "Später Snack"
+     },
+     "extern_id": "test-mahlzeit-2026-03-14T22:36:07.522152Z",
+     "erfasst_am": "2026-03-15T17:00:00.000000Z",
+     "gehoert_zu": null,
+     "art": "Snack",
+     "bestandteile": [
+      {
+       "lebensmittel": "Ernährung (Apple Health)",
+       "menge": null,
+       "einheit": null,
+       "kcal": 237.0,
+       "eiweiss_g": 11.9,
+       "kohlenhydrate_g": 29.6,
+       "fett_g": 7.9,
+       "barcode": null
+      }
+     ],
+     "summe": {
+      "kcal": 237.0,
+      "eiweiss_g": 11.9,
+      "kohlenhydrate_g": 29.6,
+      "fett_g": 7.9
+     },
+     "uhrzeit": "23:36",
+     "nach_mitternacht": false,
+     "foto_auftrag_ids": [],
+     "foto_auftrag_id": null,
+     "art_geschaetzt": true,
+     "korrigiert": false,
+     "aenderbar": false
+    }
+   ],
+   "warteschlange": {
+    "anzahl": {
+     "wartet": 2,
+     "laeuft": 0,
+     "fehler": 0,
+     "kein_essen": 0,
+     "fertig": 2,
+     "geloescht": 0
+    },
+    "auftraege": [
+     {
+      "id": 4,
+      "hat_foto": false,
+      "barcode": null,
+      "zeit": "2026-03-15T14:00:00.000000Z",
+      "notiz": "Kaffee mit Milch",
+      "status": "wartet",
+      "versuche": 0,
+      "fehler": null,
+      "erstellt_am": "2026-03-15T17:00:00.000000Z",
+      "bearbeitet_am": null,
+      "automatisch": false
+     },
+     {
+      "id": 3,
+      "hat_foto": true,
+      "barcode": null,
+      "zeit": "2026-03-15T12:00:00.000000Z",
+      "notiz": null,
+      "status": "wartet",
+      "versuche": 0,
+      "fehler": "Nur ein Hund",
+      "erstellt_am": "2026-03-15T17:00:00.000000Z",
+      "bearbeitet_am": "2026-03-15T17:00:00.000000Z",
+      "automatisch": false
+     }
+    ]
+   },
+   "unsicherheit": {
+    "kcal_geschaetzt": null,
+    "kcal_fest": 2174.0,
+    "anteil_geschaetzt_prozent": 0,
+    "mahlzeiten_geschaetzt": 0,
+    "mahlzeiten_fest": 5,
+    "analysen": {
+     "wartet": 0,
+     "laeuft": 0,
+     "fehlgeschlagen": 0
+    }
+   },
+   "ziel": null
+  },
+  "fahrten": {
+   "tag": "2026-03-14",
+   "anzahl": 3,
+   "strassennetz": true,
+   "fahrten": [
+    {
+     "kennung": "0d86268997aa506e",
+     "geraet": "iphone",
+     "start": "Zuhause",
+     "ziel": "Ort 3",
+     "start_lat": 50.09997,
+     "start_lon": 8.19992,
+     "ziel_lat": 50.10252,
+     "ziel_lon": 8.20703,
+     "abfahrt": "2026-03-14T09:55:49.263831Z",
+     "ankunft": "2026-03-14T09:56:59.000000Z",
+     "dauer_min": 1,
+     "abfahrt_ungenau_min": 2,
+     "ankunft_ungenau_min": 2,
+     "abfahrt_frueh": "2026-03-14T09:39:08.000000Z",
+     "abfahrt_spaet": "2026-03-14T09:56:59.000000Z",
+     "ankunft_frueh": "2026-03-14T09:39:08.000000Z",
+     "ankunft_spaet": "2026-03-14T09:56:59.000000Z",
+     "strecke_km": 0.6,
+     "punkte_unterwegs": 0,
+     "groesste_luecke_min": 0,
+     "lueckenhaft": false,
+     "geschwindigkeit_angenommen": true,
+     "rundweg": false,
+     "halt_unsicher": true,
+     "korrigiert": false,
+     "strasse": {
+      "strecke_km": 0.6,
+      "anteil_rekonstruiert": 1.0
+     },
+     "luecken": []
+    },
+    {
+     "kennung": "86a12b16a9b0877f",
+     "geraet": "iphone",
+     "start": "Ort 3",
+     "ziel": "Ort 4",
+     "start_lat": 50.10252,
+     "start_lon": 8.20703,
+     "ziel_lat": 50.09486,
+     "ziel_lon": 8.18769,
+     "abfahrt": "2026-03-14T10:54:57.203941Z",
+     "ankunft": "2026-03-14T11:05:55.000000Z",
+     "dauer_min": 11,
+     "abfahrt_ungenau_min": 2,
+     "ankunft_ungenau_min": 2,
+     "abfahrt_frueh": "2026-03-14T09:58:16.000000Z",
+     "abfahrt_spaet": "2026-03-14T10:57:08.000000Z",
+     "ankunft_frueh": "2026-03-14T11:04:12.000000Z",
+     "ankunft_spaet": "2026-03-14T11:05:55.000000Z",
+     "strecke_km": 1.6,
+     "punkte_unterwegs": 3,
+     "groesste_luecke_min": 4,
+     "lueckenhaft": false,
+     "geschwindigkeit_angenommen": false,
+     "rundweg": false,
+     "halt_unsicher": true,
+     "korrigiert": false,
+     "strasse": {
+      "strecke_km": 1.6,
+      "anteil_rekonstruiert": 1.0
+     },
+     "luecken": []
+    },
+    {
+     "kennung": "fec554829a498158",
+     "geraet": "iphone",
+     "start": "Ort 4",
+     "ziel": "Zuhause",
+     "start_lat": 50.09486,
+     "start_lon": 8.18769,
+     "ziel_lat": 50.10005,
+     "ziel_lon": 8.2,
+     "abfahrt": "2026-03-14T12:58:57.066145Z",
+     "ankunft": "2026-03-14T13:07:22.000000Z",
+     "dauer_min": 8,
+     "abfahrt_ungenau_min": 4,
+     "ankunft_ungenau_min": 2,
+     "abfahrt_frueh": "2026-03-14T11:05:55.000000Z",
+     "abfahrt_spaet": "2026-03-14T13:02:30.000000Z",
+     "ankunft_frueh": "2026-03-14T13:05:28.000000Z",
+     "ankunft_spaet": "2026-03-14T13:07:22.000000Z",
+     "strecke_km": 1.1,
+     "punkte_unterwegs": 2,
+     "groesste_luecke_min": 3,
+     "lueckenhaft": false,
+     "geschwindigkeit_angenommen": false,
+     "rundweg": false,
+     "halt_unsicher": true,
+     "korrigiert": false,
+     "strasse": {
+      "strecke_km": 1.1,
+      "anteil_rekonstruiert": 1.0
+     },
+     "luecken": []
+    }
+   ]
+  },
+  "pc_zeitraeume": [],
+  "orte_zeitraeume": [
+   {
+    "art": "zuhause",
+    "name": "Zuhause",
+    "von": "00:00",
+    "bis": "10:56",
+    "beginn": "2026-03-13T23:00:00.000000Z",
+    "ende": "2026-03-14T09:56:59.000000Z",
+    "minuten": 657
+   },
+   {
+    "art": "ort",
+    "name": null,
+    "von": "10:56",
+    "bis": "11:57",
+    "beginn": "2026-03-14T09:56:59.000000Z",
+    "ende": "2026-03-14T10:57:08.000000Z",
+    "minuten": 60
+   },
+   {
+    "art": "unterwegs",
+    "name": null,
+    "von": "11:57",
+    "bis": "12:05",
+    "beginn": "2026-03-14T10:57:08.000000Z",
+    "ende": "2026-03-14T11:05:55.000000Z",
+    "minuten": 9
+   },
+   {
+    "art": "ort",
+    "name": null,
+    "von": "12:05",
+    "bis": "14:02",
+    "beginn": "2026-03-14T11:05:55.000000Z",
+    "ende": "2026-03-14T13:02:30.000000Z",
+    "minuten": 117
+   },
+   {
+    "art": "unterwegs",
+    "name": null,
+    "von": "14:02",
+    "bis": "14:07",
+    "beginn": "2026-03-14T13:02:30.000000Z",
+    "ende": "2026-03-14T13:07:22.000000Z",
+    "minuten": 5
+   },
+   {
+    "art": "zuhause",
+    "name": "Zuhause",
+    "von": "14:07",
+    "bis": "24:00",
+    "beginn": "2026-03-14T13:07:22.000000Z",
+    "ende": "2026-03-14T23:00:00.000000Z",
+    "minuten": 593
+   }
+  ],
+  "vorhersage": null,
+  "koerper": {
+   "gewicht": {
+    "id": 23,
+    "zeit": "2026-03-11T06:28:38.445882Z",
+    "kg": 83.8,
+    "quelle": "manuell",
+    "notiz": null,
+    "extern_id": "test-gewicht-2026-03-11",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "geaendert_am": null,
+    "tag": "2026-03-11"
+   }
+  },
+  "status": {
+   "jetzt": "2026-03-15T17:00:00.000000Z",
+   "warnungen": 0,
+   "quellen": [
+    {
+     "quelle": "owntracks",
+     "geraet": null,
+     "name": "Standorte (OwnTracks)",
+     "letzte_ankunft": "2026-03-15T17:00:00.000000Z",
+     "neueste_messung": "2026-03-15T17:00:00.000000Z",
+     "still_stunden": 0.0,
+     "grenze_stunden": 24,
+     "status": "ok",
+     "warnung": false,
+     "tipp": null,
+     "anleitung": "/anleitung/iphone-owntracks",
+     "luecken": {
+      "tage": 7,
+      "anzahl": 0,
+      "minuten": 0,
+      "ab_stunden": 2.0
+     }
+    },
+    {
+     "quelle": "health",
+     "geraet": null,
+     "name": "Apple Health",
+     "letzte_ankunft": "2026-03-15T17:00:00.000000Z",
+     "neueste_messung": "2026-03-15T09:00:00.000000Z",
+     "still_stunden": 0.0,
+     "grenze_stunden": 24,
+     "status": "ok",
+     "warnung": false,
+     "tipp": null,
+     "anleitung": "/anleitung/iphone-kurzbefehl-health"
+    },
+    {
+     "quelle": "activitywatch",
+     "geraet": "pc-linux",
+     "name": "ActivityWatch – pc-linux",
+     "letzte_ankunft": "2026-03-15T17:00:00.000000Z",
+     "neueste_messung": "2026-03-13T20:25:21.308216Z",
+     "still_stunden": 0.0,
+     "grenze_stunden": null,
+     "status": "ok",
+     "warnung": false,
+     "tipp": null,
+     "anleitung": "/anleitung/activitywatch-standrechner"
+    },
+    {
+     "quelle": "activitywatch",
+     "geraet": "pc-windows",
+     "name": "ActivityWatch – pc-windows",
+     "letzte_ankunft": "2026-03-15T17:00:00.000000Z",
+     "neueste_messung": "2026-03-13T22:34:49.512265Z",
+     "still_stunden": 0.0,
+     "grenze_stunden": null,
+     "status": "ok",
+     "warnung": false,
+     "tipp": null,
+     "anleitung": "/anleitung/activitywatch-standrechner"
+    },
+    {
+     "quelle": "wetter",
+     "geraet": null,
+     "name": "Wetter",
+     "letzte_ankunft": "2026-03-15T17:00:00.000000Z",
+     "neueste_messung": "2026-03-15T17:00:00.000000Z",
+     "still_stunden": 0.0,
+     "grenze_stunden": 3,
+     "status": "ok",
+     "warnung": false,
+     "tipp": null,
+     "anleitung": "/anleitung/wetter"
+    },
+    {
+     "quelle": "foto",
+     "geraet": null,
+     "name": "Essensfotos",
+     "letzte_ankunft": "2026-03-15T17:00:00.000000Z",
+     "neueste_messung": "2026-03-15T14:00:00.000000Z",
+     "still_stunden": 0.0,
+     "grenze_stunden": null,
+     "status": "ok",
+     "warnung": false,
+     "tipp": null,
+     "anleitung": "/anleitung/iphone-kurzbefehl-essen"
+    },
+    {
+     "quelle": "barcode",
+     "geraet": null,
+     "name": "Barcode-Scans",
+     "letzte_ankunft": "2026-03-15T17:00:00.000000Z",
+     "neueste_messung": "2026-03-15T09:00:00.000000Z",
+     "still_stunden": 0.0,
+     "grenze_stunden": null,
+     "status": "ok",
+     "warnung": false,
+     "tipp": null,
+     "anleitung": "/anleitung/iphone-kurzbefehl-essen"
+    },
+    {
+     "quelle": "fritzbox",
+     "geraet": null,
+     "name": "FritzBox",
+     "letzte_ankunft": "2026-03-15T17:00:00.000000Z",
+     "neueste_messung": "2026-03-14T22:00:00.000000Z",
+     "still_stunden": 0.0,
+     "grenze_stunden": 2,
+     "status": "ok",
+     "warnung": false,
+     "tipp": null,
+     "anleitung": "/anleitung/fritzbox"
+    }
+   ],
+   "noch_nicht_eingerichtet": [],
+   "einstellung_fehler": [],
+   "sicherung": {
+    "ziel": "/beispiel/sicherung",
+    "letzte": "2026-03-14T23:30:00.000000Z",
+    "alter_stunden": 17.5,
+    "anzahl": 1,
+    "db_bytes": 1048576,
+    "grenze_stunden": 48,
+    "status": "ok",
+    "warnung": false
+   },
+   "https": {
+    "eingeschaltet": true,
+    "laeuft": true,
+    "port": 8443,
+    "grund": null,
+    "gueltig_bis": "2036-03-01T12:00:00.000000Z",
+    "tage_gueltig": 3638,
+    "bald_tage": 30,
+    "status": "ok",
+    "warnung": false,
+    "text": null
+   },
+   "fotoanalyse": {
+    "status": "bereit",
+    "genutzt": true,
+    "tage": 30,
+    "auftraege": 4,
+    "wartend": 2,
+    "warnung": false,
+    "text": null
+   },
+   "serverfehler": {
+    "gestartet": "2026-03-15T17:00:00.000000Z",
+    "seit_start": 0,
+    "letzte_24h": 0,
+    "zuletzt": null,
+    "zuletzt_adresse": null,
+    "zuletzt_ausnahme": null,
+    "adressen": [],
+    "warnung": false,
+    "text": null
+   }
+  }
+ }
+}

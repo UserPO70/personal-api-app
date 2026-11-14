@@ -64,6 +64,23 @@ final class Api {
         return ((antwort as? HTTPURLResponse)?.statusCode ?? 0, daten)
     }
 
+    /// Ändern mit beliebigem JSON-Inhalt (PUT). Wirft bei einer Fehlerantwort wie `daten`.
+    func schicken(_ methode: String, _ pfad: String, koerper: Data) async throws -> Data {
+        var auftrag = URLRequest(url: try Server.url(adresse, pfad))
+        auftrag.httpMethod = methode
+        if let schluessel {
+            auftrag.setValue("Bearer \(schluessel)", forHTTPHeaderField: "Authorization")
+        }
+        auftrag.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        auftrag.httpBody = koerper
+        let (daten, antwort) = try await session.data(for: auftrag)
+        let status = (antwort as? HTTPURLResponse)?.statusCode ?? 0
+        guard (200..<300).contains(status) else {
+            throw ApiFehler.status(status, Self.detail(daten))
+        }
+        return daten
+    }
+
     static func fehlertext(_ daten: Data) -> String {
         detail(daten)
     }

@@ -28,11 +28,11 @@ final class EssenTests: XCTestCase {
     func testEssenstagLesen() throws {
         let tag = try beispiel("essen-tag", Essenstag.self).antwort
         XCTAssertEqual(tag.tag, "2026-03-15")
-        XCTAssertEqual(tag.anzahl, 4)
-        XCTAssertEqual(tag.summe?.kcal, 1549)
+        XCTAssertEqual(tag.anzahl, 5)
+        XCTAssertEqual(tag.summe?.kcal, 1777)
         XCTAssertEqual(tag.mahlzeiten.first?.uhrzeit, "08:00")
         XCTAssertEqual(tag.mahlzeiten.first?.titel, "Test-Müsli Beere (Testmarke)")
-        XCTAssertEqual(tag.mahlzeiten[1].titel, "Spaghetti, Tomatensoße")
+        XCTAssertEqual(tag.mahlzeiten[2].titel, "Spaghetti, Tomatensoße")
     }
 
     func testSendeantwortenLesen() throws {

@@ -20,9 +20,51 @@ struct Bestandteil: Codable, Equatable {
     var menge: Double?
     var einheit: String?
     var kcal: Double?
+    var eiweiss: Double?
+    var kohlenhydrate: Double?
+    var fett: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case lebensmittel, menge, einheit, kcal
+        case eiweiss = "eiweiss_g"
+        case kohlenhydrate = "kohlenhydrate_g"
+        case fett = "fett_g"
+    }
+
+    /// „250 g“, „2 Stück“ oder leer.
+    var mengeText: String {
+        guard let menge else { return "" }
+        let zahl = Zahl.text(menge).replacingOccurrences(of: ".", with: ",")
+        return einheit.map { "\(zahl) \($0)" } ?? zahl
+    }
 }
 
 struct Mahlzeit: Codable, Equatable, Identifiable {
+    /// Was der Server zur Herkunft der Zahlen weiß. Je nach Quelle fehlt das meiste, deshalb wird nachsichtig gelesen.
+    struct Einschaetzung: Codable, Equatable {
+        var sicherheit: String?
+        var hinweis: String?
+        var gewogen: Double?
+
+        enum CodingKeys: String, CodingKey {
+            case sicherheit, hinweis
+            case gewogen = "gewogen_g"
+        }
+
+        init(sicherheit: String? = nil, hinweis: String? = nil, gewogen: Double? = nil) {
+            self.sicherheit = sicherheit
+            self.hinweis = hinweis
+            self.gewogen = gewogen
+        }
+
+        init(from decoder: Decoder) throws {
+            let werte = try decoder.container(keyedBy: CodingKeys.self)
+            sicherheit = try? werte.decodeIfPresent(String.self, forKey: .sicherheit)
+            hinweis = try? werte.decodeIfPresent(String.self, forKey: .hinweis)
+            gewogen = try? werte.decodeIfPresent(Double.self, forKey: .gewogen)
+        }
+    }
+
     var id: Int
     var uhrzeit: String?
     var quelle: String?
@@ -30,6 +72,37 @@ struct Mahlzeit: Codable, Equatable, Identifiable {
     var art: String?
     var bestandteile: [Bestandteil]?
     var summe: Naehrwerte?
+    var daten: Einschaetzung?
+    var fotos: [Int]?
+    var artGeschaetzt: Bool?
+    var korrigiert: Bool?
+    var aenderbar: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case id, uhrzeit, quelle, notiz, art, bestandteile, summe, daten, korrigiert, aenderbar
+        case fotos = "foto_auftrag_ids"
+        case artGeschaetzt = "art_geschaetzt"
+    }
+
+    static let arten = ["Frühstück", "Mittag", "Abend", "Snack"]
+
+    /// Woher die Zahlen stammen, in Worten.
+    var herkunft: String {
+        if korrigiert == true { return "von Hand korrigiert" }
+        switch quelle {
+        case "foto": return daten?.gewogen != nil ? "Foto, Menge gewogen" : "Foto, von Claude geschätzt"
+        case "text": return "Text, von Claude geschätzt"
+        case "barcode": return "Barcode, Nährwerte von der Packung"
+        case "health": return "aus Apple Health"
+        case "manuell": return "von Hand eingetragen oder Favorit"
+        default: return quelle ?? "unbekannt"
+        }
+    }
+
+    /// Stammen die Zahlen aus einer Schätzung?
+    var geschaetzt: Bool {
+        korrigiert != true && (quelle == "text" || (quelle == "foto" && daten?.gewogen == nil))
+    }
 
     var titel: String {
         let namen = (bestandteile ?? []).compactMap(\.lebensmittel)

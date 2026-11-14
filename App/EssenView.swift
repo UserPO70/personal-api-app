@@ -1,27 +1,20 @@
 import SwiftUI
 
-/// Essen erfassen (die Knöpfe aus `Erfassen`), Warteschlange und der Essenstag.
+/// Warteschlange, laufende Schätzungen und die Mahlzeiten des Essenstags. Erfasst wird auf dem Heute-Bildschirm.
 struct EssenView: View {
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
     @State private var tag: Essenstag?
     @State private var standVon: Date?
-    /// Das heute geltende Kalorienziel, wenn eines festgelegt ist.
-    @State private var ziel: Kalorienstand.Ziel?
 
     var body: some View {
         NavigationStack {
             List {
                 if zustand.demo {
                     Section {
-                        Label("Demo: ausgedachte Daten. Erfassen geht erst mit eigenem Server.", systemImage: "theatermasks")
+                        Label("Demo: ausgedachte Daten, kein Server", systemImage: "theatermasks")
                             .foregroundStyle(.secondary)
                     }
-                }
-                Section {
-                    Erfassen()
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
                 }
                 if let meldung = schlange.meldung {
                     Section {
@@ -148,30 +141,10 @@ struct EssenView: View {
     private var essenstag: some View {
         Section {
             if let tag {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(Zahl.kcal(tag.summe?.kcal))
-                        .font(.title2.bold())
-                    Text("Eiweiß \(Zahl.gramm(tag.summe?.eiweiss)) · Kohlenhydrate \(Zahl.gramm(tag.summe?.kohlenhydrate)) · Fett \(Zahl.gramm(tag.summe?.fett))")
-                        .font(.footnote)
-                        .foregroundStyle(Color.secondary)
-                }
-                if let ziel {
-                    VStack(alignment: .leading, spacing: 6) {
-                        ProgressView(value: Kalorientext.anteil(gegessen: tag.summe?.kcal, ziel: ziel.kcal))
-                            .tint(Color.essen)
-                        Text("Ziel \(Zahl.kcal(ziel.kcal)) · \(Kalorientext.offen(gegessen: tag.summe?.kcal, ziel: ziel.kcal))")
-                            .font(.footnote)
-                            .foregroundStyle(Color.secondary)
-                    }
-                    .accessibilityElement(children: .combine)
-                }
-                if !zustand.demo {
-                    NavigationLink {
-                        KalorienView()
-                    } label: {
-                        Label(ziel == nil ? "Gewicht und Kalorienziel festlegen" : "Gewicht und Ziel", systemImage: "target")
-                    }
-                }
+                // Die Kalorien des Tages stehen groß auf „Heute“; hier nur die Nährwerte in einer Zeile.
+                Text("Eiweiß \(Zahl.gramm(tag.summe?.eiweiss)) · Kohlenhydrate \(Zahl.gramm(tag.summe?.kohlenhydrate)) · Fett \(Zahl.gramm(tag.summe?.fett))")
+                    .font(.footnote)
+                    .foregroundStyle(Color.secondary)
                 if tag.mahlzeiten.isEmpty {
                     Text("Noch nichts eingetragen.")
                         .foregroundStyle(Color.secondary)
@@ -236,19 +209,11 @@ struct EssenView: View {
             tag = neu
             standVon = nil
             schlange.merken(neu, als: "essenstag")
-            // Ältere Server kennen den Kalorienrechner nicht: Dann bleibt es ohne Ziel.
-            if let stand = try? await zustand.api().lesen(Kalorienstand.self, "GET", "/api/kalorien/profil") {
-                ziel = stand.ziel
-                schlange.merken(stand, als: "kalorien")
-            }
         } catch {
             if Task.isCancelled { return }
             if let (alt, wann) = schlange.gemerkt(Essenstag.self, "essenstag") {
                 tag = alt
                 standVon = wann
-            }
-            if let (alt, _) = schlange.gemerkt(Kalorienstand.self, "kalorien") {
-                ziel = alt.ziel
             }
         }
     }

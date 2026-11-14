@@ -1,39 +1,13 @@
-import PhotosUI
 import SwiftUI
 
-/// Essen erfassen (Foto, Barcode, Text, Favorit), Warteschlange und der Essenstag.
+/// Essen erfassen (die Knöpfe aus `Erfassen`), Warteschlange und der Essenstag.
 struct EssenView: View {
-    private struct Aufnahme {
-        let id = UUID()
-        let bild: UIImage
-    }
-
-    private enum Blatt: Identifiable {
-        case foto(Aufnahme)
-        case barcode, text, favoriten, zustimmung
-
-        var id: String {
-            switch self {
-            case .foto(let aufnahme): return aufnahme.id.uuidString
-            case .barcode: return "barcode"
-            case .text: return "text"
-            case .favoriten: return "favoriten"
-            case .zustimmung: return "zustimmung"
-            }
-        }
-    }
-
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
     @State private var tag: Essenstag?
     @State private var standVon: Date?
     /// Das heute geltende Kalorienziel, wenn eines festgelegt ist.
     @State private var ziel: Kalorienstand.Ziel?
-    @State private var blatt: Blatt?
-    @State private var kamera = false
-    @State private var aufgenommen: UIImage?
-    @State private var auswahl: PhotosPickerItem?
-    @State private var hinweis: String?
 
     var body: some View {
         NavigationStack {
@@ -45,7 +19,7 @@ struct EssenView: View {
                     }
                 }
                 Section {
-                    erfassen
+                    Erfassen()
                         .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
                 }
@@ -74,130 +48,9 @@ struct EssenView: View {
             await laden()
             await schlange.senden()
         }
-        .task {
-            // Solange Fotos oder Texte geschätzt werden, alle paar Sekunden nachsehen.
-            while !Task.isCancelled {
-                await schlange.analysenPruefen()
-                try? await Task.sleep(nanoseconds: 5_000_000_000)
-            }
-        }
         .onChange(of: schlange.neuesAmServer) {
             Task { await laden() }
         }
-        .onChange(of: auswahl) { _, neu in
-            guard let neu else { return }
-            auswahl = nil
-            Task {
-                if let daten = try? await neu.loadTransferable(type: Data.self), let bild = UIImage(data: daten) {
-                    blatt = .foto(Aufnahme(bild: bild))
-                } else {
-                    hinweis = "Das Bild lässt sich nicht lesen."
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $kamera, onDismiss: kameraZu) {
-            Kamera { bild in
-                aufgenommen = bild
-                kamera = false
-            }
-            .ignoresSafeArea()
-        }
-        .sheet(item: $blatt) { blatt in
-            switch blatt {
-            case .foto(let aufnahme):
-                FotoBlatt(bild: aufnahme.bild)
-            case .barcode:
-                BarcodeBlatt()
-            case .text:
-                TextBlatt()
-            case .favoriten:
-                FavoritenBlatt()
-            case .zustimmung:
-                ZustimmungView()
-            }
-        }
-        .alert("Hinweis", isPresented: hinweisZeigen) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(hinweis ?? "")
-        }
-    }
-
-    private var hinweisZeigen: Binding<Bool> {
-        Binding(get: { hinweis != nil }, set: { if !$0 { hinweis = nil } })
-    }
-
-    // MARK: Erfassen
-
-    private var erfassen: some View {
-        VStack(spacing: 12) {
-            Button {
-                if claudeErlaubt() {
-                    if Kamera.vorhanden {
-                        kamera = true
-                    } else {
-                        hinweis = "Dieses Gerät hat keine Kamera. Nimm ein Foto aus der Mediathek."
-                    }
-                }
-            } label: {
-                Label("Foto", systemImage: "camera.fill")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-
-            HStack(spacing: 12) {
-                knopf("Barcode", "barcode.viewfinder") { blatt = .barcode }
-                knopf("Text", "text.cursor") {
-                    if claudeErlaubt() { blatt = .text }
-                }
-                knopf("Favorit", "star") { blatt = .favoriten }
-            }
-
-            if zustand.zustimmung == .ja {
-                PhotosPicker(selection: $auswahl, matching: .images) {
-                    Label("Foto aus der Mediathek", systemImage: "photo.on.rectangle")
-                        .font(.subheadline)
-                }
-                .buttonStyle(.borderless)
-            }
-        }
-        .disabled(zustand.demo)
-    }
-
-    private func knopf(_ name: String, _ symbol: String, _ aktion: @escaping () -> Void) -> some View {
-        Button(action: aktion) {
-            VStack(spacing: 6) {
-                Image(systemName: symbol)
-                    .font(.title3)
-                Text(name)
-                    .font(.subheadline)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 4)
-        }
-        .buttonStyle(.bordered)
-    }
-
-    /// Foto und Text gehen über den Server an Claude: nur mit Zustimmung.
-    private func claudeErlaubt() -> Bool {
-        switch zustand.zustimmung {
-        case .ja:
-            return true
-        case .offen:
-            blatt = .zustimmung
-            return false
-        case .nein:
-            hinweis = "Die Fotoanalyse ist ausgeschaltet. Du kannst sie in den Einstellungen einschalten. Barcode und Favoriten gehen auch so."
-            return false
-        }
-    }
-
-    private func kameraZu() {
-        guard let bild = aufgenommen else { return }
-        aufgenommen = nil
-        blatt = .foto(Aufnahme(bild: bild))
     }
 
     // MARK: Warteschlange

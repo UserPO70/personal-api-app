@@ -155,5 +155,8 @@ final class MahlzeitTests: XCTestCase {
         XCTAssertEqual(Dauertext.ganzzahl(9151), "9.151")
         XCTAssertEqual(Dauertext.ganzzahl(12_005), "12.005")
         XCTAssertEqual(Dauertext.ganzzahl(812), "812")
+        XCTAssertEqual(Dauertext.wartend(eintraege: 1, analysen: 0), "1 Eintrag wartet auf den Server")
+        XCTAssertEqual(Dauertext.wartend(eintraege: 3, analysen: 1), "3 Einträge warten auf den Server · 1 wird geschätzt")
+        XCTAssertEqual(Dauertext.wartend(eintraege: 0, analysen: 2), "2 werden geschätzt")
     }
 }

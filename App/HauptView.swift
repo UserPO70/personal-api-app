@@ -37,6 +37,13 @@ struct HauptView: View {
                 await Warteschlange.shared.senden()
             }
         }
+        // Solange Fotos oder Texte geschätzt werden, alle paar Sekunden nachsehen, egal welcher Tab offen ist.
+        .task {
+            while !Task.isCancelled {
+                await Warteschlange.shared.analysenPruefen()
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+            }
+        }
         .sheet(isPresented: $fragtZustimmung) {
             ZustimmungView()
         }

@@ -70,58 +70,139 @@ enum Dauertext {
         guard zahl >= 1000 else { return "\(zahl)" }
         return "\(zahl / 1000).\(String(format: "%03d", zahl % 1000))"
     }
+
+    /// „2 Einträge warten auf den Server · 1 wird geschätzt“
+    static func wartend(eintraege: Int, analysen: Int) -> String {
+        var teile: [String] = []
+        if eintraege == 1 { teile.append("1 Eintrag wartet auf den Server") }
+        if eintraege > 1 { teile.append("\(eintraege) Einträge warten auf den Server") }
+        if analysen == 1 { teile.append("1 wird geschätzt") }
+        if analysen > 1 { teile.append("\(analysen) werden geschätzt") }
+        return teile.isEmpty ? "Im Tab Essen braucht etwas deinen Blick" : teile.joined(separator: " · ")
+    }
 }
 
-/// Der Tag auf einen Blick: Essen mit Ziel, Bewegung, Schlaf, PC-Zeit, Gewicht.
+/// Eine Kachel mit Symbol, Name und Wert. Die Bereichsfarbe sitzt nur im Symbol, der Text bleibt in den Textfarben.
+struct Kachel: View {
+    let name: String
+    let wert: String
+    let symbol: String
+    let farbe: Color
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: symbol)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(farbe)
+                .frame(width: 26)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(name)
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
+                Text(wert)
+                    .font(.headline.monospacedDigit())
+                    .foregroundStyle(Color.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .combine)
+    }
+}
+
+extension Color {
+    /// Bereichsfarbe „pc-zeit“ aus dem Designkonzept, hell und dunkel.
+    static let pcZeit = Color(uiColor: UIColor { merkmale in
+        merkmale.userInterfaceStyle == .dark
+            ? UIColor(red: 0x77 / 255, green: 0x61 / 255, blue: 0xE3 / 255, alpha: 1)
+            : UIColor(red: 0x6B / 255, green: 0x30 / 255, blue: 0xAC / 255, alpha: 1)
+    })
+}
+
+/// Der Hauptbildschirm: oben Essen erfassen, darunter der Tag auf einen Blick, möglichst ohne Scrollen.
 struct HeuteView: View {
+    /// Ein Wert des Tages für eine Kachel.
+    private struct Wert: Identifiable {
+        let name: String
+        let wert: String
+        let symbol: String
+        let farbe: Color
+
+        var id: String { name }
+    }
+
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
     @State private var tag: Tagesueberblick?
     @State private var standVon: Date?
     @State private var fehler: String?
 
+    private let spalten = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+
     var body: some View {
         NavigationStack {
-            List {
-                if zustand.demo {
-                    Section {
+            ScrollView {
+                VStack(spacing: 12) {
+                    if zustand.demo {
                         Label("Demo: ausgedachte Daten, kein Server", systemImage: "theatermasks")
+                            .font(.footnote)
                             .foregroundStyle(Color.secondary)
                     }
-                }
-                if let tag {
-                    essen(tag)
-                    bewegung(tag)
-                    if let minuten = tag.uebersicht?.schlaf?.minuten {
-                        Section("Schlaf") {
-                            LabeledContent("Letzte Nacht", value: Dauertext.minuten(minuten))
-                        }
+                    Erfassen()
+                    if !schlange.eintraege.isEmpty || schlange.analysen.contains(where: \.laeuft) {
+                        Label(Dauertext.wartend(eintraege: schlange.eintraege.count,
+                                                analysen: schlange.analysen.filter(\.laeuft).count),
+                              systemImage: "tray.and.arrow.up")
+                            .font(.footnote)
+                            .foregroundStyle(Color.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    if let minuten = tag.uebersicht?.pcMinuten, minuten > 0 {
-                        Section("PC-Zeit") {
-                            LabeledContent("Heute", value: Dauertext.minuten(minuten))
-                        }
-                    }
-                    if !zustand.demo {
-                        Section {
-                            NavigationLink {
-                                KalorienView()
-                            } label: {
-                                LabeledContent("Gewicht und Ziel", value: tag.koerper?.gewicht.map { Gewichtstext.kg($0.kg) } ?? "eintragen")
+                    if let tag {
+                        kalorien(tag)
+                        LazyVGrid(columns: spalten, spacing: 10) {
+                            ForEach(werte(tag)) { wert in
+                                Kachel(name: wert.name, wert: wert.wert, symbol: wert.symbol, farbe: wert.farbe)
+                            }
+                            if !zustand.demo {
+                                NavigationLink {
+                                    KalorienView()
+                                } label: {
+                                    Kachel(name: "Gewicht und Ziel",
+                                           wert: tag.koerper?.gewicht.map { Gewichtstext.kg($0.kg) } ?? "eintragen",
+                                           symbol: "scalemass", farbe: .gesundheit)
+                                }
+                                .buttonStyle(.plain)
                             }
                         }
-                    }
-                } else if let fehler {
-                    Section {
+                        if let standVon {
+                            Text("Server nicht erreichbar. Stand von \(standVon.formatted(date: .abbreviated, time: .shortened)).")
+                                .font(.footnote)
+                                .foregroundStyle(Color.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    } else if let fehler {
                         Label(fehler, systemImage: "exclamationmark.triangle")
                             .foregroundStyle(Color.orange)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    } else {
+                        ProgressView()
+                            .padding(.top, 24)
                     }
-                } else {
-                    Section { ProgressView() }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
+            .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Heute")
-            .refreshable { await laden() }
+            .navigationBarTitleDisplayMode(.inline)
+            .refreshable {
+                await schlange.senden(alle: true)
+                await laden()
+            }
             .task { await laden() }
             .onChange(of: schlange.neuesAmServer) {
                 Task { await laden() }
@@ -129,49 +210,56 @@ struct HeuteView: View {
         }
     }
 
-    private func essen(_ tag: Tagesueberblick) -> some View {
-        Section {
-            VStack(alignment: .leading, spacing: 6) {
+    private func kalorien(_ tag: Tagesueberblick) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
                 Text(Zahl.kcal(tag.essen?.summe?.kcal))
-                    .font(.title2.bold())
+                    .font(.title.bold().monospacedDigit())
+                Spacer()
                 if let ziel = tag.essen?.ziel {
-                    ProgressView(value: Kalorientext.anteil(gegessen: tag.essen?.summe?.kcal, ziel: ziel.kcal))
-                        .tint(Color.essen)
-                    Text("Ziel \(Zahl.kcal(ziel.kcal)) · \(Kalorientext.offen(gegessen: tag.essen?.summe?.kcal, ziel: ziel.kcal))")
-                        .font(.footnote)
-                        .foregroundStyle(Color.secondary)
-                } else if (tag.essen?.anzahl ?? 0) == 0 {
-                    Text("Heute ist noch nichts eingetragen.")
-                        .font(.footnote)
+                    Text("Ziel \(Zahl.kcal(ziel.kcal))")
+                        .font(.subheadline.monospacedDigit())
                         .foregroundStyle(Color.secondary)
                 }
             }
-            .accessibilityElement(children: .combine)
-        } header: {
-            Text("Essen")
-        } footer: {
-            if let standVon {
-                Text("Server nicht erreichbar. Stand von \(standVon.formatted(date: .abbreviated, time: .shortened)).")
+            if let ziel = tag.essen?.ziel {
+                ProgressView(value: Kalorientext.anteil(gegessen: tag.essen?.summe?.kcal, ziel: ziel.kcal))
+                    .tint(Color.essen)
+                Text(Kalorientext.offen(gegessen: tag.essen?.summe?.kcal, ziel: ziel.kcal))
+                    .font(.footnote)
+                    .foregroundStyle(Color.secondary)
+            } else {
+                Text((tag.essen?.anzahl ?? 0) == 0 ? "Heute ist noch nichts eingetragen." : "Noch kein Kalorienziel festgelegt.")
+                    .font(.footnote)
+                    .foregroundStyle(Color.secondary)
             }
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .combine)
     }
 
-    @ViewBuilder
-    private func bewegung(_ tag: Tagesueberblick) -> some View {
+    /// Nur Werte, die es an dem Tag gibt. Was fehlt, nimmt keinen Platz weg.
+    private func werte(_ tag: Tagesueberblick) -> [Wert] {
+        var liste: [Wert] = []
         let uebersicht = tag.uebersicht
-        if uebersicht?.schritte != nil || uebersicht?.strecke != nil || uebersicht?.stockwerke != nil {
-            Section("Bewegung") {
-                if let schritte = uebersicht?.schritte {
-                    LabeledContent("Schritte", value: Dauertext.ganzzahl(schritte))
-                }
-                if let strecke = uebersicht?.strecke {
-                    LabeledContent("Strecke", value: Dauertext.kilometer(strecke))
-                }
-                if let stockwerke = uebersicht?.stockwerke {
-                    LabeledContent("Stockwerke", value: Dauertext.ganzzahl(stockwerke))
-                }
-            }
+        if let schritte = uebersicht?.schritte {
+            liste.append(Wert(name: "Schritte", wert: Dauertext.ganzzahl(schritte), symbol: "figure.walk", farbe: .gesundheit))
         }
+        if let strecke = uebersicht?.strecke {
+            liste.append(Wert(name: "Strecke", wert: Dauertext.kilometer(strecke), symbol: "map", farbe: .gesundheit))
+        }
+        if let stockwerke = uebersicht?.stockwerke {
+            liste.append(Wert(name: "Stockwerke", wert: Dauertext.ganzzahl(stockwerke), symbol: "stairs", farbe: .gesundheit))
+        }
+        if let minuten = uebersicht?.schlaf?.minuten {
+            liste.append(Wert(name: "Schlaf", wert: Dauertext.minuten(minuten), symbol: "bed.double.fill", farbe: .gesundheit))
+        }
+        if let minuten = uebersicht?.pcMinuten, minuten > 0 {
+            liste.append(Wert(name: "PC-Zeit", wert: Dauertext.minuten(minuten), symbol: "desktopcomputer", farbe: .pcZeit))
+        }
+        return liste
     }
 
     private func laden() async {

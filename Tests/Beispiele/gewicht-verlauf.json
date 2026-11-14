@@ -1,0 +1,164 @@
+{
+ "adresse": "GET /api/koerper/gewicht/verlauf",
+ "anfrage": {
+  "pfad": "/api/koerper/gewicht/verlauf?bis=2026-03-15&tage=14",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "von": "2026-03-02",
+  "bis": "2026-03-15",
+  "tage": [
+   {
+    "tag": "2026-03-02",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.83
+   },
+   {
+    "tag": "2026-03-03",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.83
+   },
+   {
+    "tag": "2026-03-04",
+    "kg": 84.1,
+    "messungen": 1,
+    "mittel_7_tage": 83.8
+   },
+   {
+    "tag": "2026-03-05",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.8
+   },
+   {
+    "tag": "2026-03-06",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.8
+   },
+   {
+    "tag": "2026-03-07",
+    "kg": 83.2,
+    "messungen": 1,
+    "mittel_7_tage": 83.73
+   },
+   {
+    "tag": "2026-03-08",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.65
+   },
+   {
+    "tag": "2026-03-09",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.65
+   },
+   {
+    "tag": "2026-03-10",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.65
+   },
+   {
+    "tag": "2026-03-11",
+    "kg": 83.8,
+    "messungen": 1,
+    "mittel_7_tage": 83.5
+   },
+   {
+    "tag": "2026-03-12",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.5
+   },
+   {
+    "tag": "2026-03-13",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.5
+   },
+   {
+    "tag": "2026-03-14",
+    "kg": null,
+    "messungen": 0,
+    "mittel_7_tage": 83.8
+   },
+   {
+    "tag": "2026-03-15",
+    "kg": 81.6,
+    "messungen": 1,
+    "mittel_7_tage": 82.7
+   }
+  ],
+  "messungen": [
+   {
+    "id": 21,
+    "zeit": "2026-03-04T07:21:23.227871Z",
+    "kg": 84.1,
+    "quelle": "manuell",
+    "notiz": null,
+    "extern_id": "test-gewicht-2026-03-04",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "geaendert_am": null,
+    "tag": "2026-03-04"
+   },
+   {
+    "id": 22,
+    "zeit": "2026-03-07T06:21:40.635107Z",
+    "kg": 83.2,
+    "quelle": "manuell",
+    "notiz": null,
+    "extern_id": "test-gewicht-2026-03-07",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "geaendert_am": null,
+    "tag": "2026-03-07"
+   },
+   {
+    "id": 23,
+    "zeit": "2026-03-11T06:28:38.445882Z",
+    "kg": 83.8,
+    "quelle": "manuell",
+    "notiz": null,
+    "extern_id": "test-gewicht-2026-03-11",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "geaendert_am": null,
+    "tag": "2026-03-11"
+   },
+   {
+    "id": 24,
+    "zeit": "2026-03-15T06:15:00.000000Z",
+    "kg": 81.6,
+    "quelle": "app",
+    "notiz": null,
+    "extern_id": "app-gewicht-1",
+    "erfasst_am": "2026-03-15T17:00:00.000000Z",
+    "geaendert_am": null,
+    "tag": "2026-03-15"
+   }
+  ],
+  "letzte": {
+   "id": 24,
+   "zeit": "2026-03-15T06:15:00.000000Z",
+   "kg": 81.6,
+   "quelle": "app",
+   "notiz": null,
+   "extern_id": "app-gewicht-1",
+   "erfasst_am": "2026-03-15T17:00:00.000000Z",
+   "geaendert_am": null,
+   "tag": "2026-03-15"
+  },
+  "jemals_daten": true,
+  "veraenderung": {
+   "von": "2026-02-16",
+   "bis": "2026-03-15",
+   "tage_mit_messung": 8,
+   "kg_pro_woche": -0.51,
+   "grund": null
+  }
+ }
+}

@@ -1,0 +1,24 @@
+{
+ "adresse": "POST /api/essen/barcode",
+ "anfrage": {
+  "pfad": "/api/essen/barcode",
+  "mit_schluessel": true,
+  "json": {
+   "barcode": "4000000000013",
+   "notiz": "zwei Hände voll",
+   "menge_schaetzen": true,
+   "zeit": "2026-03-15T10:00:00+01:00",
+   "extern_id": "app-6"
+  }
+ },
+ "status": 202,
+ "medientyp": "application/json",
+ "antwort": {
+  "id": 2,
+  "doppelt": false,
+  "status": "wartet",
+  "mahlzeit_id": null,
+  "warten_vor": 0,
+  "barcode": "4000000000013"
+ }
+}

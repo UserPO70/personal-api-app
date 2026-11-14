@@ -4,7 +4,7 @@ import Foundation
 /// deshalb darf ein Eintrag beliebig oft gesendet werden.
 struct Eintrag: Codable, Equatable, Identifiable {
     enum Art: String, Codable {
-        case foto, barcode, text, favorit
+        case foto, barcode, text, favorit, gewicht
     }
 
     enum Stand: String, Codable {
@@ -24,6 +24,10 @@ struct Eintrag: Codable, Equatable, Identifiable {
     var text: String?
     var favorit: String?
     var faktor: Double?
+    /// Körpergewicht in kg (Art `gewicht`).
+    var kg: Double?
+    /// Barcode: Claude schätzt die Menge aus der Notiz, die Nährwerte bleiben die der Packung.
+    var mengeSchaetzen: Bool?
     var versuche: Int = 0
     var naechsterVersuch: Date?
     var stand: Stand = .wartet
@@ -34,7 +38,7 @@ struct Eintrag: Codable, Equatable, Identifiable {
     }
 
     /// Fotos und Texte schätzt Claude, das braucht die Zustimmung.
-    var brauchtZustimmung: Bool { art == .foto || art == .text }
+    var brauchtZustimmung: Bool { art == .foto || art == .text || mengeSchaetzen == true }
 
     var symbol: String {
         switch art {
@@ -42,6 +46,7 @@ struct Eintrag: Codable, Equatable, Identifiable {
         case .barcode: return "barcode"
         case .text: return "text.cursor"
         case .favorit: return "star"
+        case .gewicht: return "scalemass"
         }
     }
 }
@@ -82,6 +87,7 @@ extension Eintrag {
             json["barcode"] = barcode ?? ""
             if let menge { json["menge"] = menge }
             if let einheit { json["einheit"] = einheit }
+            if mengeSchaetzen == true { json["menge_schaetzen"] = true }
             return try Self.json("/api/essen/barcode", json)
         case .text:
             var json = grundfelder()
@@ -92,6 +98,10 @@ extension Eintrag {
             json["name"] = favorit ?? ""
             if let faktor { json["faktor"] = faktor }
             return try Self.json("/api/essen/favorit", json)
+        case .gewicht:
+            var json: [String: Any] = ["kg": kg ?? 0, "zeit": zeitText, "quelle": "app", "extern_id": id]
+            if let notiz, !notiz.isEmpty { json["notiz"] = notiz }
+            return try Self.json("/api/koerper/gewicht", json)
         }
     }
 

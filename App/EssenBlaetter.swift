@@ -169,6 +169,7 @@ struct BarcodeBlatt: View {
     @State private var einheit = "Standard"
     @State private var menge = ""
     @State private var notiz = ""
+    @State private var schaetzen = false
     @State private var zurLetzten = false
     @State private var fehler: String?
 
@@ -232,8 +233,8 @@ struct BarcodeBlatt: View {
                         TextField("Menge", text: $menge)
                             .keyboardType(.decimalPad)
                     }
-                    if let produkt = auskunft?.produkt {
-                        LabeledContent("Ergibt", value: vorschau(produkt))
+                    if let auskunft, auskunft.produkt != nil, !schaetzt {
+                        LabeledContent("Ergibt", value: vorschau(auskunft))
                     }
                 } header: {
                     Text("Menge")
@@ -241,9 +242,12 @@ struct BarcodeBlatt: View {
                     Text(mengenhinweis)
                 }
                 Section {
-                    TextField("Notiz, z. B. zum Abendbrot", text: $notiz)
+                    TextField("Notiz, z. B. 10 Stück gegessen", text: $notiz)
+                    if darfSchaetzen {
+                        Toggle("Menge aus der Notiz schätzen lassen", isOn: $schaetzen)
+                    }
                 } footer: {
-                    Text("Wird nur dazugeschrieben und ändert die Nährwerte nicht.")
+                    Text(notizhinweis)
                 }
                 LetzteSchalter(an: $zurLetzten)
                 Fehlerzeile(text: fehler)
@@ -264,30 +268,50 @@ struct BarcodeBlatt: View {
 
     /// Nur Einheiten, mit denen der Server für dieses Produkt rechnen kann. Ohne Auskunft alle.
     private var waehlbar: [String] {
-        guard let produkt = auskunft?.produkt else { return Self.einheiten }
-        return ["Standard"] + produkt.einheiten
+        guard let auskunft, auskunft.produkt != nil else { return Self.einheiten }
+        return ["Standard"] + auskunft.waehlbar
+    }
+
+    /// Die Menge schätzt Claude nur, wenn keine Menge gewählt ist und die Fotoanalyse erlaubt ist.
+    private var darfSchaetzen: Bool {
+        zustand.zustimmung == .ja && einheit == "Standard"
+            && !notiz.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var schaetzt: Bool { darfSchaetzen && schaetzen }
+
+    private var notizhinweis: String {
+        if schaetzt {
+            return "Claude schätzt auf deinem Server nur die Menge aus der Notiz. Die Nährwerte je 100 g bleiben die von der Packung. Die Mahlzeit erscheint nach der Schätzung."
+        }
+        if darfSchaetzen {
+            return "Die Notiz wird nur dazugeschrieben. Mit dem Schalter schätzt Claude daraus die Menge."
+        }
+        return "Wird nur dazugeschrieben und ändert die Nährwerte nicht."
     }
 
     private var mengenhinweis: String {
         guard let auskunft else {
             return "Standard: eine Portion laut Packung, sonst 100 g. Ob Portion und Stück für dieses Produkt gehen, zeigt sich erst beim Nachschlagen."
         }
-        guard let produkt = auskunft.produkt else {
+        guard auskunft.produkt != nil else {
             return "Für ein unbekanntes Produkt gibt es keine Nährwerte, egal mit welcher Einheit."
         }
-        var teile = ["Standard: \(produkt.portion == nil ? "100 g" : "eine Portion (\(Zahl.text(produkt.standardGramm)) g)")."]
-        let fehlt = ["Portion", "Stück"].filter { produkt.groesse($0) == nil }
+        var teile: [String] = []
+        if let standard = auskunft.standardText { teile.append("Standard: \(standard).") }
+        let fehlt = auskunft.nichtWaehlbar.map(\.einheit)
         if !fehlt.isEmpty {
             teile.append("\(fehlt.joined(separator: " und ")) fehlt, weil die Packung dafür keine Größe nennt.")
-        } else if produkt.stueck == nil {
+        }
+        if auskunft.angabe("Stück")?.wiePortion == true {
             teile.append("Ein Stück zählt wie eine Portion, weil die Packung kein Stückgewicht nennt.")
         }
         return teile.joined(separator: " ")
     }
 
-    private func vorschau(_ produkt: BarcodeAuskunft.Produkt) -> String {
+    private func vorschau(_ auskunft: BarcodeAuskunft) -> String {
         let gewaehlt = einheit == "Standard" ? nil : einheit
-        guard let kcal = produkt.kcal(menge: Zahl.lesen(menge), einheit: gewaehlt) else {
+        guard let kcal = auskunft.kcal(menge: Zahl.lesen(menge), einheit: gewaehlt) else {
             return gewaehlt == nil ? "keine Nährwerte bekannt" : "–"
         }
         return Zahl.kcal(kcal)
@@ -312,7 +336,7 @@ struct BarcodeBlatt: View {
             auskunft = neu
             suchhinweis = nil
             // Eine Einheit, die es für dieses Produkt nicht gibt, bleibt nicht gewählt.
-            if let produkt = neu.produkt, einheit != "Standard", !produkt.einheiten.contains(einheit) {
+            if neu.produkt != nil, einheit != "Standard", !neu.waehlbar.contains(einheit) {
                 einheit = "Standard"
             }
         } catch {
@@ -334,7 +358,8 @@ struct BarcodeBlatt: View {
         let name = auskunft?.produkt?.bezeichnung ?? auskunft?.produkt?.name ?? "Barcode \(sauber)"
         let bemerkung = notiz.trimmingCharacters(in: .whitespacesAndNewlines)
         let eintrag = Eintrag(id: Eintrag.neueKennung(), art: .barcode, zeit: Date(), titel: name,
-                              notiz: bemerkung.isEmpty ? nil : bemerkung, barcode: sauber, menge: anzahl, einheit: einheit == "Standard" ? nil : einheit)
+                              notiz: bemerkung.isEmpty ? nil : bemerkung, barcode: sauber, menge: anzahl, einheit: einheit == "Standard" ? nil : einheit,
+                              mengeSchaetzen: schaetzt ? true : nil)
         do {
             try einreihen(eintrag, zurLetzten: zurLetzten)
             schliessen()

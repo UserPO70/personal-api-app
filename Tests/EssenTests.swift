@@ -63,23 +63,100 @@ final class EssenTests: XCTestCase {
     }
 
     func testEinheitenJeProdukt() throws {
-        // Das Beispielprodukt nennt eine Portion (50 g), aber kein Stückgewicht.
-        var produkt = try XCTUnwrap(beispiel("essen-barcode-nachschlagen", BarcodeAuskunft.self).antwort.produkt)
-        XCTAssertEqual(produkt.einheiten, ["g", "ml", "Portion", "Stück"])
-        XCTAssertEqual(produkt.kcal(menge: nil, einheit: nil), 190)       // Standard: eine Portion
-        XCTAssertEqual(produkt.kcal(menge: 80, einheit: "g"), 304)        // wie in essen-barcode.json
-        XCTAssertEqual(produkt.kcal(menge: 2, einheit: "Portion"), 380)
-        XCTAssertEqual(produkt.kcal(menge: 3, einheit: "Stück"), 570)     // Stück zählt wie eine Portion
-        XCTAssertNil(produkt.kcal(menge: nil, einheit: "g"))
+        // Das Beispielprodukt nennt eine Portion (50 g), aber kein Stückgewicht. Welche Einheiten gehen, sagt der Server.
+        var auskunft = try beispiel("essen-barcode-nachschlagen", BarcodeAuskunft.self).antwort
+        XCTAssertEqual(auskunft.waehlbar, ["g", "ml", "Portion", "Stück"])
+        XCTAssertEqual(auskunft.standardText, "1 Portion (50 g)")
+        XCTAssertEqual(auskunft.angabe("Stück")?.wiePortion, true)
+        XCTAssertEqual(auskunft.kcal(menge: nil, einheit: nil), 190)       // Standard: eine Portion
+        XCTAssertEqual(auskunft.kcal(menge: 80, einheit: "g"), 304)        // wie in essen-barcode.json
+        XCTAssertEqual(auskunft.kcal(menge: 2, einheit: "Portion"), 380)
+        XCTAssertEqual(auskunft.kcal(menge: 3, einheit: "Stück"), 570)     // Stück zählt wie eine Portion
+        XCTAssertNil(auskunft.kcal(menge: nil, einheit: "g"))
 
-        produkt.stueck = 12
-        XCTAssertEqual(produkt.kcal(menge: 10, einheit: "Stück"), 456)
+        // Packung ohne Portionsgröße: Der Server meldet Portion und Stück als nicht berechenbar.
+        auskunft.einheiten = [
+            .init(einheit: "g", rechnet: true, gramm: 1),
+            .init(einheit: "ml", rechnet: true, gramm: 1),
+            .init(einheit: "Portion", rechnet: false, gramm: nil, hinweis: "Die Packung nennt keine Größe je Portion"),
+            .init(einheit: "Stück", rechnet: false, gramm: nil),
+        ]
+        auskunft.standard = .init(menge: 100, einheit: "g", gramm: 100, rechnet: true)
+        XCTAssertEqual(auskunft.waehlbar, ["g", "ml"])
+        XCTAssertEqual(auskunft.nichtWaehlbar.map(\.einheit), ["Portion", "Stück"])
+        XCTAssertEqual(auskunft.standardText, "100 g")
+        XCTAssertEqual(auskunft.kcal(menge: nil, einheit: nil), 380)       // Standard: 100 g
+        XCTAssertNil(auskunft.kcal(menge: 1, einheit: "Portion"))
 
-        produkt.stueck = nil
-        produkt.portion = nil
-        XCTAssertEqual(produkt.einheiten, ["g", "ml"])
-        XCTAssertEqual(produkt.kcal(menge: nil, einheit: nil), 380)       // Standard: 100 g
-        XCTAssertNil(produkt.kcal(menge: 1, einheit: "Portion"))
+        // Älterer Server ohne diese Angaben: alles bleibt wählbar, aber ohne Vorschau.
+        auskunft.einheiten = nil
+        auskunft.standard = nil
+        XCTAssertEqual(auskunft.waehlbar, BarcodeAuskunft.alleEinheiten)
+        XCTAssertNil(auskunft.kcal(menge: 80, einheit: "g"))
+    }
+
+    func testBarcodeMengeSchaetzen() throws {
+        var scan = eintrag(.barcode)
+        scan.barcode = "4000000000013"
+        scan.notiz = "zwei Hände voll"
+        XCTAssertFalse(scan.brauchtZustimmung)
+        XCTAssertNil(try json(scan.anfrage(bild: nil))["menge_schaetzen"])
+        scan.mengeSchaetzen = true
+        XCTAssertTrue(scan.brauchtZustimmung)   // geht über Claude
+        XCTAssertEqual(try json(scan.anfrage(bild: nil))["menge_schaetzen"] as? Bool, true)
+        let antwort = try beispiel("essen-barcode-menge-schaetzen", Sendeantwort.self)
+        XCTAssertEqual(antwort.status, 202)
+        XCTAssertEqual(antwort.antwort.status, "wartet")
+        XCTAssertEqual(antwort.antwort.id, 2)
+    }
+
+    func testGewichtAnfrageUndVerlauf() throws {
+        var messung = eintrag(.gewicht)
+        messung.kg = 81.6
+        XCTAssertFalse(messung.brauchtZustimmung)
+        let anfrage = try messung.anfrage(bild: nil)
+        XCTAssertEqual(anfrage.pfad, "/api/koerper/gewicht")
+        let inhalt = try json(anfrage)
+        XCTAssertEqual(inhalt["kg"] as? Double, 81.6)
+        XCTAssertEqual(inhalt["quelle"] as? String, "app")
+        XCTAssertEqual(inhalt["extern_id"] as? String, "app-1")
+        XCTAssertEqual(inhalt["zeit"] as? String, "2026-03-15T07:30:00Z")
+        XCTAssertEqual(Ergebnis.bewerten(status: 201, art: .gewicht), .erledigt)
+        XCTAssertEqual(Ergebnis.bewerten(status: 422, art: .gewicht), .fehlgeschlagen(nil))
+        XCTAssertEqual(try beispiel("gewicht-doppelt", Sendeantwort.self).antwort.doppelt, true)
+
+        let verlauf = try beispiel("gewicht-verlauf", Gewichtsverlauf.self).antwort
+        XCTAssertEqual(verlauf.tage.count, 14)
+        XCTAssertNil(verlauf.tage[0].kg)                       // Tag ohne Messung bleibt eine Lücke
+        XCTAssertEqual(verlauf.tage[0].mittel, 83.83)
+        XCTAssertEqual(verlauf.tage.last?.kg, 81.6)
+        XCTAssertEqual(verlauf.letzte?.kg, 81.6)
+        XCTAssertEqual(verlauf.veraenderung?.kgProWoche, -0.51)
+        XCTAssertEqual(verlauf.achse, 80...86)
+        XCTAssertNotNil(Gewichtsverlauf.datum("2026-03-15"))
+        XCTAssertNil(Gewichtsverlauf.datum("gestern"))
+        XCTAssertEqual(Gewichtstext.kg(81.6), "81,6 kg")
+        XCTAssertEqual(Gewichtstext.proWoche(-0.51), "−0,51 kg je Woche")
+        XCTAssertEqual(Gewichtstext.proWoche(0.3), "+0,30 kg je Woche")
+    }
+
+    @MainActor
+    func testGewichtAendertDieLetzteMahlzeitNicht() throws {
+        let schlange = leereSchlange()
+        var mahlzeit = eintrag(.barcode)
+        mahlzeit.id = "app-mahlzeit"
+        try schlange.aufnehmen(mahlzeit)
+        var messung = eintrag(.gewicht)
+        messung.id = "app-gewicht"
+        messung.kg = 81.6
+        messung.zeit = mahlzeit.zeit.addingTimeInterval(60)
+        try schlange.aufnehmen(messung, zurLetzten: true)
+        XCTAssertNil(schlange.eintraege[1].gehoertZu)
+        var dazu = eintrag(.text)
+        dazu.id = "app-dazu"
+        dazu.zeit = mahlzeit.zeit.addingTimeInterval(120)
+        try schlange.aufnehmen(dazu, zurLetzten: true)
+        XCTAssertEqual(schlange.eintraege[2].gehoertZu, "app-mahlzeit")
     }
 
     func testBarcodeMitNotiz() throws {

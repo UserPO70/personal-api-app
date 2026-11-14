@@ -80,6 +80,15 @@ struct UebersichtView: View {
                         ProgressView()
                     }
                 }
+                if !zustand.demo {
+                    Section {
+                        NavigationLink {
+                            GewichtView()
+                        } label: {
+                            Label("Gewicht", systemImage: "scalemass")
+                        }
+                    }
+                }
                 Section {
                     Text("Hier erscheint bald dein Tag: Essen, Schritte, Wege und PC-Zeit.")
                         .foregroundStyle(.secondary)

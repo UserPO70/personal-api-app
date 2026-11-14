@@ -23,6 +23,39 @@
    },
    "stueck_g": null,
    "bezeichnung": "Test-Müsli Beere (Testmarke)"
+  },
+  "einheiten": [
+   {
+    "einheit": "g",
+    "rechnet": true,
+    "gramm": 1.0,
+    "hinweis": null
+   },
+   {
+    "einheit": "ml",
+    "rechnet": true,
+    "gramm": 1.0,
+    "hinweis": null
+   },
+   {
+    "einheit": "Portion",
+    "rechnet": true,
+    "gramm": 50.0,
+    "hinweis": null
+   },
+   {
+    "einheit": "Stück",
+    "rechnet": true,
+    "gramm": 50.0,
+    "wie_portion": true,
+    "hinweis": null
+   }
+  ],
+  "standard": {
+   "menge": 1,
+   "einheit": "Portion",
+   "gramm": 50.0,
+   "rechnet": true
   }
  }
 }

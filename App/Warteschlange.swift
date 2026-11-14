@@ -107,7 +107,9 @@ final class Warteschlange: ObservableObject {
             guard let bild, !bild.isEmpty else { throw EintragFehler.fotoFehlt }
             try schreiben(bild, nach: bildDatei(eintrag.id))
         }
-        if zurLetzten, letzteMoeglich(jetzt: eintrag.zeit), let letzte {
+        if eintrag.art == .gewicht {
+            // Keine Mahlzeit: ändert nichts an „zur letzten Mahlzeit“.
+        } else if zurLetzten, letzteMoeglich(jetzt: eintrag.zeit), let letzte {
             eintrag.gehoertZu = letzte.id
         } else {
             letzte = Letzte(id: eintrag.id, zeit: eintrag.zeit)

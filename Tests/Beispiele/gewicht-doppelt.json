@@ -1,0 +1,19 @@
+{
+ "adresse": "POST /api/koerper/gewicht",
+ "anfrage": {
+  "pfad": "/api/koerper/gewicht",
+  "mit_schluessel": true,
+  "json": {
+   "kg": "81,6",
+   "zeit": "2026-03-15T07:15:00+01:00",
+   "quelle": "app",
+   "extern_id": "app-gewicht-1"
+  }
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "id": 24,
+  "doppelt": true
+ }
+}

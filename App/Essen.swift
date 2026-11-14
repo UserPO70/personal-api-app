@@ -84,37 +84,71 @@ struct BarcodeAuskunft: Codable, Equatable {
             case je100 = "je_100"
         }
     }
-    var barcode: String
-    var gefunden: Bool
-    var produkt: Produkt?
-}
+    /// Was der Server mit einer Einheit für dieses Produkt anfangen kann.
+    struct Einheit: Codable, Equatable {
+        var einheit: String
+        var rechnet: Bool
+        var gramm: Double?
+        var hinweis: String?
+        var wiePortion: Bool?
 
-extension BarcodeAuskunft.Produkt {
-    /// Gramm bzw. Milliliter je Einheit, wie der Server rechnet: Stück ohne eigenes Gewicht zählt wie eine Portion.
-    /// `nil`: Für diese Einheit nennt die Packung keine Größe, der Server könnte keine Nährwerte berechnen.
-    func groesse(_ einheit: String) -> Double? {
-        switch einheit {
-        case "g", "ml": return 1
-        case "Portion": return portion
-        case "Stück": return stueck ?? portion
-        default: return nil
+        enum CodingKeys: String, CodingKey {
+            case einheit, rechnet, gramm, hinweis
+            case wiePortion = "wie_portion"
         }
     }
 
-    /// Einheiten, mit denen der Server Nährwerte berechnen kann.
-    var einheiten: [String] {
-        ["g", "ml", "Portion", "Stück"].filter { groesse($0) != nil }
+    /// Was gilt, wenn keine Menge angegeben wird.
+    struct Standard: Codable, Equatable {
+        var menge: Double?
+        var einheit: String?
+        var gramm: Double?
+        var rechnet: Bool?
     }
 
-    /// Was „Standard“ für dieses Produkt heißt: eine Portion laut Packung, sonst 100 g.
-    var standardGramm: Double { portion ?? 100 }
+    var barcode: String
+    var gefunden: Bool
+    var produkt: Produkt?
+    var einheiten: [Einheit]?
+    var standard: Standard?
+}
 
-    /// Kalorien für die gewählte Menge; `einheit` nil heißt Standard.
+extension BarcodeAuskunft {
+    static let alleEinheiten = ["g", "ml", "Portion", "Stück"]
+
+    /// Einheiten, mit denen der Server Nährwerte berechnen kann. Sagt er nichts dazu, alle.
+    var waehlbar: [String] {
+        guard let einheiten else { return Self.alleEinheiten }
+        return einheiten.filter(\.rechnet).map(\.einheit)
+    }
+
+    /// Einheiten, die für dieses Produkt nicht gehen, mit dem Grund des Servers.
+    var nichtWaehlbar: [Einheit] {
+        (einheiten ?? []).filter { !$0.rechnet }
+    }
+
+    func angabe(_ einheit: String) -> Einheit? {
+        einheiten?.first { $0.einheit == einheit }
+    }
+
+    /// Kalorien für die gewählte Menge; `einheit` nil heißt Standard. Gerechnet mit den Angaben des Servers.
     func kcal(menge: Double?, einheit: String?) -> Double? {
-        guard let je100 = je100?.kcal else { return nil }
-        guard let einheit else { return je100 * standardGramm / 100 }
-        guard let menge, let groesse = groesse(einheit) else { return nil }
-        return je100 * menge * groesse / 100
+        guard let je100 = produkt?.je100?.kcal else { return nil }
+        guard let einheit else {
+            guard standard?.rechnet != false, let gramm = standard?.gramm else { return nil }
+            return je100 * gramm / 100
+        }
+        guard let menge, let angabe = angabe(einheit), angabe.rechnet, let gramm = angabe.gramm else { return nil }
+        return je100 * menge * gramm / 100
+    }
+
+    /// „1 Portion (50 g)“ oder „100 g“.
+    var standardText: String? {
+        guard let standard, let einheit = standard.einheit else { return nil }
+        let menge = Zahl.text(standard.menge ?? 1)
+        if einheit == "g" || einheit == "ml" { return "\(menge) \(einheit)" }
+        guard let gramm = standard.gramm else { return "\(menge) \(einheit)" }
+        return "\(menge) \(einheit) (\(Zahl.text(gramm)) g)"
     }
 }
 

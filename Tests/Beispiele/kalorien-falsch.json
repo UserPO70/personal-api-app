@@ -1,0 +1,20 @@
+{
+ "adresse": "PUT /api/kalorien/profil",
+ "anfrage": {
+  "pfad": "/api/kalorien/profil",
+  "mit_schluessel": true,
+  "json": {
+   "groesse_cm": "180",
+   "geburtsjahr": 1990,
+   "geschlecht": "m",
+   "aktivitaet": "leicht",
+   "ziel": "abnehmen",
+   "kg_pro_woche": 2
+  }
+ },
+ "status": 422,
+ "medientyp": "application/json",
+ "antwort": {
+  "detail": "Tempo: mehr als 0 und höchstens 1 kg je Woche"
+ }
+}

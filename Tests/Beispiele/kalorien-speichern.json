@@ -1,0 +1,85 @@
+{
+ "adresse": "PUT /api/kalorien/profil",
+ "anfrage": {
+  "pfad": "/api/kalorien/profil",
+  "mit_schluessel": true,
+  "json": {
+   "groesse_cm": "180",
+   "geburtsjahr": 1990,
+   "geschlecht": "m",
+   "aktivitaet": "leicht",
+   "ziel": "abnehmen",
+   "kg_pro_woche": "0,5"
+  }
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "angaben": {
+   "groesse_cm": 180.0,
+   "geburtsjahr": 1990,
+   "geschlecht": "m",
+   "aktivitaet": "leicht",
+   "ziel": "abnehmen",
+   "kg_pro_woche": 0.5,
+   "eigenes_ziel_kcal": null
+  },
+  "rechnung": {
+   "gewicht_kg": 82.7,
+   "alter": 36,
+   "grundumsatz_kcal": 1777.0,
+   "bedarf_kcal": 2443.0,
+   "ziel_kcal": 1893.0,
+   "ziel_gerechnet_kcal": 1893.0,
+   "unterschied_kcal": -550.0,
+   "quelle": "rechnung",
+   "rechenweg": [
+    "Grundumsatz (Mifflin-St Jeor): 10 × 82,7 kg + 6,25 × 180 cm − 5 × 36 Jahre + 5 = 1777 kcal",
+    "Bedarf: 1777 kcal × 1,375 (Aktivität „Leicht“) = 2443 kcal",
+    "Ziel: 0,5 kg je Woche abnehmen = 0,5 × 7700 kcal / 7 Tage = 550 kcal am Tag weniger: 2443 − 550 = 1893 kcal"
+   ],
+   "grenzen": [],
+   "grund": null
+  },
+  "ziel": {
+   "kcal": 1893.0,
+   "quelle": "rechnung",
+   "gilt_ab": "2026-03-15"
+  },
+  "abweichung_kcal": 0.0,
+  "stufen": [
+   {
+    "stufe": "wenig",
+    "faktor": 1.2,
+    "name": "Wenig",
+    "beschreibung": "überwiegend sitzend, kaum Sport"
+   },
+   {
+    "stufe": "leicht",
+    "faktor": 1.375,
+    "name": "Leicht",
+    "beschreibung": "sitzende Arbeit, ein- bis dreimal Sport in der Woche oder viel zu Fuß"
+   },
+   {
+    "stufe": "mittel",
+    "faktor": 1.55,
+    "name": "Mittel",
+    "beschreibung": "teils stehend oder gehend, drei- bis fünfmal Sport in der Woche"
+   },
+   {
+    "stufe": "hoch",
+    "faktor": 1.725,
+    "name": "Hoch",
+    "beschreibung": "körperliche Arbeit oder fast täglich Sport"
+   },
+   {
+    "stufe": "sehr_hoch",
+    "faktor": 1.9,
+    "name": "Sehr hoch",
+    "beschreibung": "schwere körperliche Arbeit oder Sport zweimal am Tag"
+   }
+  ],
+  "grund": null,
+  "hinweis": "Richtwert aus einer Formel, keine medizinische Beratung."
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "adresse": "GET /api/kalorien/verlauf",
+ "anfrage": {
+  "pfad": "/api/kalorien/verlauf?bis=2026-03-15&tage=7",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "von": "2026-03-09",
+  "bis": "2026-03-15",
+  "tage": [
+   {
+    "tag": "2026-03-09",
+    "kcal": 2051.0,
+    "ziel_kcal": null,
+    "differenz_kcal": null
+   },
+   {
+    "tag": "2026-03-10",
+    "kcal": 1531.0,
+    "ziel_kcal": null,
+    "differenz_kcal": null
+   },
+   {
+    "tag": "2026-03-11",
+    "kcal": 1618.0,
+    "ziel_kcal": null,
+    "differenz_kcal": null
+   },
+   {
+    "tag": "2026-03-12",
+    "kcal": 1890.0,
+    "ziel_kcal": null,
+    "differenz_kcal": null
+   },
+   {
+    "tag": "2026-03-13",
+    "kcal": 2054.0,
+    "ziel_kcal": null,
+    "differenz_kcal": null
+   },
+   {
+    "tag": "2026-03-14",
+    "kcal": 2174.0,
+    "ziel_kcal": null,
+    "differenz_kcal": null
+   },
+   {
+    "tag": "2026-03-15",
+    "kcal": 1777.0,
+    "ziel_kcal": 1893.0,
+    "differenz_kcal": -116.0
+   }
+  ],
+  "wochenmittel": {
+   "tage_mit_essen": 7,
+   "kcal": 1871.0,
+   "ziel_kcal": 1893.0
+  },
+  "ziel": {
+   "kcal": 1893.0,
+   "quelle": "rechnung",
+   "gilt_ab": "2026-03-15"
+  },
+  "gegenprobe": {
+   "von": "2026-02-16",
+   "bis": "2026-03-15",
+   "tage_mit_essen": 23,
+   "mittel_gegessen_kcal": 1707.0,
+   "kg_pro_woche": -0.51,
+   "bedarf_geschaetzt_kcal": 2268.0,
+   "bedarf_gerechnet_kcal": 2443.0,
+   "abweichung_prozent": -7,
+   "hinweis": null,
+   "grund": null
+  }
+ }
+}

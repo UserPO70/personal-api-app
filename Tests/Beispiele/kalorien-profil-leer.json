@@ -1,0 +1,49 @@
+{
+ "adresse": "GET /api/kalorien/profil",
+ "anfrage": {
+  "pfad": "/api/kalorien/profil",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "angaben": null,
+  "rechnung": null,
+  "ziel": null,
+  "abweichung_kcal": null,
+  "stufen": [
+   {
+    "stufe": "wenig",
+    "faktor": 1.2,
+    "name": "Wenig",
+    "beschreibung": "überwiegend sitzend, kaum Sport"
+   },
+   {
+    "stufe": "leicht",
+    "faktor": 1.375,
+    "name": "Leicht",
+    "beschreibung": "sitzende Arbeit, ein- bis dreimal Sport in der Woche oder viel zu Fuß"
+   },
+   {
+    "stufe": "mittel",
+    "faktor": 1.55,
+    "name": "Mittel",
+    "beschreibung": "teils stehend oder gehend, drei- bis fünfmal Sport in der Woche"
+   },
+   {
+    "stufe": "hoch",
+    "faktor": 1.725,
+    "name": "Hoch",
+    "beschreibung": "körperliche Arbeit oder fast täglich Sport"
+   },
+   {
+    "stufe": "sehr_hoch",
+    "faktor": 1.9,
+    "name": "Sehr hoch",
+    "beschreibung": "schwere körperliche Arbeit oder Sport zweimal am Tag"
+   }
+  ],
+  "grund": "Noch keine Angaben zur Person.",
+  "hinweis": "Richtwert aus einer Formel, keine medizinische Beratung."
+ }
+}

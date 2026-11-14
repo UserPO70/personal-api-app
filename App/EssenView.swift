@@ -27,6 +27,8 @@ struct EssenView: View {
     @ObservedObject private var schlange = Warteschlange.shared
     @State private var tag: Essenstag?
     @State private var standVon: Date?
+    /// Das heute geltende Kalorienziel, wenn eines festgelegt ist.
+    @State private var ziel: Kalorienstand.Ziel?
     @State private var blatt: Blatt?
     @State private var kamera = false
     @State private var aufgenommen: UIImage?
@@ -300,6 +302,23 @@ struct EssenView: View {
                         .font(.footnote)
                         .foregroundStyle(Color.secondary)
                 }
+                if let ziel {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ProgressView(value: Kalorientext.anteil(gegessen: tag.summe?.kcal, ziel: ziel.kcal))
+                            .tint(Color.essen)
+                        Text("Ziel \(Zahl.kcal(ziel.kcal)) · \(Kalorientext.offen(gegessen: tag.summe?.kcal, ziel: ziel.kcal))")
+                            .font(.footnote)
+                            .foregroundStyle(Color.secondary)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+                if !zustand.demo {
+                    NavigationLink {
+                        KalorienView()
+                    } label: {
+                        Label(ziel == nil ? "Kalorienziel festlegen" : "Kalorienrechner", systemImage: "target")
+                    }
+                }
                 if tag.mahlzeiten.isEmpty {
                     Text("Noch nichts eingetragen.")
                         .foregroundStyle(Color.secondary)
@@ -359,11 +378,19 @@ struct EssenView: View {
             tag = neu
             standVon = nil
             schlange.merken(neu, als: "essenstag")
+            // Ältere Server kennen den Kalorienrechner nicht: Dann bleibt es ohne Ziel.
+            if let stand = try? await zustand.api().lesen(Kalorienstand.self, "GET", "/api/kalorien/profil") {
+                ziel = stand.ziel
+                schlange.merken(stand, als: "kalorien")
+            }
         } catch {
             if Task.isCancelled { return }
             if let (alt, wann) = schlange.gemerkt(Essenstag.self, "essenstag") {
                 tag = alt
                 standVon = wann
+            }
+            if let (alt, _) = schlange.gemerkt(Kalorienstand.self, "kalorien") {
+                ziel = alt.ziel
             }
         }
     }

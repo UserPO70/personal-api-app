@@ -88,6 +88,8 @@ struct Kachel: View {
     let wert: String
     let symbol: String
     let farbe: Color
+    /// Die Kachel führt auf eine Unterseite: Dann steht rechts ein Pfeil.
+    var oeffnet = false
 
     var body: some View {
         HStack(spacing: Abstand.eng) {
@@ -106,6 +108,12 @@ struct Kachel: View {
                     .minimumScaleFactor(0.7)
             }
             Spacer(minLength: 0)
+            if oeffnet {
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Color.text3)
+                    .accessibilityHidden(true)
+            }
         }
         .alsFlaeche(innen: Abstand.kachel)
         .accessibilityElement(children: .combine)
@@ -162,7 +170,7 @@ struct HeuteView: View {
                                 } label: {
                                     Kachel(name: "Gewicht und Ziel",
                                            wert: tag.koerper?.gewicht.map { Gewichtstext.kg($0.kg) } ?? "eintragen",
-                                           symbol: "scalemass", farbe: .gesundheit)
+                                           symbol: "scalemass", farbe: .gesundheit, oeffnet: true)
                                 }
                                 .buttonStyle(.plain)
                             }

@@ -16,11 +16,11 @@ struct KalorienView: View {
     @State private var zeigtRechenweg = false
 
     var body: some View {
-        Form {
+        AppFormular {
             if let fehler {
                 Section {
                     Label(fehler, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(Color.warnung)
                 }
             }
             if !geladen {
@@ -75,7 +75,7 @@ struct KalorienView: View {
                         .font(.title2.bold())
                     Text(ziel.quelle == "eigenes" ? "dein eigenes Ziel" : "gerechneter Richtwert")
                         .font(.footnote)
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(Color.text2)
                 }
                 if let rechnung = stand?.rechnung {
                     if let grundumsatz = rechnung.grundumsatz {
@@ -92,7 +92,7 @@ struct KalorienView: View {
                             ForEach(rechnung.rechenweg, id: \.self) { schritt in
                                 Text(schritt)
                                     .font(.footnote)
-                                    .foregroundStyle(Color.secondary)
+                                    .foregroundStyle(Color.text2)
                             }
                         }
                     }
@@ -108,7 +108,7 @@ struct KalorienView: View {
                 }
             } else {
                 Text(ohneZiel)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
             }
         } header: {
             Text("Dein Richtwert")
@@ -150,7 +150,7 @@ struct KalorienView: View {
             if let beschreibung = stufen.first(where: { $0.stufe == eingabe.aktivitaet })?.beschreibung {
                 Text(beschreibung)
                     .font(.footnote)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
             }
             Picker("Ziel", selection: $eingabe.ziel) {
                 ForEach(["halten", "abnehmen", "zunehmen"], id: \.self) { ziel in
@@ -214,7 +214,7 @@ struct KalorienView: View {
                 .accessibilityLabel("Gegessene Kalorien je Tag und das Ziel, letzte 30 Tage")
             } else {
                 Text("In den letzten 30 Tagen ist kein Essen erfasst.")
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
             }
             if let mittel = verlauf.wochenmittel?.kcal {
                 LabeledContent("Mittel der letzten 7 Tage", value: Zahl.kcal(mittel))
@@ -240,7 +240,7 @@ struct KalorienView: View {
                     }
                 } else {
                     Text(probe.grund ?? "Dafür reichen die Daten noch nicht.")
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(Color.text2)
                 }
             }
         } header: {

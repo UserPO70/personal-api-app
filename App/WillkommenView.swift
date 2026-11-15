@@ -17,7 +17,7 @@ struct WillkommenView: View {
                     .font(.largeTitle.bold())
                 Text("Deine Daten liegen auf deinem eigenen Server im Heimnetz. Die App zeigt sie an und schickt neue dorthin, sonst nirgendwohin.")
                     .font(.body)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.text2)
                     .multilineTextAlignment(.center)
             }
             Spacer()
@@ -36,7 +36,7 @@ struct WillkommenView: View {
                 .controlSize(.large)
             }
         }
-        .padding(24)
+        .padding(Abstand.abschnitt)
         .sheet(isPresented: $koppeln) {
             KoppelnView(einladung: nil)
         }

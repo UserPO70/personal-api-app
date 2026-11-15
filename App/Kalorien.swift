@@ -215,11 +215,3 @@ enum Kalorientext {
     }
 }
 
-extension Color {
-    /// Bereichsfarbe „essen“ aus dem Designkonzept, hell und dunkel.
-    static let essen = Color(uiColor: UIColor { merkmale in
-        merkmale.userInterfaceStyle == .dark
-            ? UIColor(red: 0xC0 / 255, green: 0x5F / 255, blue: 0x0D / 255, alpha: 1)
-            : UIColor(red: 0xE0 / 255, green: 0x5A / 255, blue: 0x03 / 255, alpha: 1)
-    })
-}

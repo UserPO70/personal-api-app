@@ -90,7 +90,7 @@ struct Kachel: View {
     let farbe: Color
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: Abstand.eng) {
             Image(systemName: symbol)
                 .font(.body.weight(.semibold))
                 .foregroundStyle(farbe)
@@ -98,29 +98,18 @@ struct Kachel: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(name)
                     .font(.caption)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
                 Text(wert)
                     .font(.headline.monospacedDigit())
-                    .foregroundStyle(Color.primary)
+                    .foregroundStyle(Color.text)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .alsFlaeche(innen: Abstand.kachel)
         .accessibilityElement(children: .combine)
     }
-}
-
-extension Color {
-    /// Bereichsfarbe „pc-zeit“ aus dem Designkonzept, hell und dunkel.
-    static let pcZeit = Color(uiColor: UIColor { merkmale in
-        merkmale.userInterfaceStyle == .dark
-            ? UIColor(red: 0x77 / 255, green: 0x61 / 255, blue: 0xE3 / 255, alpha: 1)
-            : UIColor(red: 0x6B / 255, green: 0x30 / 255, blue: 0xAC / 255, alpha: 1)
-    })
 }
 
 /// Der Hauptbildschirm: der Tag auf einen Blick, möglichst ohne Scrollen, und unten in Daumenreichweite Essen erfassen.
@@ -141,28 +130,28 @@ struct HeuteView: View {
     @State private var standVon: Date?
     @State private var fehler: String?
 
-    private let spalten = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+    private let spalten = [GridItem(.flexible(), spacing: Abstand.kachel), GridItem(.flexible(), spacing: Abstand.kachel)]
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 12) {
+                VStack(spacing: Abstand.kachel) {
                     if zustand.demo {
                         Label("Demo: ausgedachte Daten, kein Server", systemImage: "theatermasks")
                             .font(.footnote)
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                     if !schlange.eintraege.isEmpty || schlange.analysen.contains(where: \.laeuft) {
                         Label(Dauertext.wartend(eintraege: schlange.eintraege.count,
                                                 analysen: schlange.analysen.filter(\.laeuft).count),
                               systemImage: "tray.and.arrow.up")
                             .font(.footnote)
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     if let tag {
                         kalorien(tag)
-                        LazyVGrid(columns: spalten, spacing: 10) {
+                        LazyVGrid(columns: spalten, spacing: Abstand.kachel) {
                             ForEach(werte(tag)) { wert in
                                 Kachel(name: wert.name, wert: wert.wert, symbol: wert.symbol, farbe: wert.farbe)
                             }
@@ -181,29 +170,28 @@ struct HeuteView: View {
                         if let standVon {
                             Text("Server nicht erreichbar. Stand von \(standVon.formatted(date: .abbreviated, time: .shortened)).")
                                 .font(.footnote)
-                                .foregroundStyle(Color.secondary)
+                                .foregroundStyle(Color.text2)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     } else if let fehler {
                         Label(fehler, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(Color.orange)
+                            .foregroundStyle(Color.warnung)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
                         ProgressView()
                             .padding(.top, 24)
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.horizontal, Abstand.rand)
+                .padding(.vertical, Abstand.kachel)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background(Color.grund)
             // Erfassen sitzt unten direkt über der Tab-Leiste, damit der Daumen den Foto-Knopf mit einer Hand erreicht.
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 Erfassen(umfang: .foto)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
-                    .padding(.bottom, 10)
-                    .background(Color(uiColor: .systemGroupedBackground))
+                    .padding(.horizontal, Abstand.rand)
+                    .padding(.vertical, Abstand.eng)
+                    .background(Color.grund)
             }
             .navigationTitle("Heute")
             .navigationBarTitleDisplayMode(.inline)
@@ -219,7 +207,7 @@ struct HeuteView: View {
     }
 
     private func kalorien(_ tag: Tagesueberblick) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: Abstand.eng) {
             HStack(alignment: .firstTextBaseline) {
                 Text(Zahl.kcal(tag.essen?.summe?.kcal))
                     .font(.title.bold().monospacedDigit())
@@ -227,7 +215,7 @@ struct HeuteView: View {
                 if let ziel = tag.essen?.ziel {
                     Text("Ziel \(Zahl.kcal(ziel.kcal))")
                         .font(.subheadline.monospacedDigit())
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(Color.text2)
                 }
             }
             if let ziel = tag.essen?.ziel {
@@ -235,16 +223,15 @@ struct HeuteView: View {
                     .tint(Color.essen)
                 Text(Kalorientext.offen(gegessen: tag.essen?.summe?.kcal, ziel: ziel.kcal))
                     .font(.footnote)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
             } else {
                 Text((tag.essen?.anzahl ?? 0) == 0 ? "Heute ist noch nichts eingetragen." : "Noch kein Kalorienziel festgelegt.")
                     .font(.footnote)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
             }
         }
-        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .alsFlaeche()
         .accessibilityElement(children: .combine)
     }
 
@@ -313,7 +300,7 @@ struct ServerAuskunft: View {
             } else if let fehler {
                 Label(fehler, systemImage: "exclamationmark.triangle")
                     .font(.footnote)
-                    .foregroundStyle(Color.orange)
+                    .foregroundStyle(Color.warnung)
             } else {
                 LabeledContent("Server", value: "wird abgefragt …")
             }

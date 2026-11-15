@@ -9,7 +9,7 @@ struct ProbeView: View {
     @State private var laeuft = false
 
     var body: some View {
-        Form {
+        AppFormular {
                 Section("Server") {
                     TextField("http://192.168.0.10:8000", text: $adresse)
                         .keyboardType(.URL)
@@ -31,7 +31,7 @@ struct ProbeView: View {
                 .disabled(laeuft)
                 Section {
                     if protokoll.eintraege.isEmpty {
-                        Text("Noch nichts geprüft.").foregroundStyle(.secondary)
+                        Text("Noch nichts geprüft.").foregroundStyle(Color.text2)
                     }
                     ForEach(protokoll.eintraege) { eintrag in
                         HStack(alignment: .top) {
@@ -40,7 +40,7 @@ struct ProbeView: View {
                             VStack(alignment: .leading) {
                                 Text(eintrag.text).font(.callout)
                                 Text(eintrag.zeit.formatted(date: .omitted, time: .standard))
-                                    .font(.caption).foregroundStyle(.secondary)
+                                    .font(.caption).foregroundStyle(Color.text2)
                             }
                         }
                     }

@@ -9,11 +9,11 @@ struct EssenView: View {
 
     var body: some View {
         NavigationStack {
-            List {
+            AppListe {
                 if zustand.demo {
                     Section {
                         Label("Demo: ausgedachte Daten, kein Server", systemImage: "theatermasks")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                 }
                 Section {
@@ -24,7 +24,7 @@ struct EssenView: View {
                 if let meldung = schlange.meldung {
                     Section {
                         Label(meldung, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(Color.orange)
+                            .foregroundStyle(Color.warnung)
                     }
                 }
                 if !schlange.eintraege.isEmpty {
@@ -58,14 +58,14 @@ struct EssenView: View {
             ForEach(schlange.eintraege) { eintrag in
                 HStack(alignment: .top, spacing: 12) {
                     Image(systemName: eintrag.stand == .fehlgeschlagen ? "exclamationmark.circle.fill" : eintrag.symbol)
-                        .foregroundStyle(eintrag.stand == .fehlgeschlagen ? Color.red : Color.secondary)
+                        .foregroundStyle(eintrag.stand == .fehlgeschlagen ? Color.fehler : Color.text2)
                         .frame(width: 24)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(eintrag.titel)
                             .lineLimit(2)
                         Text(standText(eintrag))
                             .font(.footnote)
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                     Spacer(minLength: 0)
                     // Ein sichtbares Menü statt Wischen: Wischen wechselt zwischen den Tabs.
@@ -80,7 +80,7 @@ struct EssenView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle")
                             .font(.title3)
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                     .accessibilityLabel("Aktionen für \(eintrag.titel)")
                 }
@@ -116,7 +116,7 @@ struct EssenView: View {
                             .frame(width: 24)
                     } else {
                         Image(systemName: "exclamationmark.circle")
-                            .foregroundStyle(Color.orange)
+                            .foregroundStyle(Color.warnung)
                             .frame(width: 24)
                     }
                     VStack(alignment: .leading, spacing: 2) {
@@ -124,7 +124,7 @@ struct EssenView: View {
                             .lineLimit(2)
                         Text(analyseText(analyse))
                             .font(.footnote)
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                     Spacer(minLength: 0)
                     if !analyse.laeuft {
@@ -133,7 +133,7 @@ struct EssenView: View {
                         } label: {
                             Image(systemName: "xmark.circle")
                                 .font(.title3)
-                                .foregroundStyle(Color.secondary)
+                                .foregroundStyle(Color.text2)
                         }
                         .buttonStyle(.borderless)
                         .accessibilityLabel("Ausblenden")
@@ -165,10 +165,10 @@ struct EssenView: View {
                 // Die Kalorien des Tages stehen groß auf „Heute“; hier nur die Nährwerte in einer Zeile.
                 Text("Eiweiß \(Zahl.gramm(tag.summe?.eiweiss)) · Kohlenhydrate \(Zahl.gramm(tag.summe?.kohlenhydrate)) · Fett \(Zahl.gramm(tag.summe?.fett))")
                     .font(.footnote)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
                 if tag.mahlzeiten.isEmpty {
                     Text("Noch nichts eingetragen.")
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(Color.text2)
                 }
                 ForEach(tag.mahlzeiten) { mahlzeit in
                     NavigationLink {
@@ -178,7 +178,7 @@ struct EssenView: View {
                     HStack(alignment: .top, spacing: 12) {
                         Text(mahlzeit.uhrzeit ?? "")
                             .font(.footnote.monospacedDigit())
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                             .frame(width: 44, alignment: .leading)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(mahlzeit.titel)
@@ -186,20 +186,20 @@ struct EssenView: View {
                             if let art = mahlzeit.art {
                                 Text(art)
                                     .font(.footnote)
-                                    .foregroundStyle(Color.secondary)
+                                    .foregroundStyle(Color.text2)
                             }
                         }
                         Spacer()
                         Text((mahlzeit.geschaetzt ? "≈ " : "") + Zahl.kcal(mahlzeit.summe?.kcal))
                             .font(.subheadline.monospacedDigit())
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                     }
                     .disabled(zustand.demo)
                 }
             } else {
                 Text("Der Tag lässt sich gerade nicht laden.")
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
             }
         } header: {
             Text(tag.map { "Essenstag \($0.tag)" } ?? "Essenstag")

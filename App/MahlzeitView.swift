@@ -113,11 +113,11 @@ struct MahlzeitView: View {
     @State private var laeuft = false
 
     var body: some View {
-        List {
+        AppListe {
             if let fehler {
                 Section {
                     Label(fehler, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(Color.warnung)
                 }
             }
             if !(mahlzeit.fotos ?? []).isEmpty {
@@ -128,7 +128,7 @@ struct MahlzeitView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(maxWidth: .infinity, maxHeight: 280)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .clipShape(RoundedRectangle(cornerRadius: Ecke.bild))
                                 .accessibilityLabel("Foto der Mahlzeit")
                         } else {
                             ProgressView()
@@ -145,11 +145,11 @@ struct MahlzeitView: View {
                             Spacer()
                             Text(Zahl.kcal(teil.kcal))
                                 .font(.subheadline.monospacedDigit())
-                                .foregroundStyle(Color.secondary)
+                                .foregroundStyle(Color.text2)
                         }
                         Text(untertitel(teil))
                             .font(.footnote)
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                 }
             } header: {
@@ -178,7 +178,7 @@ struct MahlzeitView: View {
                 if let hinweis = mahlzeit.daten?.hinweis, !hinweis.isEmpty {
                     Text(hinweis)
                         .font(.footnote)
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(Color.text2)
                 }
                 if let notiz = mahlzeit.notiz, !notiz.isEmpty {
                     LabeledContent("Notiz", value: notiz)
@@ -207,7 +207,7 @@ struct MahlzeitView: View {
             } else {
                 Section {
                     Text("Diese Mahlzeit kommt aus Apple Health und lässt sich hier nicht ändern.")
-                        .foregroundStyle(Color.secondary)
+                        .foregroundStyle(Color.text2)
                 }
             }
         }
@@ -291,11 +291,11 @@ struct MahlzeitBearbeiten: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            AppFormular {
                 if let fehler {
                     Section {
                         Label(fehler, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(Color.orange)
+                            .foregroundStyle(Color.warnung)
                     }
                 }
                 Section {

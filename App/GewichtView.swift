@@ -67,15 +67,6 @@ enum Gewichtstext {
     }
 }
 
-extension Color {
-    /// Bereichsfarbe „gesundheit“ aus dem Designkonzept, hell und dunkel.
-    static let gesundheit = Color(uiColor: UIColor { merkmale in
-        merkmale.userInterfaceStyle == .dark
-            ? UIColor(red: 0xD9 / 255, green: 0x51 / 255, blue: 0x8D / 255, alpha: 1)
-            : UIColor(red: 0xA7 / 255, green: 0x13 / 255, blue: 0x45 / 255, alpha: 1)
-    })
-}
-
 /// Körpergewicht eintragen und den Verlauf ansehen. Geht nie an Claude.
 struct GewichtView: View {
     @EnvironmentObject private var zustand: AppZustand
@@ -86,18 +77,18 @@ struct GewichtView: View {
     @State private var traegtEin = false
 
     var body: some View {
-        List {
+        AppListe {
             if let fehler, verlauf != nil {
                 Section {
                     Label(fehler, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(Color.warnung)
                 }
             }
             if let verlauf {
                 if verlauf.messungen.isEmpty && verlauf.letzte == nil {
                     Section {
                         Text("Noch keine Messung. Trag dein Gewicht ein, dann entsteht hier der Verlauf.")
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                 } else {
                     uebersicht(verlauf)
@@ -107,7 +98,7 @@ struct GewichtView: View {
             } else if let fehler {
                 Section {
                     Label(fehler, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(Color.warnung)
                 }
             } else {
                 Section { ProgressView() }
@@ -117,7 +108,7 @@ struct GewichtView: View {
                 Section {
                     ForEach(wartend) { eintrag in
                         Label(eintrag.titel, systemImage: "clock")
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                 } footer: {
                     Text("Wird gesendet, sobald dein Server erreichbar ist.")
@@ -157,7 +148,7 @@ struct GewichtView: View {
             } else if let grund = verlauf.veraenderung?.grund {
                 Text(grund)
                     .font(.footnote)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color.text2)
             }
         } footer: {
             if let standVon {
@@ -258,7 +249,7 @@ struct GewichtBlatt: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            AppFormular {
                 Section {
                     TextField(vorschlag.map { String(format: "%.1f", $0).replacingOccurrences(of: ".", with: ",") } ?? "z. B. 82,4",
                               text: $kg)
@@ -273,7 +264,7 @@ struct GewichtBlatt: View {
                 if let fehler {
                     Section {
                         Label(fehler, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(Color.orange)
+                            .foregroundStyle(Color.warnung)
                     }
                 }
             }

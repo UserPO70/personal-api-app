@@ -73,7 +73,7 @@ struct EinstellungenView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            AppFormular {
                 if zustand.demo {
                     Section {
                         Button("Demo beenden") { zustand.demo = false }
@@ -122,12 +122,12 @@ struct EinstellungenView: View {
                             if let stand = gesundheit.stand {
                                 Text(stand)
                                     .font(.footnote)
-                                    .foregroundStyle(Color.secondary)
+                                    .foregroundStyle(Color.text2)
                             }
                             if let fehler = gesundheit.fehler {
                                 Label(fehler, systemImage: "exclamationmark.triangle")
                                     .font(.footnote)
-                                    .foregroundStyle(Color.orange)
+                                    .foregroundStyle(Color.warnung)
                             }
                             Button(gesundheit.laeuft ? "Sendet …" : "Jetzt senden") {
                                 Task { await gesundheit.senden() }
@@ -157,7 +157,7 @@ struct EinstellungenView: View {
                             if standort.probeSeit != nil {
                                 Text("Prüft gerade, ob du losfährst …")
                                     .font(.footnote)
-                                    .foregroundStyle(Color.secondary)
+                                    .foregroundStyle(Color.text2)
                             }
                             Toggle("Fahrt aufzeichnen", isOn: Binding(
                                 get: { standort.fahrtSeit != nil },
@@ -178,7 +178,7 @@ struct EinstellungenView: View {
                             if let fehler = standort.fehler {
                                 Label(fehler, systemImage: "exclamationmark.triangle")
                                     .font(.footnote)
-                                    .foregroundStyle(Color.orange)
+                                    .foregroundStyle(Color.warnung)
                             }
                         }
                     } header: {

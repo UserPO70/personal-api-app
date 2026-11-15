@@ -121,7 +121,7 @@ struct Seiten: UIViewControllerRepresentable {
         let blaetterer = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
         blaetterer.dataSource = context.coordinator
         blaetterer.delegate = context.coordinator
-        blaetterer.view.backgroundColor = .systemGroupedBackground
+        blaetterer.view.backgroundColor = UIColor(named: Farbe.grund.rawValue)
         let bildschirme = context.coordinator.bildschirme
         if bildschirme.indices.contains(tab.rawValue) {
             blaetterer.setViewControllers([bildschirme[tab.rawValue]], direction: .forward, animated: false)

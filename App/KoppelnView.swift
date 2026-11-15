@@ -38,7 +38,7 @@ struct KoppelnView: View {
     // MARK: Eingabe
 
     private var eingabe: some View {
-        Form {
+        AppFormular {
             Section {
                 if DataScannerViewController.isSupported && DataScannerViewController.isAvailable {
                     QRScanner { text in
@@ -52,7 +52,7 @@ struct KoppelnView: View {
                     .listRowInsets(EdgeInsets())
                 } else {
                     Text("Die Kamera steht hier nicht zur Verfügung. Scanne den QR-Code mit der Kamera-App des iPhones oder gib den Code unten ein.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.text2)
                 }
             } header: {
                 Text("QR-Code scannen")
@@ -91,7 +91,7 @@ struct KoppelnView: View {
             case .verbinden:
                 ProgressView()
                 Text("Verbinde mit \(einladung.adresse) …")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.text2)
             case .wartet(let pruefzahl):
                 Text("Prüfzahl")
                     .font(.headline)
@@ -101,18 +101,18 @@ struct KoppelnView: View {
                     .accessibilityLabel("Prüfzahl \(pruefzahl.map(String.init).joined(separator: " "))")
                 Text("Öffne am Server das Dashboard, Bereich „Geräte“. Steht dort bei der wartenden App dieselbe Zahl, bestätige sie. Sonst lehne ab.")
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.text2)
                 ProgressView()
             case .fertig:
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 56))
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.ok)
                 Text("Gekoppelt")
                     .font(.title2.bold())
             case .fehler(let text):
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 44))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Color.warnung)
                 Text(text)
                     .multilineTextAlignment(.center)
                 Button("Noch einmal") {
@@ -124,9 +124,9 @@ struct KoppelnView: View {
             Label(einladung.verschluesselt ? "Verschlüsselt, Fingerabdruck aus dem QR-Code" : "Unverschlüsselt (nur im Heimnetz verwenden)",
                   systemImage: einladung.verschluesselt ? "lock.fill" : "lock.open")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.text2)
         }
-        .padding(24)
+        .padding(Abstand.abschnitt)
         .task(id: einladung) {
             await kopplung.ausfuehren(einladung, zustand: zustand)
             if kopplung.stand == .fertig {

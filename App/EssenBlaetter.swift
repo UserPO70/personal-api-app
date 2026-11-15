@@ -25,7 +25,7 @@ private struct Fehlerzeile: View {
         if let text {
             Section {
                 Label(text, systemImage: "exclamationmark.triangle")
-                    .foregroundStyle(Color.orange)
+                    .foregroundStyle(Color.warnung)
             }
         }
     }
@@ -50,7 +50,7 @@ struct FotoBlatt: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            AppFormular {
                 Section {
                     Image(uiImage: bild)
                         .resizable()
@@ -116,7 +116,7 @@ struct TextBlatt: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            AppFormular {
                 Section {
                     TextField("z. B. Kaffee mit Milch", text: $text, axis: .vertical)
                         .lineLimit(2...5)
@@ -175,7 +175,7 @@ struct BarcodeBlatt: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            AppFormular {
                 if code.isEmpty && DataScannerViewController.isSupported && DataScannerViewController.isAvailable {
                     Section {
                         QRScanner(gefunden: { text in
@@ -218,10 +218,10 @@ struct BarcodeBlatt: View {
                             }
                         } else if auskunft != nil {
                             Text("Bei Open Food Facts nicht gefunden. Es wird ohne Nährwerte gespeichert.")
-                                .foregroundStyle(Color.secondary)
+                                .foregroundStyle(Color.text2)
                         } else if let suchhinweis {
                             Text(suchhinweis)
-                                .foregroundStyle(Color.secondary)
+                                .foregroundStyle(Color.text2)
                         }
                     }
                 }
@@ -386,7 +386,7 @@ struct FavoritenBlatt: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            AppFormular {
                 Section("Portionen") {
                     Picker("Portionen", selection: $faktor) {
                         ForEach(Self.faktoren, id: \.self) { wert in
@@ -400,7 +400,7 @@ struct FavoritenBlatt: View {
                         ProgressView()
                     } else if favoriten.isEmpty {
                         Text("Noch keine Favoriten. Du legst sie im Dashboard auf der Essen-Seite an.")
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color.text2)
                     }
                     ForEach(favoriten) { favorit in
                         Button {
@@ -411,7 +411,7 @@ struct FavoritenBlatt: View {
                                     .foregroundStyle(Color.primary)
                                 Spacer()
                                 Text(Zahl.kcal(favorit.summe?.kcal.map { $0 * faktor }))
-                                    .foregroundStyle(Color.secondary)
+                                    .foregroundStyle(Color.text2)
                             }
                         }
                     }
@@ -482,7 +482,7 @@ struct ZustimmungView: View {
                 .font(.title2.bold())
             Text("Deine Mahlzeiten gehen an deinen eigenen Server. Fotos und Texte schickt dein Server zur Schätzung der Nährwerte an Claude von Anthropic, über dein eigenes Claude-Konto. Barcodes schlägt dein Server bei Open Food Facts nach. Der Anbieter dieser App bekommt nichts davon.")
             Text("Ohne Zustimmung kannst du Barcode und Favoriten nutzen. Du kannst das jederzeit in den Einstellungen ändern.")
-                .foregroundStyle(Color.secondary)
+                .foregroundStyle(Color.text2)
             Spacer()
             Button {
                 zustand.zustimmung = .ja
@@ -503,7 +503,7 @@ struct ZustimmungView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
         }
-        .padding(24)
+        .padding(Abstand.abschnitt)
         .interactiveDismissDisabled()
     }
 }

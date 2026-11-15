@@ -10,24 +10,23 @@ struct HauptView: View {
 
     var body: some View {
         // Seiten nebeneinander: Beim Wischen gleitet der Nachbar-Tab mit dem Finger herein.
-        TabView(selection: $tab) {
-            HeuteView()
-                .tag(Reiter.heute)
-            EssenView()
-                .tag(Reiter.essen)
-            EinstellungenView()
-                .tag(Reiter.einstellungen)
-        }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        // Auf einer Unterseite nicht zwischen den Tabs wischen: Dort heißt Wischen vom Rand „zurück“.
-        .scrollDisabled(lage.aufUnterseite)
-        .background(Color(uiColor: .systemGroupedBackground))
-        .ignoresSafeArea(.keyboard)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        // Auf einer Unterseite ist nur das seitliche Blättern gesperrt (dort heißt Wischen vom Rand „zurück“),
+        // die Unterseite selbst scrollt ganz normal.
+        ZStack(alignment: .bottom) {
+            Seiten(tab: $tab,
+                   gesperrt: lage.aufUnterseite,
+                   platzUnten: lage.aufUnterseite ? 0 : Tableiste.hoehe,
+                   seiten: [
+                       AnyView(HeuteView().environmentObject(zustand).environmentObject(lage)),
+                       AnyView(EssenView().environmentObject(zustand).environmentObject(lage)),
+                       AnyView(EinstellungenView().environmentObject(zustand).environmentObject(lage)),
+                   ])
+                .ignoresSafeArea()
             if !lage.aufUnterseite {
                 Tableiste(tab: $tab)
             }
         }
+        .ignoresSafeArea(.keyboard)
         .environmentObject(lage)
         // Verlässlichster Zeitpunkt zum Nachsenden: wenn die App geöffnet wird.
         .onChange(of: phase) { _, neu in

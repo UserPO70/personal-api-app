@@ -169,9 +169,16 @@ struct KennzahlView: View {
                 Chart {
                     ForEach(verlauf.tage) { tag in
                         if let datum = Gewichtsverlauf.datum(tag.tag), let wert = kennzahl.wert(tag) {
-                            BarMark(x: .value("Tag", datum, unit: .day), y: .value(kennzahl.name, kennzahl.imDiagramm(wert)))
-                                .foregroundStyle(kennzahl.farbe.opacity(0.35))
-                                .cornerRadius(tage > 90 ? 0 : 3)
+                            if kennzahl.jeTag {
+                                BarMark(x: .value("Tag", datum, unit: .day), y: .value(kennzahl.name, kennzahl.imDiagramm(wert)))
+                                    .foregroundStyle(kennzahl.farbe.opacity(0.35))
+                                    .cornerRadius(tage > 90 ? 0 : 3)
+                            } else {
+                                // Tempo und Schrittlänge schwanken nur wenig: Punkte auf einer Achse nah an den Werten.
+                                PointMark(x: .value("Tag", datum, unit: .day), y: .value(kennzahl.name, kennzahl.imDiagramm(wert)))
+                                    .symbolSize(tage > 90 ? 12 : 30)
+                                    .foregroundStyle(kennzahl.farbe.opacity(0.45))
+                            }
                         }
                     }
                     ForEach(verlauf.linie(kennzahl)) { punkt in
@@ -191,6 +198,10 @@ struct KennzahlView: View {
                     }
                 }
                 .chartXSelection(value: $gewaehlt)
+                .chartYScale(domain: verlauf.achse(kennzahl))
+                .chartXAxis {
+                    AxisMarks(preset: .aligned, values: .automatic(desiredCount: 4))
+                }
                 .chartYAxisLabel(kennzahl.achse)
                 .frame(height: 220)
                 .padding(.vertical, Abstand.winzig)
@@ -209,7 +220,7 @@ struct KennzahlView: View {
     }
 
     private func fusszeile(_ verlauf: Tagesverlauf) -> String {
-        var text = "Säulen sind einzelne Tage"
+        var text = kennzahl.jeTag ? "Säulen sind einzelne Tage" : "Punkte sind einzelne Tage"
         text += verlauf.linie(kennzahl).isEmpty ? "." : ", die Linie ist das Mittel über 7 Tage."
         text += " Tage ohne Daten bleiben leer und zählen nicht als 0."
         if let standVon {

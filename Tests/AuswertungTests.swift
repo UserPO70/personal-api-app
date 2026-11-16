@@ -63,6 +63,18 @@ final class AuswertungTests: XCTestCase {
         XCTAssertEqual(Kennzahl.gehtempo.schnittText((wert: 4.84, tage: 1)), "Gehtempo: Ø 4,8 km/h an 1 Tag mit Daten.")
     }
 
+    func testAchse() {
+        let tage = [
+            Tagesverlauf.Tag(tag: "2026-03-01", schritte: 4000, gehtempo: 4.0),
+            Tagesverlauf.Tag(tag: "2026-03-02", schritte: 6000, gehtempo: 5.0),
+        ]
+        let verlauf = Tagesverlauf(bis: "2026-03-02", tage: tage, trends: nil)
+        XCTAssertEqual(verlauf.achse(.schritte).lowerBound, 0)
+        XCTAssertEqual(verlauf.achse(.schritte).upperBound, 6300, accuracy: 0.001)
+        XCTAssertEqual(verlauf.achse(.gehtempo), 3.75...5.25)
+        XCTAssertEqual(verlauf.achse(.schlaf), 0...1)
+    }
+
     func testTexte() {
         XCTAssertEqual(Kennzahl.schlaf.text(430), "7 h 10 min")
         XCTAssertEqual(Kennzahl.strecke.text(6.54), "6,5 km")

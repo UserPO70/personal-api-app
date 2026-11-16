@@ -54,6 +54,16 @@ struct Tagesverlauf: Codable, Equatable {
         return (werte.reduce(0, +) / Double(werte.count), werte.count)
     }
 
+    /// Bereich der Wertachse, in der Einheit des Diagramms. Summen beginnen bei 0; Tempo und Schrittlänge
+    /// bekommen etwas Luft um ihre Werte, sonst sähe jeder Tag gleich aus.
+    func achse(_ kennzahl: Kennzahl) -> ClosedRange<Double> {
+        let werte = (tage.compactMap { kennzahl.wert($0) } + linie(kennzahl).map(\.wert)).map(kennzahl.imDiagramm)
+        guard let unten = werte.min(), let oben = werte.max() else { return 0...1 }
+        if kennzahl.jeTag { return 0...max(oben * 1.05, 1) }
+        let luft = max((oben - unten) * 0.25, oben * 0.02)
+        return (unten - luft)...(oben + luft)
+    }
+
     func trend(_ kennzahl: Kennzahl) -> Trend? {
         guard let schluessel = kennzahl.trendSchluessel else { return nil }
         return trends?.kennzahlen.first { $0.schluessel == schluessel }

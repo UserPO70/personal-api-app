@@ -166,6 +166,11 @@ struct KennzahlView: View {
             if let schnitt = verlauf.schnitt(kennzahl) {
                 Text(verlauf.trend(kennzahl)?.vergleich?.text ?? kennzahl.schnittText(schnitt))
                     .font(.subheadline)
+                // Über dem Diagramm, damit die Hand den Wert beim Antippen nicht verdeckt.
+                LabeledContent(gewaehlt.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "Tag antippen",
+                               value: gewaehlt.map { wertText(am: $0, verlauf) } ?? "")
+                    .font(.subheadline)
+                    .foregroundStyle(gewaehlt == nil ? Color.text2 : Color.text)
                 Chart {
                     ForEach(verlauf.tage) { tag in
                         if let datum = Gewichtsverlauf.datum(tag.tag), let wert = kennzahl.wert(tag) {
@@ -206,10 +211,6 @@ struct KennzahlView: View {
                 .frame(height: 220)
                 .padding(.vertical, Abstand.winzig)
                 .accessibilityLabel("\(kennzahl.name) je Tag, letzte \(tage) Tage")
-                LabeledContent(gewaehlt.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "Tag antippen",
-                               value: gewaehlt.map { wertText(am: $0, verlauf) } ?? "")
-                    .font(.subheadline)
-                    .foregroundStyle(gewaehlt == nil ? Color.text2 : Color.text)
             } else {
                 Text("In den letzten \(tage) Tagen gibt es dazu keine Daten.")
                     .foregroundStyle(Color.text2)

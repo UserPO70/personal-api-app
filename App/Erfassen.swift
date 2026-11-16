@@ -56,6 +56,7 @@ struct Erfassen: View {
                 } label: {
                     Label("Essen fotografieren", systemImage: "camera.fill")
                         .font(.headline)
+                        .foregroundStyle(Color.aufAkzent)
                         .frame(maxWidth: .infinity, minHeight: 36)
                 }
                 .buttonStyle(.borderedProminent)

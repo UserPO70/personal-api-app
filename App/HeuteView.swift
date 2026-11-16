@@ -101,6 +101,8 @@ struct Kachel: View {
                 Text(name)
                     .font(.caption)
                     .foregroundStyle(Color.text2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
                 Text(wert)
                     .font(.headline.monospacedDigit())
                     .foregroundStyle(Color.text)

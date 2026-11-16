@@ -76,8 +76,10 @@ struct Tableiste: View {
                         Image(systemName: eintrag.symbol)
                             .font(.system(size: 20, weight: .medium))
                             .symbolVariant(tab == eintrag ? .fill : .none)
+                            .frame(height: 24)
                         Text(eintrag.name)
-                            .font(.caption2.weight(.medium))
+                            // Feste Größe wie in der Tab-Leiste von iOS, damit alle vier Namen gleich groß bleiben.
+                            .font(.system(size: 10, weight: .medium))
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
                     }
@@ -99,7 +101,7 @@ struct Tableiste: View {
         .background(.regularMaterial, in: Capsule())
         .overlay(Capsule().strokeBorder(Color.primary.opacity(0.06)))
         .shadow(color: Color.black.opacity(0.08), radius: 10, y: 2)
-        .padding(.horizontal, Abstand.rand)
+        .padding(.horizontal, Abstand.kachel)
         .padding(.bottom, 2)
     }
 }

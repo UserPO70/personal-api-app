@@ -19,6 +19,7 @@ struct HauptView: View {
                    seiten: [
                        AnyView(HeuteView().environmentObject(zustand).environmentObject(lage)),
                        AnyView(EssenView().environmentObject(zustand).environmentObject(lage)),
+                       AnyView(AuswertungenView().environmentObject(zustand).environmentObject(lage)),
                        AnyView(EinstellungenView().environmentObject(zustand).environmentObject(lage)),
                    ])
                 .ignoresSafeArea()
@@ -70,6 +71,7 @@ struct EinstellungenView: View {
     @ObservedObject private var standort = Standort.shared
     @State private var abmeldenFragen = false
     @State private var abmeldenLaeuft = false
+    @AppStorage(Darstellung.schluessel) private var darstellung = Darstellung.system
 
     var body: some View {
         NavigationStack {
@@ -186,6 +188,21 @@ struct EinstellungenView: View {
                     } footer: {
                         Text("Im Alltag meldet iOS größere Ortswechsel und Aufenthalte, das kostet kaum Akku. Mit „Fahrten selbst erkennen“ misst die App nach jedem Aufbruch drei Minuten lang genau; ab etwa 20 km/h wird daraus eine Fahrt, die genau aufgezeichnet wird und nach 10 Minuten Stillstand endet. Fahrrad und Bahn zählen dabei auch. Dafür braucht die App die Erlaubnis „Immer“. Die Punkte gehen an deinen eigenen Server, nie an Claude. Das ersetzt OwnTracks: Schalte es dort aus, sonst läuft beides doppelt.")
                     }
+                }
+                Section {
+                    Picker("Darstellung", selection: $darstellung) {
+                        ForEach(Darstellung.allCases) { art in
+                            Text(art.name).tag(art)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: darstellung) { _, neu in
+                        neu.anwenden()
+                    }
+                } header: {
+                    Text("Darstellung")
+                } footer: {
+                    Text("„System“ folgt der Einstellung deines iPhones.")
                 }
                 Section("Entwicklung") {
                     NavigationLink("Probe") { ProbeView().alsUnterseite() }

@@ -124,12 +124,10 @@ struct Kachel: View {
 struct HeuteView: View {
     /// Ein Wert des Tages für eine Kachel.
     private struct Wert: Identifiable {
-        let name: String
+        let kennzahl: Kennzahl
         let wert: String
-        let symbol: String
-        let farbe: Color
 
-        var id: String { name }
+        var id: String { kennzahl.rawValue }
     }
 
     @EnvironmentObject private var zustand: AppZustand
@@ -161,7 +159,14 @@ struct HeuteView: View {
                         kalorien(tag)
                         LazyVGrid(columns: spalten, spacing: Abstand.kachel) {
                             ForEach(werte(tag)) { wert in
-                                Kachel(name: wert.name, wert: wert.wert, symbol: wert.symbol, farbe: wert.farbe)
+                                NavigationLink {
+                                    KennzahlView(kennzahl: wert.kennzahl)
+                                        .alsUnterseite()
+                                } label: {
+                                    Kachel(name: wert.kennzahl.name, wert: wert.wert, symbol: wert.kennzahl.symbol,
+                                           farbe: wert.kennzahl.farbe, oeffnet: true)
+                                }
+                                .buttonStyle(.plain)
                             }
                             if !zustand.demo {
                                 NavigationLink {
@@ -248,19 +253,19 @@ struct HeuteView: View {
         var liste: [Wert] = []
         let uebersicht = tag.uebersicht
         if let schritte = uebersicht?.schritte {
-            liste.append(Wert(name: "Schritte", wert: Dauertext.ganzzahl(schritte), symbol: "figure.walk", farbe: .gesundheit))
+            liste.append(Wert(kennzahl: .schritte, wert: Kennzahl.schritte.text(schritte)))
         }
         if let strecke = uebersicht?.strecke {
-            liste.append(Wert(name: "Strecke", wert: Dauertext.kilometer(strecke), symbol: "map", farbe: .gesundheit))
+            liste.append(Wert(kennzahl: .strecke, wert: Kennzahl.strecke.text(strecke)))
         }
         if let stockwerke = uebersicht?.stockwerke {
-            liste.append(Wert(name: "Stockwerke", wert: Dauertext.ganzzahl(stockwerke), symbol: "stairs", farbe: .gesundheit))
+            liste.append(Wert(kennzahl: .stockwerke, wert: Kennzahl.stockwerke.text(stockwerke)))
         }
         if let minuten = uebersicht?.schlaf?.minuten {
-            liste.append(Wert(name: "Schlaf", wert: Dauertext.minuten(minuten), symbol: "bed.double.fill", farbe: .gesundheit))
+            liste.append(Wert(kennzahl: .schlaf, wert: Kennzahl.schlaf.text(minuten)))
         }
         if let minuten = uebersicht?.pcMinuten, minuten > 0 {
-            liste.append(Wert(name: "PC-Zeit", wert: Dauertext.minuten(minuten), symbol: "desktopcomputer", farbe: .pcZeit))
+            liste.append(Wert(kennzahl: .pcZeit, wert: Kennzahl.pcZeit.text(minuten)))
         }
         return liste
     }

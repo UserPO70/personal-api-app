@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Die Tabs der App. Zwischen ihnen wird gewischt: Der Nachbar gleitet mit dem Finger herein.
 enum Reiter: Int, CaseIterable, Identifiable {
-    case heute, essen, einstellungen
+    case heute, essen, auswertungen, einstellungen
 
     var id: Int { rawValue }
 
@@ -10,6 +10,7 @@ enum Reiter: Int, CaseIterable, Identifiable {
         switch self {
         case .heute: return "Heute"
         case .essen: return "Essen"
+        case .auswertungen: return "Auswertungen"
         case .einstellungen: return "Einstellungen"
         }
     }
@@ -18,6 +19,7 @@ enum Reiter: Int, CaseIterable, Identifiable {
         switch self {
         case .heute: return "sun.max"
         case .essen: return "fork.knife"
+        case .auswertungen: return "chart.xyaxis.line"
         case .einstellungen: return "gearshape"
         }
     }
@@ -65,7 +67,7 @@ struct Tableiste: View {
     @Binding var tab: Reiter
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 2) {
             ForEach(Reiter.allCases) { eintrag in
                 Button {
                     withAnimation(.snappy) { tab = eintrag }
@@ -77,7 +79,7 @@ struct Tableiste: View {
                         Text(eintrag.name)
                             .font(.caption2.weight(.medium))
                             .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .minimumScaleFactor(0.7)
                     }
                     .foregroundStyle(tab == eintrag ? Color.accentColor : Color.primary)
                     .frame(maxWidth: .infinity, minHeight: 48)
@@ -97,7 +99,7 @@ struct Tableiste: View {
         .background(.regularMaterial, in: Capsule())
         .overlay(Capsule().strokeBorder(Color.primary.opacity(0.06)))
         .shadow(color: Color.black.opacity(0.08), radius: 10, y: 2)
-        .padding(.horizontal, 28)
+        .padding(.horizontal, Abstand.rand)
         .padding(.bottom, 2)
     }
 }

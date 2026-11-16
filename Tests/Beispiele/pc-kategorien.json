@@ -1,0 +1,144 @@
+{
+ "adresse": "GET /api/pc/kategorien",
+ "anfrage": {
+  "pfad": "/api/pc/kategorien?bis=2026-03-14&tage=7",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "von": "2026-03-08",
+  "bis": "2026-03-14",
+  "tage_anzahl": 7,
+  "gesamt_minuten": 661,
+  "nicht_zugeordnet_minuten": 0,
+  "kategorien": [
+   {
+    "name": "Programmieren",
+    "minuten": 244,
+    "anteil": 37
+   },
+   {
+    "name": "Surfen",
+    "minuten": 144,
+    "anteil": 22
+   },
+   {
+    "name": "Spiele",
+    "minuten": 107,
+    "anteil": 16
+   },
+   {
+    "name": "Wissen",
+    "minuten": 63,
+    "anteil": 10
+   },
+   {
+    "name": "Kommunikation",
+    "minuten": 47,
+    "anteil": 7
+   },
+   {
+    "name": "Video & Musik",
+    "minuten": 33,
+    "anteil": 5
+   },
+   {
+    "name": "System",
+    "minuten": 12,
+    "anteil": 2
+   },
+   {
+    "name": "Spiele-Plattform",
+    "minuten": 10,
+    "anteil": 2
+   }
+  ],
+  "geraete": [
+   {
+    "name": "pc-linux",
+    "minuten": 531
+   },
+   {
+    "name": "pc-windows",
+    "minuten": 130
+   }
+  ],
+  "spiele": [
+   {
+    "name": "Sternenfahrer",
+    "minuten": 107,
+    "tage": 1,
+    "geraete": [
+     "pc-windows"
+    ],
+    "vermutet": true
+   }
+  ],
+  "spiele_minuten": 107,
+  "nicht_zugeordnet": [],
+  "tage": [
+   {
+    "tag": "2026-03-08",
+    "kategorien": {
+     "Programmieren": 67,
+     "Surfen": 7
+    }
+   },
+   {
+    "tag": "2026-03-09",
+    "kategorien": {
+     "Kommunikation": 15,
+     "Programmieren": 43,
+     "Surfen": 8,
+     "System": 4,
+     "Video & Musik": 15,
+     "Wissen": 2
+    }
+   },
+   {
+    "tag": "2026-03-10",
+    "kategorien": {
+     "Kommunikation": 2,
+     "Programmieren": 33,
+     "Surfen": 45,
+     "System": 3,
+     "Video & Musik": 18,
+     "Wissen": 2
+    }
+   },
+   {
+    "tag": "2026-03-11",
+    "kategorien": {
+     "Programmieren": 26,
+     "Surfen": 21,
+     "Wissen": 34
+    }
+   },
+   {
+    "tag": "2026-03-12",
+    "kategorien": {
+     "Kommunikation": 13,
+     "Programmieren": 66,
+     "Surfen": 26,
+     "System": 5,
+     "Wissen": 26
+    }
+   },
+   {
+    "tag": "2026-03-13",
+    "kategorien": {
+     "Kommunikation": 17,
+     "Programmieren": 10,
+     "Spiele": 107,
+     "Spiele-Plattform": 10,
+     "Surfen": 37
+    }
+   },
+   {
+    "tag": "2026-03-14",
+    "kategorien": {}
+   }
+  ]
+ }
+}

@@ -16,6 +16,7 @@ struct PersonalAPIApp: App {
                 }
             }
             .environmentObject(zustand)
+            .onAppear { Darstellung.gespeichert.anwenden() }
             // QR-Code mit der Kamera-App gescannt: personal-api://koppeln?...
             .onOpenURL { url in
                 zustand.einladung = Einladung(text: url.absoluteString)

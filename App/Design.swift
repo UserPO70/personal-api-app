@@ -58,6 +58,45 @@ extension Color {
     static let fehler = Farbe.fehler.farbe
 }
 
+/// Hell, dunkel oder wie das iPhone: der Schalter in den Einstellungen.
+enum Darstellung: String, CaseIterable, Identifiable {
+    case system, hell, dunkel
+
+    static let schluessel = "darstellung"
+
+    static var gespeichert: Darstellung {
+        UserDefaults.standard.string(forKey: schluessel).flatMap(Darstellung.init(rawValue:)) ?? .system
+    }
+
+    var id: String { rawValue }
+
+    var name: String {
+        switch self {
+        case .system: return "System"
+        case .hell: return "Hell"
+        case .dunkel: return "Dunkel"
+        }
+    }
+
+    var stil: UIUserInterfaceStyle {
+        switch self {
+        case .system: return .unspecified
+        case .hell: return .light
+        case .dunkel: return .dark
+        }
+    }
+
+    /// Gilt für alle Fenster der App, also auch für Blätter und die Kamera-Ansicht.
+    @MainActor
+    func anwenden() {
+        for szene in UIApplication.shared.connectedScenes {
+            for fenster in (szene as? UIWindowScene)?.windows ?? [] {
+                fenster.overrideUserInterfaceStyle = stil
+            }
+        }
+    }
+}
+
 /// Abstände in Punkten.
 enum Abstand {
     /// Symbol und Text, Wert und Einheit.

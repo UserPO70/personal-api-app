@@ -190,7 +190,7 @@ struct EinstellungenView: View {
                     } header: {
                         Text("Standort")
                     } footer: {
-                        Text("Im Alltag meldet iOS größere Ortswechsel und Aufenthalte, das kostet kaum Akku. Mit „Fahrten selbst erkennen“ misst die App nach jedem Aufbruch drei Minuten lang genau; ab etwa 20 km/h wird daraus eine Fahrt, die genau aufgezeichnet wird und nach 10 Minuten Stillstand endet. Fahrrad und Bahn zählen dabei auch. Dafür braucht die App die Erlaubnis „Immer“. Die Punkte gehen an deinen eigenen Server, nie an Claude. Das ersetzt OwnTracks: Schalte es dort aus, sonst läuft beides doppelt.")
+                        Text("Im Alltag meldet iOS größere Ortswechsel und Aufenthalte, das kostet kaum Akku. Mit „Fahrten selbst erkennen“ misst die App nach jedem Aufbruch drei Minuten lang genau; ab etwa 20 km/h wird daraus eine Fahrt, die genau aufgezeichnet wird und nach 5 Minuten Stillstand endet. Fahrrad und Bahn zählen dabei auch. Dafür braucht die App die Erlaubnis „Immer“. Die Punkte gehen an deinen eigenen Server, nie an Claude. Das ersetzt OwnTracks: Schalte es dort aus, sonst läuft beides doppelt.")
                     }
                 }
                 Section {

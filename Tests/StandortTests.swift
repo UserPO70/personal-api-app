@@ -39,8 +39,17 @@ final class StandortTests: XCTestCase {
 
     func testVergesseneFahrtEndetVonSelbst() {
         XCTAssertFalse(Standortregel.fahrtZuEnde(seitBewegung: 120, seitBeginn: 3600))
-        XCTAssertTrue(Standortregel.fahrtZuEnde(seitBewegung: 600, seitBeginn: 3600))        // 10 Minuten Stillstand
+        XCTAssertFalse(Standortregel.fahrtZuEnde(seitBewegung: 4 * 60, seitBeginn: 3600))   // rote Ampel, kurzer Stau
+        XCTAssertTrue(Standortregel.fahrtZuEnde(seitBewegung: 5 * 60, seitBeginn: 3600))    // 5 Minuten Stillstand
         XCTAssertTrue(Standortregel.fahrtZuEnde(seitBewegung: 5, seitBeginn: 8 * 3600))      // läuft schon 8 Stunden
+    }
+
+    /// Der Weg vom Parkplatz zur Tür hält das GPS nicht an, langsames Kriechen im Stau schon.
+    func testBewegungWaehrendDerFahrt() {
+        XCTAssertFalse(Standortregel.istBewegung(meterProSekunde: 1.6, meterVomAnker: 40))   // zu Fuß zur Tür
+        XCTAssertFalse(Standortregel.istBewegung(meterProSekunde: -1, meterVomAnker: nil))   // kein Tempo, kein Anker
+        XCTAssertTrue(Standortregel.istBewegung(meterProSekunde: 8, meterVomAnker: 10))      // fährt wieder an
+        XCTAssertTrue(Standortregel.istBewegung(meterProSekunde: 2, meterVomAnker: 120))     // Stau: langsam, aber weiter
     }
 
     func testTempoGemessenOderGerechnet() throws {

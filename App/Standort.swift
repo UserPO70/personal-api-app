@@ -43,8 +43,14 @@ enum Standortregel {
     static let fahrtMeter = 25.0
     /// Während einer Fahrt zählen nur Punkte, die mindestens so genau sind.
     static let fahrtGenauigkeit = 100.0
-    /// Steht das iPhone so lange still, endet die Fahrt von selbst.
-    static let stillstand: TimeInterval = 10 * 60
+    /// Steht das iPhone so lange still, endet die Fahrt von selbst und das GPS geht aus. Fünf Minuten reichen für Ampel,
+    /// Bahnübergang und die meisten Staus; steht es länger und geht es dann weiter, weckt der Kreis um den Halt die App,
+    /// und es beginnt eine neue Fahrt.
+    static let stillstand: TimeInterval = 5 * 60
+    /// Als Bewegung während einer Fahrt zählt erst mehr als Gehtempo oder ein deutliches Stück Weg. Sonst hielte der Weg
+    /// vom Parkplatz zur Tür das GPS weiter an.
+    static let bewegungMeterProSekunde = 3.0
+    static let bewegungMeter = 100.0
     /// Eine Fahrt endet spätestens nach dieser Zeit, falls das Beenden vergessen wird.
     static let fahrtHoechstens: TimeInterval = 8 * 3600
 
@@ -93,6 +99,11 @@ enum Standortregel {
 
     static func probeErlaubt(seitLetzter: TimeInterval) -> Bool {
         seitLetzter >= probePause
+    }
+
+    /// `meterVomAnker`: Abstand zum Ort der letzten erkannten Bewegung.
+    static func istBewegung(meterProSekunde: Double, meterVomAnker: Double?) -> Bool {
+        meterProSekunde > bewegungMeterProSekunde || (meterVomAnker ?? 0) > bewegungMeter
     }
 
     static func fahrtZuEnde(seitBewegung: TimeInterval, seitBeginn: TimeInterval) -> Bool {
@@ -316,7 +327,7 @@ final class Standort: NSObject, ObservableObject {
         if fahrt {
             // Bewegung erkennen, damit eine vergessene Fahrt von selbst endet.
             if anker == nil { anker = ort }
-            if ort.speed > 1.5 || (anker.map { ort.distance(from: $0) > 50 } ?? false) {
+            if Standortregel.istBewegung(meterProSekunde: ort.speed, meterVomAnker: anker.map { ort.distance(from: $0) }) {
                 letzteBewegung = ort.timestamp
                 anker = ort
             }

@@ -91,4 +91,11 @@ final class OrteTests: XCTestCase {
             XCTAssertTrue(Kartenfenster.einbetten.contains(teil), teil)
         }
     }
+
+    /// Die Vorschau blendet Knöpfe und Maßstab aus, nie den Lizenzhinweis von OpenStreetMap (unten rechts).
+    func testVorschauBehaeltLizenzhinweis() {
+        XCTAssertTrue(Kartenfenster.vorschauStil.contains("maplibregl-ctrl-top-right"))
+        XCTAssertFalse(Kartenfenster.vorschauStil.contains("ctrl-bottom-right"))
+        XCTAssertFalse(Kartenfenster.vorschauStil.contains("attrib {display"))
+    }
 }

@@ -185,8 +185,12 @@ struct Seiten: UIViewControllerRepresentable {
         guard let sichtbar = blaetterer.viewControllers?.first,
               let stelle = koordinator.bildschirme.firstIndex(of: sichtbar),
               stelle != tab.rawValue, koordinator.bildschirme.indices.contains(tab.rawValue) else { return }
+        // Die Leiste gleitet dabei selbst (Tableiste); das Mitlesen der Bewegung ruht so lange.
+        koordinator.programmatisch = true
         blaetterer.setViewControllers([koordinator.bildschirme[tab.rawValue]],
-                                      direction: tab.rawValue > stelle ? .forward : .reverse, animated: true)
+                                      direction: tab.rawValue > stelle ? .forward : .reverse, animated: true) { _ in
+            koordinator.programmatisch = false
+        }
     }
 
     final class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
@@ -194,6 +198,8 @@ struct Seiten: UIViewControllerRepresentable {
         let bildschirme: [UIViewController]
         let stand: Blaetterstand
         private var beobachtung: NSKeyValueObservation?
+        /// Wahr, solange die Seiten nach einem Tipp auf die Leiste gleiten (nicht nach dem Finger).
+        var programmatisch = false
 
         init(tab: Binding<Reiter>, bildschirme: [UIViewController], stand: Blaetterstand) {
             self.tab = tab
@@ -208,13 +214,12 @@ struct Seiten: UIViewControllerRepresentable {
             guard let rollen = blaetterer.view.subviews.compactMap({ $0 as? UIScrollView }).first else { return }
             beobachtung = rollen.observe(\.contentOffset, options: [.new]) { [weak self, weak blaetterer] rollen, _ in
                 MainActor.assumeIsolated {
-                    guard let self, let blaetterer, rollen.isTracking || rollen.isDragging || rollen.isDecelerating,
-                          rollen.bounds.width > 0,
-                          let sichtbar = blaetterer.viewControllers?.first,
-                          let stelle = self.bildschirme.firstIndex(of: sichtbar) else { return }
-                    // In Ruhe steht die Scroll-Ansicht genau eine Seitenbreite weit; davon weicht der Finger ab.
+                    // Jede Bewegung zählt, auch das Weitergleiten nach dem Loslassen: Das fährt iOS als eigene
+                    // Animation, nicht als Ausrollen. Bezug ist der Tab, auf dem das Wischen begann; er wechselt
+                    // erst, wenn die neue Seite ganz da ist.
+                    guard let self, blaetterer != nil, !self.programmatisch, rollen.bounds.width > 0 else { return }
                     let versatz = (rollen.contentOffset.x - rollen.bounds.width) / rollen.bounds.width
-                    self.stand.gewischt(CGFloat(stelle) + versatz, anzahl: self.bildschirme.count)
+                    self.stand.gewischt(CGFloat(self.tab.wrappedValue.rawValue) + versatz, anzahl: self.bildschirme.count)
                 }
             }
         }
@@ -237,11 +242,12 @@ struct Seiten: UIViewControllerRepresentable {
                   let stelle = bildschirme.firstIndex(of: sichtbar), let neu = Reiter(rawValue: stelle) else {
                 // Abgebrochen: zurück auf den Tab, auf dem die Seiten stehen geblieben sind.
                 let bleibt = CGFloat(tab.wrappedValue.rawValue)
-                MainActor.assumeIsolated { withAnimation(.snappy) { stand.stelle = bleibt } }
+                MainActor.assumeIsolated { stand.stelle = bleibt }
                 return
             }
             tab.wrappedValue = neu
-            MainActor.assumeIsolated { withAnimation(.snappy) { stand.stelle = CGFloat(stelle) } }
+            // Die Markierung steht hier schon fast genau; ohne eigene Animation, damit nichts nachfedert.
+            MainActor.assumeIsolated { stand.stelle = CGFloat(stelle) }
         }
     }
 }

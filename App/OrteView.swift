@@ -26,22 +26,24 @@ struct OrteView: View {
                         .listRowBackground(Color.clear)
                 }
                 Section {
-                    NavigationLink {
-                        KarteView(tag: tag)
-                            .alsUnterseite()
-                    } label: {
-                        Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Karte")
-                                Text("Strecken und Orte dieses Tages")
-                                    .font(.footnote)
-                                    .foregroundStyle(Color.text2)
+                    Kartenvorschau(tag: tag)
+                        .id(tag)
+                        .frame(height: 220)
+                        .listRowInsets(EdgeInsets())
+                        // Ganze Vorschau antippbar, ohne den Pfeil einer Listenzeile.
+                        .background {
+                            NavigationLink {
+                                KarteView(tag: tag)
+                                    .alsUnterseite()
+                            } label: {
+                                EmptyView()
                             }
-                        } icon: {
-                            Image(systemName: "map.fill")
-                                .foregroundStyle(Color.orte)
+                            .opacity(0)
                         }
-                    }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Karte mit den Strecken dieses Tages")
+                        .accessibilityHint("Öffnet die Karte zum Verschieben und Zoomen")
+                        .accessibilityAddTraits(.isButton)
                 }
                 if let ortstag {
                     ablauf(ortstag)
@@ -176,6 +178,53 @@ struct OrteView: View {
 
 // MARK: Karte
 
+/// Die Karte des Tages als Vorschau in der Liste: nicht verschiebbar, damit Wischen weiter die Tabs wechselt.
+struct Kartenvorschau: View {
+    let tag: String
+
+    @EnvironmentObject private var zustand: AppZustand
+    @State private var fehler: String?
+    @State private var laedt = true
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            Color.flaeche2
+            if zustand.demo {
+                platzhalter("In der Demo gibt es keine Karte.")
+            } else if let verbindung = zustand.verbindung,
+                      let adresse = try? Server.url(verbindung.adresse, "/karte?tag=\(tag)") {
+                Kartenfenster(adresse: adresse, fingerabdruck: verbindung.fingerabdruck, vorschau: true,
+                              fehler: $fehler, laedt: $laedt)
+                    .allowsHitTesting(false)
+                if let fehler {
+                    platzhalter(fehler)
+                } else if laedt {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else {
+                platzhalter("Kein Server gekoppelt.")
+            }
+            Label("Karte öffnen", systemImage: "arrow.up.left.and.arrow.down.right")
+                .font(.footnote.weight(.semibold))
+                .padding(.horizontal, Abstand.kachel)
+                .padding(.vertical, 6)
+                .background(.regularMaterial, in: Capsule())
+                .padding(Abstand.kachel)
+        }
+        .contentShape(Rectangle())
+    }
+
+    private func platzhalter(_ text: String) -> some View {
+        Label(text, systemImage: "map")
+            .font(.footnote)
+            .foregroundStyle(Color.text2)
+            .multilineTextAlignment(.center)
+            .padding(Abstand.rand)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
 /// Die Offline-Karte des Servers (`/karte`): Kacheln, Strecken und Orte kommen vom eigenen Server, nichts von Apple
 /// oder anderen Kartendiensten. Eine eigene Seite, weil Wischen auf der Karte sonst den Tab wechseln würde.
 struct KarteView: View {
@@ -191,7 +240,8 @@ struct KarteView: View {
             if zustand.demo {
                 hinweis("In der Demo gibt es keine Karte. Sie kommt von deinem eigenen Server.")
             } else if let verbindung = zustand.verbindung, let adresse = try? Server.url(verbindung.adresse, "/karte?tag=\(tag)") {
-                Kartenfenster(adresse: adresse, fingerabdruck: verbindung.fingerabdruck, fehler: $fehler, laedt: $laedt)
+                Kartenfenster(adresse: adresse, fingerabdruck: verbindung.fingerabdruck, vorschau: false,
+                              fehler: $fehler, laedt: $laedt)
                     .ignoresSafeArea(edges: .bottom)
                 if let fehler {
                     hinweis(fehler)
@@ -219,6 +269,8 @@ struct KarteView: View {
 struct Kartenfenster: UIViewRepresentable {
     let adresse: URL
     let fingerabdruck: String?
+    /// Als Vorschau: ohne Knöpfe und Maßstab, nicht bedienbar.
+    let vorschau: Bool
     @Binding var fehler: String?
     @Binding var laedt: Bool
 
@@ -228,6 +280,16 @@ struct Kartenfenster: UIViewRepresentable {
       var stil = document.createElement("style");
       stil.textContent = "#kopf, nav.leiste, #blatt-mehr { display: none !important; } " +
         "body { padding-bottom: 0 !important; }";
+      document.documentElement.appendChild(stil);
+    })();
+    """
+
+    /// In der Vorschau zusätzlich Zoom-Knöpfe und Maßstab weg. Der Hinweis auf OpenStreetMap bleibt (Lizenz).
+    static let vorschauStil = """
+    (function () {
+      var stil = document.createElement("style");
+      stil.textContent = ".maplibregl-ctrl-top-right, .maplibregl-ctrl-bottom-left { display: none !important; } " +
+        ".maplibregl-ctrl-attrib { font-size: 9px !important; }";
       document.documentElement.appendChild(stil);
     })();
     """
@@ -242,12 +304,20 @@ struct Kartenfenster: UIViewRepresentable {
         einstellungen.websiteDataStore = .nonPersistent()
         einstellungen.userContentController.addUserScript(
             WKUserScript(source: Self.einbetten, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        if vorschau {
+            einstellungen.userContentController.addUserScript(
+                WKUserScript(source: Self.vorschauStil, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        }
         let fenster = WKWebView(frame: .zero, configuration: einstellungen)
         fenster.navigationDelegate = context.coordinator
         fenster.isOpaque = false
         fenster.backgroundColor = UIColor(named: Farbe.grund.rawValue)
         fenster.scrollView.bounces = false
         fenster.allowsBackForwardNavigationGestures = false
+        if vorschau {
+            fenster.isUserInteractionEnabled = false
+            fenster.scrollView.isScrollEnabled = false
+        }
         fenster.load(URLRequest(url: adresse))
         return fenster
     }

@@ -6,6 +6,8 @@ struct EssenView: View {
     @ObservedObject private var schlange = Warteschlange.shared
     @State private var tag: Essenstag?
     @State private var standVon: Date?
+    /// Läuft mit, damit „Eben erfasst“ nach 30 Minuten von selbst verschwindet.
+    @State private var jetzt = Date()
 
     var body: some View {
         NavigationStack {
@@ -20,6 +22,13 @@ struct EssenView: View {
                     Erfassen(umfang: .uebrige)
                         .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
+                }
+                if !zustand.demo && schlange.letzteMoeglich(jetzt: jetzt) {
+                    Section {
+                        Erfassen(umfang: .ergaenzen)
+                    } footer: {
+                        Text("Noch bis \(ergaenzenBis) kann ein Foto zu dieser Mahlzeit dazukommen.")
+                    }
                 }
                 if let meldung = schlange.meldung {
                     Section {
@@ -49,6 +58,17 @@ struct EssenView: View {
         .onChange(of: schlange.neuesAmServer) {
             Task { await laden() }
         }
+        .task {
+            while !Task.isCancelled {
+                jetzt = Date()
+                try? await Task.sleep(nanoseconds: 30_000_000_000)
+            }
+        }
+    }
+
+    private var ergaenzenBis: String {
+        let ende = (schlange.letzte?.zeit ?? jetzt).addingTimeInterval(Warteschlange.fensterLetzte)
+        return ende.formatted(date: .omitted, time: .shortened)
     }
 
     // MARK: Warteschlange

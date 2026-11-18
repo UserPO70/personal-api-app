@@ -25,6 +25,8 @@ final class Warteschlange: ObservableObject {
     struct Letzte: Codable, Equatable {
         var id: String
         var zeit: Date
+        /// Für „Eben erfasst“ im Tab Essen. Fehlt bei älteren Ständen.
+        var titel: String?
     }
 
     private struct Ablage: Codable {
@@ -40,7 +42,7 @@ final class Warteschlange: ObservableObject {
     @Published var meldung: String?
     /// Ändert sich, sobald der Server etwas Neues hat: Die Anzeige des Tages lädt dann neu.
     @Published private(set) var neuesAmServer = 0
-    private(set) var letzte: Letzte?
+    @Published private(set) var letzte: Letzte?
 
     let ordner: URL
     /// Für Tests: ersetzt den gekoppelten Server.
@@ -77,7 +79,16 @@ final class Warteschlange: ObservableObject {
 
     private var standDatei: URL { ordner.appendingPathComponent("stand.json") }
 
-    private func bildDatei(_ id: String) -> URL { ordner.appendingPathComponent("\(id).jpg") }
+    /// Das erste Bild heißt wie der Eintrag, die weiteren bekommen eine Nummer: `id.jpg`, `id-2.jpg`, …
+    func bildDatei(_ id: String, nummer: Int = 1) -> URL {
+        ordner.appendingPathComponent(nummer == 1 ? "\(id).jpg" : "\(id)-\(nummer).jpg")
+    }
+
+    private func bilderEntfernen(_ id: String) {
+        for nummer in 1...Eintrag.maxFotos {
+            try? FileManager.default.removeItem(at: bildDatei(id, nummer: nummer))
+        }
+    }
 
     /// Auch bei gesperrtem iPhone les- und schreibbar, sobald es einmal entsperrt war.
     private func schreiben(_ daten: Data, nach datei: URL) throws {
@@ -100,19 +111,34 @@ final class Warteschlange: ObservableObject {
         return alter >= 0 && alter < Self.fensterLetzte
     }
 
-    /// `zurLetzten`: kommt zur vorigen Mahlzeit dazu, statt eine neue anzulegen.
-    func aufnehmen(_ neu: Eintrag, bild: Data? = nil, zurLetzten: Bool = false) throws {
+    func aufnehmen(_ neu: Eintrag, bild: Data?, zurLetzten: Bool = false) throws {
+        try aufnehmen(neu, bilder: bild.map { [$0] } ?? [], zurLetzten: zurLetzten)
+    }
+
+    /// `bilder`: die Fotos einer Mahlzeit, höchstens vier. `zurLetzten`: kommt zur vorigen Mahlzeit dazu,
+    /// statt eine neue anzulegen.
+    func aufnehmen(_ neu: Eintrag, bilder: [Data] = [], zurLetzten: Bool = false) throws {
         var eintrag = neu
         if eintrag.art == .foto {
-            guard let bild, !bild.isEmpty else { throw EintragFehler.fotoFehlt }
-            try schreiben(bild, nach: bildDatei(eintrag.id))
+            guard !bilder.isEmpty, bilder.count <= Eintrag.maxFotos, !bilder.contains(where: \.isEmpty) else {
+                throw EintragFehler.fotoFehlt
+            }
+            do {
+                for (stelle, bild) in bilder.enumerated() {
+                    try schreiben(bild, nach: bildDatei(eintrag.id, nummer: stelle + 1))
+                }
+            } catch {
+                bilderEntfernen(eintrag.id)
+                throw error
+            }
+            eintrag.fotos = bilder.count
         }
         if eintrag.art == .gewicht {
             // Keine Mahlzeit: ändert nichts an „zur letzten Mahlzeit“.
         } else if zurLetzten, letzteMoeglich(jetzt: eintrag.zeit), let letzte {
             eintrag.gehoertZu = letzte.id
         } else {
-            letzte = Letzte(id: eintrag.id, zeit: eintrag.zeit)
+            letzte = Letzte(id: eintrag.id, zeit: eintrag.zeit, titel: eintrag.titel)
         }
         eintraege.append(eintrag)
         speichern()
@@ -120,7 +146,7 @@ final class Warteschlange: ObservableObject {
 
     func loeschen(_ id: String) {
         eintraege.removeAll { $0.id == id }
-        try? FileManager.default.removeItem(at: bildDatei(id))
+        bilderEntfernen(id)
         speichern()
     }
 
@@ -176,9 +202,16 @@ final class Warteschlange: ObservableObject {
             }
             let anfrage: Anfrage
             do {
-                var bild: Data?
-                if eintrag.art == .foto { bild = try? Data(contentsOf: bildDatei(id)) }
-                anfrage = try eintrag.anfrage(bild: bild)
+                var bilder: [Data] = []
+                if eintrag.fotoAnzahl > 0 {
+                    for nummer in 1...eintrag.fotoAnzahl {
+                        guard let bild = try? Data(contentsOf: bildDatei(id, nummer: nummer)) else {
+                            throw EintragFehler.fotoFehlt
+                        }
+                        bilder.append(bild)
+                    }
+                }
+                anfrage = try eintrag.anfrage(bilder: bilder)
             } catch {
                 aendern(id) { eintrag in
                     eintrag.stand = .fehlgeschlagen
@@ -252,7 +285,7 @@ final class Warteschlange: ObservableObject {
 
     private func erledigt(_ eintrag: Eintrag, _ daten: Data) {
         eintraege.removeAll { $0.id == eintrag.id }
-        try? FileManager.default.removeItem(at: bildDatei(eintrag.id))
+        bilderEntfernen(eintrag.id)
         if eintrag.brauchtZustimmung,
            let antwort = try? JSONDecoder().decode(Sendeantwort.self, from: daten), let auftrag = antwort.id,
            !analysen.contains(where: { $0.auftrag == auftrag }) {

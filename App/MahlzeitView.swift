@@ -106,7 +106,7 @@ struct MahlzeitView: View {
     @EnvironmentObject private var zustand: AppZustand
     @Environment(\.dismiss) private var schliessen
     @State private var art: String?
-    @State private var bilder: [Int: UIImage] = [:]
+    @State private var bilder: [String: UIImage] = [:]
     @State private var fehler: String?
     @State private var bearbeitet = false
     @State private var loeschenFragen = false
@@ -120,10 +120,10 @@ struct MahlzeitView: View {
                         .foregroundStyle(Color.warnung)
                 }
             }
-            if !(mahlzeit.fotos ?? []).isEmpty {
+            if !mahlzeit.bildpfade.isEmpty {
                 Section {
-                    ForEach(mahlzeit.fotos ?? [], id: \.self) { auftrag in
-                        if let bild = bilder[auftrag] {
+                    ForEach(mahlzeit.bildpfade, id: \.self) { pfad in
+                        if let bild = bilder[pfad] {
                             Image(uiImage: bild)
                                 .resizable()
                                 .scaledToFit()
@@ -235,9 +235,9 @@ struct MahlzeitView: View {
 
     private func bilderLaden() async {
         guard let api = try? zustand.api() else { return }
-        for auftrag in mahlzeit.fotos ?? [] where bilder[auftrag] == nil {
-            if let daten = try? await api.daten("GET", "/api/essen/foto/\(auftrag)/bild"), let bild = UIImage(data: daten) {
-                bilder[auftrag] = bild
+        for pfad in mahlzeit.bildpfade where bilder[pfad] == nil {
+            if let daten = try? await api.daten("GET", pfad), let bild = UIImage(data: daten) {
+                bilder[pfad] = bild
             }
         }
     }

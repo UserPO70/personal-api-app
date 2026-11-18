@@ -28,10 +28,17 @@ struct Eintrag: Codable, Equatable, Identifiable {
     var kg: Double?
     /// Barcode: Claude schätzt die Menge aus der Notiz, die Nährwerte bleiben die der Packung.
     var mengeSchaetzen: Bool?
+    /// Foto: so viele Bilder gehören dazu (höchstens `Eintrag.maxFotos`). Fehlt bei älteren Einträgen, dann eins.
+    var fotos: Int?
     var versuche: Int = 0
     var naechsterVersuch: Date?
     var stand: Stand = .wartet
     var hinweis: String?
+
+    /// So viele Fotos nimmt der Server je Mahlzeit.
+    static let maxFotos = 4
+
+    var fotoAnzahl: Int { art == .foto ? max(fotos ?? 1, 1) : 0 }
 
     static func neueKennung() -> String {
         "app-" + UUID().uuidString.lowercased()
@@ -73,15 +80,20 @@ extension Eintrag {
     }
 
     func anfrage(bild: Data?, grenze: String = "Grenze-" + UUID().uuidString) throws -> Anfrage {
+        try anfrage(bilder: bild.map { [$0] } ?? [], grenze: grenze)
+    }
+
+    /// Bei Fotos gehen alle Bilder in einer Anfrage mit: Der Server schätzt sie zusammen als eine Mahlzeit.
+    func anfrage(bilder: [Data], grenze: String = "Grenze-" + UUID().uuidString) throws -> Anfrage {
         switch art {
         case .foto:
-            guard let bild, !bild.isEmpty else { throw EintragFehler.fotoFehlt }
+            guard !bilder.isEmpty, !bilder.contains(where: \.isEmpty) else { throw EintragFehler.fotoFehlt }
             var felder: [(String, String)] = [("zeit", zeitText), ("geraet", Self.geraet), ("extern_id", id)]
             if let notiz, !notiz.isEmpty { felder.append(("notiz", notiz)) }
             if let gramm { felder.append(("gramm", Zahl.text(gramm))) }
             if let gehoertZu { felder.append(("gehoert_zu", gehoertZu)) }
             return Anfrage(pfad: "/api/essen/foto", typ: "multipart/form-data; boundary=\(grenze)",
-                           koerper: Formular.bauen(felder: felder, datei: bild, grenze: grenze))
+                           koerper: Formular.bauen(felder: felder, dateien: bilder, grenze: grenze))
         case .barcode:
             var json = grundfelder()
             json["barcode"] = barcode ?? ""
@@ -119,15 +131,19 @@ extension Eintrag {
 }
 
 enum Formular {
-    /// Formular mit Textfeldern und dem Foto im Feld `foto`.
-    static func bauen(felder: [(String, String)], datei: Data, grenze: String) -> Data {
+    /// Formular mit Textfeldern und den Fotos, jedes im Feld `foto` (das Feld steht so oft da, wie es Fotos gibt).
+    static func bauen(felder: [(String, String)], dateien: [Data], grenze: String) -> Data {
         var daten = Data()
         for (name, wert) in felder {
             daten.append(Data("--\(grenze)\r\nContent-Disposition: form-data; name=\"\(name)\"\r\n\r\n\(wert)\r\n".utf8))
         }
-        daten.append(Data("--\(grenze)\r\nContent-Disposition: form-data; name=\"foto\"; filename=\"foto.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".utf8))
-        daten.append(datei)
-        daten.append(Data("\r\n--\(grenze)--\r\n".utf8))
+        for (nummer, datei) in dateien.enumerated() {
+            let name = nummer == 0 ? "foto.jpg" : "foto-\(nummer + 1).jpg"
+            daten.append(Data("--\(grenze)\r\nContent-Disposition: form-data; name=\"foto\"; filename=\"\(name)\"\r\nContent-Type: image/jpeg\r\n\r\n".utf8))
+            daten.append(datei)
+            daten.append(Data("\r\n".utf8))
+        }
+        daten.append(Data("--\(grenze)--\r\n".utf8))
         return daten
     }
 }

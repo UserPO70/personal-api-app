@@ -74,6 +74,8 @@ struct Mahlzeit: Codable, Equatable, Identifiable {
     var summe: Naehrwerte?
     var daten: Einschaetzung?
     var fotos: [Int]?
+    /// Jedes Foto einzeln, auch mehrere eines Auftrags. Ältere Server schicken das nicht.
+    var bilder: [Bildadresse]?
     var artGeschaetzt: Bool?
     var korrigiert: Bool?
     var aenderbar: Bool?
@@ -81,10 +83,22 @@ struct Mahlzeit: Codable, Equatable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id, uhrzeit, quelle, notiz, art, bestandteile, summe, daten, korrigiert, aenderbar
         case fotos = "foto_auftrag_ids"
+        case bilder = "fotos"
         case artGeschaetzt = "art_geschaetzt"
     }
 
     static let arten = ["Frühstück", "Mittag", "Abend", "Snack"]
+
+    /// Ein Foto der Mahlzeit: `adresse` ist der Pfad am Server, etwa `/api/essen/foto/3/bild?nr=2`.
+    struct Bildadresse: Codable, Equatable, Hashable {
+        var adresse: String
+    }
+
+    /// Pfade aller Fotos. Ohne Liste vom Server das erste Foto jedes Auftrags.
+    var bildpfade: [String] {
+        if let bilder, !bilder.isEmpty { return bilder.map(\.adresse) }
+        return (fotos ?? []).map { "/api/essen/foto/\($0)/bild" }
+    }
 
     /// Woher die Zahlen stammen, in Worten.
     var herkunft: String {

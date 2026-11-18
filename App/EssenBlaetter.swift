@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 import Vision
 import VisionKit
@@ -33,29 +34,69 @@ private struct Fehlerzeile: View {
 
 /// Reiht einen Eintrag ein und stößt das Senden an.
 @MainActor
-private func einreihen(_ eintrag: Eintrag, bild: Data? = nil, zurLetzten: Bool) throws {
-    try Warteschlange.shared.aufnehmen(eintrag, bild: bild, zurLetzten: zurLetzten)
+private func einreihen(_ eintrag: Eintrag, bilder: [Data] = [], zurLetzten: Bool) throws {
+    try Warteschlange.shared.aufnehmen(eintrag, bilder: bilder, zurLetzten: zurLetzten)
     Task { await Warteschlange.shared.senden() }
 }
 
 // MARK: Foto
 
+/// Die Übersicht nach dem Foto: bis zu vier Bilder einer Mahlzeit (etwa Teller und Packung), Notiz und Gewicht.
+/// Alle Bilder gehen zusammen an den Server und ergeben eine Mahlzeit.
 struct FotoBlatt: View {
-    let bild: UIImage
+    /// Woher das erste Bild kam. Weitere kommen vom selben Ort.
+    enum Quelle {
+        case kamera, mediathek
+    }
+
+    private struct Foto: Identifiable {
+        let id = UUID()
+        let bild: UIImage
+    }
+
+    let quelle: Quelle
+    /// Gesetzt, wenn die Bilder zur eben erfassten Mahlzeit dazukommen („Foto ergänzen“).
+    let ergaenzt: Warteschlange.Letzte?
+
     @Environment(\.dismiss) private var schliessen
+    @State private var fotos: [Foto]
     @State private var notiz = ""
     @State private var gramm = ""
     @State private var zurLetzten = false
     @State private var fehler: String?
+    @State private var kamera = false
+    @State private var aufgenommen: UIImage?
+    @State private var auswahl: [PhotosPickerItem] = []
+
+    init(bilder: [UIImage], quelle: Quelle, ergaenzt: Warteschlange.Letzte? = nil) {
+        self.quelle = quelle
+        self.ergaenzt = ergaenzt
+        _fotos = State(initialValue: bilder.prefix(Eintrag.maxFotos).map { Foto(bild: $0) })
+    }
+
+    private static let breite: CGFloat = 104
+    private static let hoehe: CGFloat = 136
 
     var body: some View {
         NavigationStack {
             AppFormular {
                 Section {
-                    Image(uiImage: bild)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: 260)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: Abstand.eng) {
+                            ForEach(Array(fotos.enumerated()), id: \.element.id) { stelle, foto in
+                                vorschau(foto, nummer: stelle + 1)
+                            }
+                            if fotos.count < Eintrag.maxFotos {
+                                dazu
+                            }
+                        }
+                    }
+                    .listRowInsets(EdgeInsets(top: Abstand.kachel, leading: Abstand.rand,
+                                              bottom: Abstand.kachel, trailing: Abstand.rand))
+                } header: {
+                    Text(fotos.count == 1 ? "1 Foto" : "\(fotos.count) von \(Eintrag.maxFotos) Fotos")
+                } footer: {
+                    Text("Bis zu \(Eintrag.maxFotos) Fotos ergeben eine Mahlzeit, etwa Teller und Packung. Packung und Etikett zählen nicht als eigene Portion.")
                 }
                 Section {
                     TextField("Notiz, z. B. große Portion", text: $notiz)
@@ -66,10 +107,19 @@ struct FotoBlatt: View {
                 } footer: {
                     Text("Mit gewogenem Gewicht rechnet Claude, statt die Menge zu schätzen.")
                 }
-                LetzteSchalter(an: $zurLetzten)
+                if let ergaenzt {
+                    Section {
+                        Label("Kommt zu „\(ergaenzt.titel ?? "Mahlzeit")“ von \(ergaenzt.zeit.formatted(date: .omitted, time: .shortened)) dazu",
+                              systemImage: "plus.circle")
+                    } footer: {
+                        Text("Claude schätzt diese Fotos für sich und rechnet sie zur Mahlzeit dazu, etwa Nachtisch oder Nachschlag. Eine Packung fotografierst du am besten gleich mit dem ersten Foto.")
+                    }
+                } else {
+                    LetzteSchalter(an: $zurLetzten)
+                }
                 Fehlerzeile(text: fehler)
             }
-            .navigationTitle("Foto")
+            .navigationTitle(ergaenzt == nil ? "Foto" : "Foto ergänzen")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -77,9 +127,115 @@ struct FotoBlatt: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Senden") { senden() }
+                        .disabled(fotos.isEmpty)
                 }
             }
+            .onChange(of: auswahl) { _, neu in
+                guard !neu.isEmpty else { return }
+                auswahl = []
+                Task {
+                    let bilder = await Self.laden(neu)
+                    if bilder.isEmpty {
+                        fehler = "Die Bilder lassen sich nicht lesen."
+                    }
+                    hinzufuegen(bilder)
+                }
+            }
+            .fullScreenCover(isPresented: $kamera, onDismiss: kameraZu) {
+                Kamera { bild in
+                    aufgenommen = bild
+                    kamera = false
+                }
+                .ignoresSafeArea()
+            }
         }
+    }
+
+    private func vorschau(_ foto: Foto, nummer: Int) -> some View {
+        Image(uiImage: foto.bild)
+            .resizable()
+            .scaledToFill()
+            .frame(width: Self.breite, height: Self.hoehe)
+            .clipShape(RoundedRectangle(cornerRadius: Ecke.feld))
+            .overlay(alignment: .topTrailing) {
+                if fotos.count > 1 {
+                    Button {
+                        fotos.removeAll { $0.id == foto.id }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(Color.white, Color.black.opacity(0.55))
+                            .padding(Abstand.winzig)
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityLabel("Foto \(nummer) entfernen")
+                }
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Foto \(nummer)")
+    }
+
+    /// Die Kachel für ein weiteres Foto, aus derselben Quelle wie das erste.
+    @ViewBuilder
+    private var dazu: some View {
+        if quelle == .kamera && Kamera.vorhanden {
+            Button {
+                kamera = true
+            } label: {
+                dazuBeschriftung("camera")
+            }
+            .buttonStyle(.borderless)
+            .accessibilityLabel("Weiteres Foto aufnehmen")
+        } else {
+            PhotosPicker(selection: $auswahl, maxSelectionCount: Eintrag.maxFotos - fotos.count,
+                         selectionBehavior: .ordered, matching: .images) {
+                dazuBeschriftung("photo.on.rectangle")
+            }
+            .buttonStyle(.borderless)
+            .accessibilityLabel("Weitere Fotos aus der Mediathek")
+        }
+    }
+
+    private func dazuBeschriftung(_ symbol: String) -> some View {
+        VStack(spacing: Abstand.winzig) {
+            Image(systemName: "plus")
+                .font(.title2.weight(.semibold))
+            Text("Foto")
+                .font(.footnote.weight(.medium))
+            Image(systemName: symbol)
+                .font(.footnote)
+                .foregroundStyle(Color.text3)
+        }
+        .foregroundStyle(Color.accentColor)
+        .frame(width: Self.breite, height: Self.hoehe)
+        .background(Color.flaeche2, in: RoundedRectangle(cornerRadius: Ecke.feld))
+        .overlay(
+            RoundedRectangle(cornerRadius: Ecke.feld)
+                .strokeBorder(Color.rand, style: StrokeStyle(lineWidth: 1, dash: [5, 4]))
+        )
+    }
+
+    private func hinzufuegen(_ bilder: [UIImage]) {
+        let platz = Eintrag.maxFotos - fotos.count
+        fotos.append(contentsOf: bilder.prefix(max(platz, 0)).map { Foto(bild: $0) })
+    }
+
+    private func kameraZu() {
+        guard let bild = aufgenommen else { return }
+        aufgenommen = nil
+        hinzufuegen([bild])
+    }
+
+    /// Lädt die gewählten Bilder aus der Mediathek, in der gewählten Reihenfolge. Was sich nicht lesen lässt, fällt weg.
+    static func laden(_ auswahl: [PhotosPickerItem]) async -> [UIImage] {
+        var bilder: [UIImage] = []
+        for eintrag in auswahl.prefix(Eintrag.maxFotos) {
+            if let daten = try? await eintrag.loadTransferable(type: Data.self), let bild = UIImage(data: daten) {
+                bilder.append(bild)
+            }
+        }
+        return bilder
     }
 
     private func senden() {
@@ -88,19 +244,25 @@ struct FotoBlatt: View {
             fehler = "Das Gewicht ist keine Zahl."
             return
         }
-        guard let daten = Bild.jpeg(bild) else {
-            fehler = "Das Foto lässt sich nicht verkleinern."
-            return
+        var daten: [Data] = []
+        for foto in fotos {
+            guard let jpeg = Bild.jpeg(foto.bild) else {
+                fehler = "Ein Foto lässt sich nicht verkleinern."
+                return
+            }
+            daten.append(jpeg)
         }
+        guard !daten.isEmpty else { return }
         let text = notiz.trimmingCharacters(in: .whitespacesAndNewlines)
+        let name = daten.count == 1 ? "Foto" : "\(daten.count) Fotos"
         let eintrag = Eintrag(id: Eintrag.neueKennung(), art: .foto, zeit: Date(),
-                              titel: text.isEmpty ? "Foto" : "Foto: \(text)",
+                              titel: text.isEmpty ? name : "\(name): \(text)",
                               notiz: text.isEmpty ? nil : text, gramm: gewicht)
         do {
-            try einreihen(eintrag, bild: daten, zurLetzten: zurLetzten)
+            try einreihen(eintrag, bilder: daten, zurLetzten: ergaenzt != nil || zurLetzten)
             schliessen()
         } catch {
-            fehler = "Das Foto lässt sich nicht speichern: \(error.localizedDescription)"
+            fehler = "Die Fotos lassen sich nicht speichern: \(error.localizedDescription)"
         }
     }
 }

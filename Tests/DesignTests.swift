@@ -35,4 +35,22 @@ final class DesignTests: XCTestCase {
         XCTAssertEqual(try farbe(.text3, dunkel: true, kontrast: true), try farbe(.text, dunkel: true))
         XCTAssertEqual(try farbe(.rand, dunkel: false, kontrast: true), try farbe(.text3, dunkel: false))
     }
+
+    /// Die Markierung in der Tab-Leiste folgt dem Finger, übergeht aber den Sprung beim Zurücksetzen der Seiten.
+    @MainActor
+    func testMarkierungFolgtDemFinger() {
+        let stand = Blaetterstand()
+        stand.gewischt(0.3, anzahl: 5)
+        XCTAssertEqual(stand.stelle, 0.3, accuracy: 0.0001)
+        stand.gewischt(0.7, anzahl: 5)
+        XCTAssertEqual(stand.stelle, 0.7, accuracy: 0.0001)
+        stand.gewischt(1.0, anzahl: 5)
+        stand.gewischt(0.0, anzahl: 5)          // Zurücksetzen: Sprung um eine ganze Seite
+        XCTAssertEqual(stand.stelle, 1.0, accuracy: 0.0001)
+        stand.gewischt(-0.2, anzahl: 5)         // Federn am Rand: nicht vor den ersten Tab
+        XCTAssertEqual(stand.stelle, 1.0, accuracy: 0.0001)
+        stand.stelle = 4
+        stand.gewischt(4.3, anzahl: 5)          // nicht hinter den letzten
+        XCTAssertEqual(stand.stelle, 4, accuracy: 0.0001)
+    }
 }

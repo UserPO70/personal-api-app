@@ -1,0 +1,361 @@
+{
+ "adresse": "GET /api/dashboard/karte",
+ "anfrage": {
+  "pfad": "/api/dashboard/karte?tag=2026-03-14",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "tag": "2026-03-14",
+  "aufenthalte": [
+   {
+    "ort": "Zuhause",
+    "beginn": "2026-03-13T20:36:07.000000Z",
+    "ende": "2026-03-14T09:56:59.000000Z",
+    "lat": 50.09997,
+    "lon": 8.19992,
+    "minuten": 657,
+    "neu": false,
+    "luecke": false
+   },
+   {
+    "ort": "Ort 3",
+    "beginn": "2026-03-14T09:56:59.000000Z",
+    "ende": "2026-03-14T10:57:08.000000Z",
+    "lat": 50.10252,
+    "lon": 8.20703,
+    "minuten": 60,
+    "neu": false,
+    "luecke": false
+   },
+   {
+    "ort": "Ort 4",
+    "beginn": "2026-03-14T11:05:55.000000Z",
+    "ende": "2026-03-14T13:02:30.000000Z",
+    "lat": 50.09486,
+    "lon": 8.18769,
+    "minuten": 117,
+    "neu": false,
+    "luecke": false
+   },
+   {
+    "ort": "Zuhause",
+    "beginn": "2026-03-14T13:07:22.000000Z",
+    "ende": "2026-03-15T17:00:00.000000Z",
+    "lat": 50.10005,
+    "lon": 8.2,
+    "minuten": 593,
+    "neu": false,
+    "luecke": false
+   }
+  ],
+  "strassennetz": true,
+  "routen": [
+   {
+    "kennung": "0d86268997aa506e",
+    "start": "Zuhause",
+    "ziel": "Ort 3",
+    "abfahrt": "2026-03-14T09:55:49.263831Z",
+    "ankunft": "2026-03-14T09:56:59.000000Z",
+    "dauer_min": 1,
+    "korrigiert": false,
+    "strecke_km": 0.6,
+    "anteil_rekonstruiert": 1.0,
+    "teile": [
+     {
+      "art": "rekonstruiert",
+      "koordinaten": [
+       [
+        8.199918,
+        50.099968
+       ],
+       [
+        8.200807,
+        50.100287
+       ],
+       [
+        8.201696,
+        50.100606
+       ],
+       [
+        8.202585,
+        50.100924
+       ],
+       [
+        8.203474,
+        50.101243
+       ],
+       [
+        8.204363,
+        50.101562
+       ],
+       [
+        8.205252,
+        50.101881
+       ],
+       [
+        8.206141,
+        50.1022
+       ],
+       [
+        8.20703,
+        50.102519
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "kennung": "86a12b16a9b0877f",
+    "start": "Ort 3",
+    "ziel": "Ort 4",
+    "abfahrt": "2026-03-14T10:54:57.203941Z",
+    "ankunft": "2026-03-14T11:05:55.000000Z",
+    "dauer_min": 11,
+    "korrigiert": false,
+    "strecke_km": 1.6,
+    "anteil_rekonstruiert": 1.0,
+    "teile": [
+     {
+      "art": "rekonstruiert",
+      "koordinaten": [
+       [
+        8.20703,
+        50.102519
+       ],
+       [
+        8.204613,
+        50.101561
+       ],
+       [
+        8.202196,
+        50.100604
+       ],
+       [
+        8.199778,
+        50.099646
+       ],
+       [
+        8.197361,
+        50.098689
+       ],
+       [
+        8.194944,
+        50.097731
+       ],
+       [
+        8.192527,
+        50.096774
+       ],
+       [
+        8.19011,
+        50.095816
+       ],
+       [
+        8.187693,
+        50.094859
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "kennung": "fec554829a498158",
+    "start": "Ort 4",
+    "ziel": "Zuhause",
+    "abfahrt": "2026-03-14T12:58:57.066145Z",
+    "ankunft": "2026-03-14T13:07:22.000000Z",
+    "dauer_min": 8,
+    "korrigiert": false,
+    "strecke_km": 1.1,
+    "anteil_rekonstruiert": 1.0,
+    "teile": [
+     {
+      "art": "rekonstruiert",
+      "koordinaten": [
+       [
+        8.187693,
+        50.094859
+       ],
+       [
+        8.189231,
+        50.095507
+       ],
+       [
+        8.19077,
+        50.096156
+       ],
+       [
+        8.192308,
+        50.096805
+       ],
+       [
+        8.193847,
+        50.097453
+       ],
+       [
+        8.195385,
+        50.098102
+       ],
+       [
+        8.196924,
+        50.09875
+       ],
+       [
+        8.198462,
+        50.099399
+       ],
+       [
+        8.2,
+        50.100047
+       ]
+      ]
+     }
+    ]
+   }
+  ],
+  "aufenthalte_herkunft": "owntracks",
+  "punkte": [
+   {
+    "zeit": "2026-03-14T01:07:26.000000Z",
+    "lat": 50.100114,
+    "lon": 8.199642,
+    "acc": 65,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T03:48:25.000000Z",
+    "lat": 50.099931,
+    "lon": 8.200337,
+    "acc": 65,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T04:49:08.000000Z",
+    "lat": 50.099988,
+    "lon": 8.199976,
+    "acc": 5,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T07:09:26.000000Z",
+    "lat": 50.099941,
+    "lon": 8.199843,
+    "acc": 16,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T09:39:08.000000Z",
+    "lat": 50.100018,
+    "lon": 8.199691,
+    "acc": 65,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T09:56:59.000000Z",
+    "lat": 50.101944,
+    "lon": 8.205192,
+    "acc": 30,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T09:58:16.000000Z",
+    "lat": 50.102523,
+    "lon": 8.207043,
+    "acc": 10,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T10:57:08.000000Z",
+    "lat": 50.101009,
+    "lon": 8.203339,
+    "acc": 5,
+    "ungenau": false,
+    "luecke_davor": true
+   },
+   {
+    "zeit": "2026-03-14T11:00:43.000000Z",
+    "lat": 50.098564,
+    "lon": 8.196988,
+    "acc": 30,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T11:04:12.000000Z",
+    "lat": 50.096141,
+    "lon": 8.191355,
+    "acc": 30,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T11:05:55.000000Z",
+    "lat": 50.094859,
+    "lon": 8.187693,
+    "acc": 30,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T13:02:30.000000Z",
+    "lat": 50.096928,
+    "lon": 8.192899,
+    "acc": 16,
+    "ungenau": false,
+    "luecke_davor": true
+   },
+   {
+    "zeit": "2026-03-14T13:05:28.000000Z",
+    "lat": 50.098805,
+    "lon": 8.1971,
+    "acc": 5,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T13:07:22.000000Z",
+    "lat": 50.100035,
+    "lon": 8.200347,
+    "acc": 65,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T16:03:40.000000Z",
+    "lat": 50.100145,
+    "lon": 8.199687,
+    "acc": 30,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T18:45:56.000000Z",
+    "lat": 50.100064,
+    "lon": 8.199987,
+    "acc": 30,
+    "ungenau": false,
+    "luecke_davor": false
+   },
+   {
+    "zeit": "2026-03-14T20:34:35.000000Z",
+    "lat": 50.10004,
+    "lon": 8.200011,
+    "acc": 16,
+    "ungenau": false,
+    "luecke_davor": false
+   }
+  ],
+  "ausgeduennt": false,
+  "luecken": [],
+  "luecke_ab_stunden": 2.0
+ }
+}

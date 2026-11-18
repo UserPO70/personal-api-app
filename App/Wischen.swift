@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Die Tabs der App. Zwischen ihnen wird gewischt: Der Nachbar gleitet mit dem Finger herein.
 enum Reiter: Int, CaseIterable, Identifiable {
-    case heute, essen, auswertungen, einstellungen
+    case heute, essen, orte, auswertungen, einstellungen
 
     var id: Int { rawValue }
 
@@ -10,6 +10,7 @@ enum Reiter: Int, CaseIterable, Identifiable {
         switch self {
         case .heute: return "Heute"
         case .essen: return "Essen"
+        case .orte: return "Orte"
         case .auswertungen: return "Auswertungen"
         case .einstellungen: return "Einstellungen"
         }
@@ -19,6 +20,7 @@ enum Reiter: Int, CaseIterable, Identifiable {
         switch self {
         case .heute: return "sun.max"
         case .essen: return "fork.knife"
+        case .orte: return "map"
         case .auswertungen: return "chart.xyaxis.line"
         case .einstellungen: return "gearshape"
         }
@@ -59,42 +61,74 @@ extension View {
     }
 }
 
+/// Wo die Seiten gerade stehen, als Kommazahl: 1,5 heißt halb zwischen Essen und Orte. Folgt beim Wischen dem Finger,
+/// damit die Markierung in der Leiste mitgleitet. Eigenes Objekt, damit nur die Leiste bei jeder Bewegung neu zeichnet.
+@MainActor
+final class Blaetterstand: ObservableObject {
+    @Published var stelle: CGFloat = 0
+
+    /// Neue Stelle aus dem Wischen. Sprünge um mehr als eine halbe Seite kommen nur vom Zurücksetzen der Blätter-Ansicht
+    /// am Ende einer Bewegung, nie vom Finger, und werden übergangen.
+    func gewischt(_ neu: CGFloat, anzahl: Int) {
+        let begrenzt = min(max(neu, 0), CGFloat(anzahl - 1))
+        guard abs(begrenzt - stelle) <= 0.5 else { return }
+        stelle = begrenzt
+    }
+}
+
 /// Die Leiste unten. Eine eigene statt der von iOS, weil nur so die Tabs mit dem Finger mitgleiten können.
 struct Tableiste: View {
     /// So viel Platz hält jede Seite unten für die Leiste frei.
     static let hoehe: CGFloat = 64
 
     @Binding var tab: Reiter
+    @ObservedObject var stand: Blaetterstand
+
+    private static let abstand: CGFloat = 2
+
+    /// Der Tab, über dem die Markierung gerade am meisten steht: Er bekommt Farbe und volles Symbol.
+    private var hervorgehoben: Reiter {
+        Reiter(rawValue: Int(stand.stelle.rounded())) ?? tab
+    }
 
     var body: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: Self.abstand) {
             ForEach(Reiter.allCases) { eintrag in
                 Button {
-                    withAnimation(.snappy) { tab = eintrag }
+                    withAnimation(.snappy) {
+                        tab = eintrag
+                        stand.stelle = CGFloat(eintrag.rawValue)
+                    }
                 } label: {
                     VStack(spacing: 3) {
                         Image(systemName: eintrag.symbol)
                             .font(.system(size: 20, weight: .medium))
-                            .symbolVariant(tab == eintrag ? .fill : .none)
+                            .symbolVariant(hervorgehoben == eintrag ? .fill : .none)
                             .frame(height: 24)
                         Text(eintrag.name)
-                            // Feste Größe wie in der Tab-Leiste von iOS, damit alle vier Namen gleich groß bleiben.
+                            // Feste Größe wie in der Tab-Leiste von iOS, damit alle Namen gleich groß bleiben.
                             .font(.system(size: 10, weight: .medium))
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
                     }
-                    .foregroundStyle(tab == eintrag ? Color.accentColor : Color.primary)
+                    .foregroundStyle(hervorgehoben == eintrag ? Color.accentColor : Color.primary)
                     .frame(maxWidth: .infinity, minHeight: 48)
-                    .background {
-                        if tab == eintrag {
-                            Capsule().fill(Color.primary.opacity(0.08))
-                        }
-                    }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(eintrag.name)
                 .accessibilityAddTraits(tab == eintrag ? .isSelected : [])
+            }
+        }
+        // Die Markierung liegt unter den Knöpfen und gleitet mit der Stelle der Seiten.
+        .background(alignment: .leading) {
+            GeometryReader { flaeche in
+                let anzahl = CGFloat(Reiter.allCases.count)
+                let breite = (flaeche.size.width - Self.abstand * (anzahl - 1)) / anzahl
+                Capsule()
+                    .fill(Color.primary.opacity(0.08))
+                    .frame(width: breite, height: flaeche.size.height)
+                    .offset(x: stand.stelle * (breite + Self.abstand))
             }
         }
         .padding(5)
@@ -116,9 +150,11 @@ struct Seiten: UIViewControllerRepresentable {
     let platzUnten: CGFloat
     /// Die Bildschirme in der Reihenfolge der Tabs. Nur beim Anlegen gelesen.
     let seiten: [AnyView]
+    /// Bekommt beim Wischen laufend die Stelle, für die Markierung in der Leiste.
+    let stand: Blaetterstand
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(tab: $tab, bildschirme: seiten.map { UIHostingController(rootView: $0) })
+        Coordinator(tab: $tab, bildschirme: seiten.map { UIHostingController(rootView: $0) }, stand: stand)
     }
 
     func makeUIViewController(context: Context) -> UIPageViewController {
@@ -130,6 +166,8 @@ struct Seiten: UIViewControllerRepresentable {
         if bildschirme.indices.contains(tab.rawValue) {
             blaetterer.setViewControllers([bildschirme[tab.rawValue]], direction: .forward, animated: false)
         }
+        stand.stelle = CGFloat(tab.rawValue)
+        context.coordinator.beobachten(blaetterer)
         return blaetterer
     }
 
@@ -154,10 +192,31 @@ struct Seiten: UIViewControllerRepresentable {
     final class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
         var tab: Binding<Reiter>
         let bildschirme: [UIViewController]
+        let stand: Blaetterstand
+        private var beobachtung: NSKeyValueObservation?
 
-        init(tab: Binding<Reiter>, bildschirme: [UIViewController]) {
+        init(tab: Binding<Reiter>, bildschirme: [UIViewController], stand: Blaetterstand) {
             self.tab = tab
             self.bildschirme = bildschirme
+            self.stand = stand
+        }
+
+        /// Liest beim Wischen mit, wie weit die Seiten verschoben sind. Der Delegate der Scroll-Ansicht gehört der
+        /// Blätter-Ansicht selbst, deshalb über Key-Value-Observing statt als Delegate.
+        @MainActor
+        func beobachten(_ blaetterer: UIPageViewController) {
+            guard let rollen = blaetterer.view.subviews.compactMap({ $0 as? UIScrollView }).first else { return }
+            beobachtung = rollen.observe(\.contentOffset, options: [.new]) { [weak self, weak blaetterer] rollen, _ in
+                MainActor.assumeIsolated {
+                    guard let self, let blaetterer, rollen.isTracking || rollen.isDragging || rollen.isDecelerating,
+                          rollen.bounds.width > 0,
+                          let sichtbar = blaetterer.viewControllers?.first,
+                          let stelle = self.bildschirme.firstIndex(of: sichtbar) else { return }
+                    // In Ruhe steht die Scroll-Ansicht genau eine Seitenbreite weit; davon weicht der Finger ab.
+                    let versatz = (rollen.contentOffset.x - rollen.bounds.width) / rollen.bounds.width
+                    self.stand.gewischt(CGFloat(stelle) + versatz, anzahl: self.bildschirme.count)
+                }
+            }
         }
 
         func pageViewController(_ pageViewController: UIPageViewController,
@@ -175,8 +234,14 @@ struct Seiten: UIViewControllerRepresentable {
         func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool,
                                 previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
             guard completed, let sichtbar = pageViewController.viewControllers?.first,
-                  let stelle = bildschirme.firstIndex(of: sichtbar), let neu = Reiter(rawValue: stelle) else { return }
+                  let stelle = bildschirme.firstIndex(of: sichtbar), let neu = Reiter(rawValue: stelle) else {
+                // Abgebrochen: zurück auf den Tab, auf dem die Seiten stehen geblieben sind.
+                let bleibt = CGFloat(tab.wrappedValue.rawValue)
+                MainActor.assumeIsolated { withAnimation(.snappy) { stand.stelle = bleibt } }
+                return
+            }
             tab.wrappedValue = neu
+            MainActor.assumeIsolated { withAnimation(.snappy) { stand.stelle = CGFloat(stelle) } }
         }
     }
 }

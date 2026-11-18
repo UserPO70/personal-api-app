@@ -5,6 +5,8 @@ struct EssenView: View {
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
     @State private var tag: Essenstag?
+    /// Der angezeigte Essenstag. Erfasst wird immer jetzt, egal welcher Tag gerade zu sehen ist.
+    @State private var gewaehlt = Essenstag.heute()
     @State private var standVon: Date?
     /// Läuft mit, damit „Eben erfasst“ nach 30 Minuten von selbst verschwindet.
     @State private var jetzt = Date()
@@ -42,6 +44,11 @@ struct EssenView: View {
                 if !schlange.analysen.isEmpty {
                     analysen
                 }
+                Section {
+                    TagWahl(tag: $gewaehlt, heute: Essenstag.heute())
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
                 essenstag
             }
             .navigationTitle("Essen")
@@ -52,8 +59,10 @@ struct EssenView: View {
             }
         }
         .task {
-            await laden()
             await schlange.senden()
+        }
+        .task(id: gewaehlt) {
+            await laden()
         }
         .onChange(of: schlange.neuesAmServer) {
             Task { await laden() }
@@ -182,12 +191,16 @@ struct EssenView: View {
     private var essenstag: some View {
         Section {
             if let tag {
-                // Die Kalorien des Tages stehen groß auf „Heute“; hier nur die Nährwerte in einer Zeile.
+                // Die Kalorien von heute stehen groß auf „Heute“; für andere Tage hier.
+                if gewaehlt != Essenstag.heute() {
+                    LabeledContent("Gegessen", value: Zahl.kcal(tag.summe?.kcal))
+                        .monospacedDigit()
+                }
                 Text("Eiweiß \(Zahl.gramm(tag.summe?.eiweiss)) · Kohlenhydrate \(Zahl.gramm(tag.summe?.kohlenhydrate)) · Fett \(Zahl.gramm(tag.summe?.fett))")
                     .font(.footnote)
                     .foregroundStyle(Color.text2)
                 if tag.mahlzeiten.isEmpty {
-                    Text("Noch nichts eingetragen.")
+                    Text(gewaehlt == Essenstag.heute() ? "Noch nichts eingetragen." : "An diesem Tag ist nichts eingetragen.")
                         .foregroundStyle(Color.text2)
                 }
                 ForEach(tag.mahlzeiten) { mahlzeit in
@@ -222,7 +235,7 @@ struct EssenView: View {
                     .foregroundStyle(Color.text2)
             }
         } header: {
-            Text(tag.map { "Essenstag \($0.tag)" } ?? "Essenstag")
+            Text("Mahlzeiten")
         } footer: {
             if let standVon {
                 Text("Server nicht erreichbar. Stand von \(standVon.formatted(date: .abbreviated, time: .shortened)).")
@@ -247,15 +260,18 @@ struct EssenView: View {
             return
         }
         do {
-            let neu = try await zustand.api().lesen(Essenstag.self, "GET", "/api/essen/tag?tag=\(Essenstag.heute())")
+            let neu = try await zustand.api().lesen(Essenstag.self, "GET", "/api/essen/tag?tag=\(gewaehlt)")
             tag = neu
             standVon = nil
-            schlange.merken(neu, als: "essenstag")
+            schlange.merken(neu, als: "essenstag-\(gewaehlt)")
         } catch {
             if Task.isCancelled { return }
-            if let (alt, wann) = schlange.gemerkt(Essenstag.self, "essenstag") {
+            if let (alt, wann) = schlange.gemerkt(Essenstag.self, "essenstag-\(gewaehlt)") {
                 tag = alt
                 standVon = wann
+            } else {
+                tag = nil
+                standVon = nil
             }
         }
     }

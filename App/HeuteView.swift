@@ -135,6 +135,7 @@ struct HeuteView: View {
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
     @State private var tag: Tagesueberblick?
+    @State private var traegtGewichtEin = false
     @State private var standVon: Date?
     @State private var fehler: String?
 
@@ -203,13 +204,30 @@ struct HeuteView: View {
             .background(Color.grund)
             // Erfassen sitzt unten direkt über der Tab-Leiste, damit der Daumen den Foto-Knopf mit einer Hand erreicht.
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Erfassen(umfang: .foto)
+                HStack(spacing: Abstand.eng) {
+                    Erfassen(umfang: .foto)
+                    // Gewicht ist seltener als Essen: ein kleiner Knopf neben dem großen.
+                    Button {
+                        traegtGewichtEin = true
+                    } label: {
+                        Image(systemName: "scalemass")
+                            .font(.headline)
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                    .disabled(zustand.demo)
+                    .accessibilityLabel("Gewicht eintragen")
+                }
                     .padding(.horizontal, Abstand.rand)
                     .padding(.vertical, Abstand.eng)
                     .background(Color.grund)
             }
             .navigationTitle("Heute")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $traegtGewichtEin) {
+                GewichtBlatt(vorschlag: tag?.koerper?.gewicht?.kg)
+            }
             .refreshable {
                 await schlange.senden(alle: true)
                 await laden()

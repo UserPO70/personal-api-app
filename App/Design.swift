@@ -159,3 +159,59 @@ struct AppFormular<Inhalt: View>: View {
         .background(Color.grund)
     }
 }
+
+/// Ein Kalendertag als Text, wie der Server ihn will: `2026-03-14`.
+enum Kalendertag {
+    static func heute(jetzt: Date = Date(), kalender: Calendar = .current) -> String {
+        let teile = kalender.dateComponents([.year, .month, .day], from: jetzt)
+        return String(format: "%04d-%02d-%02d", teile.year ?? 0, teile.month ?? 0, teile.day ?? 0)
+    }
+
+    static func verschoben(_ tag: String, um tage: Int, kalender: Calendar = .current) -> String {
+        guard let datum = Gewichtsverlauf.datum(tag),
+              let neu = kalender.date(byAdding: .day, value: tage, to: datum) else { return tag }
+        return heute(jetzt: neu, kalender: kalender)
+    }
+
+    /// „Heute“, „Gestern“ oder „Mo., 16. Nov.“. `heute` ist der laufende Tag des Bereichs (beim Essen bis 4 Uhr früh
+    /// noch der Vortag).
+    static func name(_ tag: String, heute: String) -> String {
+        if tag == heute { return "Heute" }
+        if tag == verschoben(heute, um: -1) { return "Gestern" }
+        guard let datum = Gewichtsverlauf.datum(tag) else { return tag }
+        return datum.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated))
+    }
+}
+
+/// Tag zurück, Name des Tages, Tag vor: oben in „Essen“ und „Orte“. In die Zukunft geht es nicht.
+struct TagWahl: View {
+    @Binding var tag: String
+    let heute: String
+
+    var body: some View {
+        HStack(spacing: Abstand.eng) {
+            Button {
+                tag = Kalendertag.verschoben(tag, um: -1)
+            } label: {
+                Image(systemName: "chevron.left")
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel("Tag davor")
+            Spacer(minLength: 0)
+            Text(Kalendertag.name(tag, heute: heute))
+                .font(.headline)
+                .monospacedDigit()
+            Spacer(minLength: 0)
+            Button {
+                tag = Kalendertag.verschoben(tag, um: 1)
+            } label: {
+                Image(systemName: "chevron.right")
+                    .frame(width: 44, height: 44)
+            }
+            .disabled(tag >= heute)
+            .accessibilityLabel("Tag danach")
+        }
+        .buttonStyle(.borderless)
+        .alsFlaeche(innen: Abstand.winzig, ecke: Ecke.feld)
+    }
+}

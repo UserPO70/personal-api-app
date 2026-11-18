@@ -7,6 +7,8 @@ struct HauptView: View {
     @State private var fragtZustimmung = false
     @State private var tab = Reiter.heute
     @StateObject private var lage = Seitenlage()
+    /// Nicht beobachtet: Nur die Leiste zeichnet bei jeder Bewegung neu, nicht die ganze Ansicht.
+    @State private var stand = Blaetterstand()
 
     var body: some View {
         // Seiten nebeneinander: Beim Wischen gleitet der Nachbar-Tab mit dem Finger herein.
@@ -19,12 +21,14 @@ struct HauptView: View {
                    seiten: [
                        AnyView(HeuteView().environmentObject(zustand).environmentObject(lage)),
                        AnyView(EssenView().environmentObject(zustand).environmentObject(lage)),
+                       AnyView(OrteView().environmentObject(zustand).environmentObject(lage)),
                        AnyView(AuswertungenView().environmentObject(zustand).environmentObject(lage)),
                        AnyView(EinstellungenView().environmentObject(zustand).environmentObject(lage)),
-                   ])
+                   ],
+                   stand: stand)
                 .ignoresSafeArea()
             if !lage.aufUnterseite {
-                Tableiste(tab: $tab)
+                Tableiste(tab: $tab, stand: stand)
             }
         }
         .ignoresSafeArea(.keyboard)

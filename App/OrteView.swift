@@ -1,0 +1,311 @@
+import CryptoKit
+import SwiftUI
+import WebKit
+
+/// Der Tab „Orte“: wo du an einem Tag warst und wie du dazwischen gefahren bist, darüber der Weg zur Karte.
+struct OrteView: View {
+    @EnvironmentObject private var zustand: AppZustand
+    @ObservedObject private var schlange = Warteschlange.shared
+    @State private var tag = Kalendertag.heute()
+    @State private var ortstag: Ortstag?
+    @State private var standVon: Date?
+    @State private var fehler: String?
+
+    var body: some View {
+        NavigationStack {
+            AppListe {
+                if zustand.demo {
+                    Section {
+                        Label("Demo: ausgedachte Daten, kein Server", systemImage: "theatermasks")
+                            .foregroundStyle(Color.text2)
+                    }
+                }
+                Section {
+                    TagWahl(tag: $tag, heute: Kalendertag.heute())
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+                Section {
+                    NavigationLink {
+                        KarteView(tag: tag)
+                            .alsUnterseite()
+                    } label: {
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Karte")
+                                Text("Strecken und Orte dieses Tages")
+                                    .font(.footnote)
+                                    .foregroundStyle(Color.text2)
+                            }
+                        } icon: {
+                            Image(systemName: "map.fill")
+                                .foregroundStyle(Color.orte)
+                        }
+                    }
+                }
+                if let ortstag {
+                    ablauf(ortstag)
+                } else if let fehler {
+                    Section {
+                        Label(fehler, systemImage: "exclamationmark.triangle")
+                            .foregroundStyle(Color.warnung)
+                    }
+                } else {
+                    Section { ProgressView() }
+                }
+            }
+            .navigationTitle("Orte")
+            .refreshable { await laden() }
+            .task(id: tag) { await laden() }
+        }
+    }
+
+    // MARK: Ablauf
+
+    @ViewBuilder
+    private func ablauf(_ ortstag: Ortstag) -> some View {
+        let schritte = ortstag.ablauf
+        Section {
+            if schritte.isEmpty {
+                Text("Für diesen Tag gibt es keine Orte. Läuft der Standort in den Einstellungen?")
+                    .foregroundStyle(Color.text2)
+            }
+            ForEach(schritte) { schritt in
+                switch schritt {
+                case .ort(let aufenthalt):
+                    ortZeile(aufenthalt, tag: ortstag.tag)
+                case .fahrt(let fahrt):
+                    fahrtZeile(fahrt)
+                }
+            }
+        } header: {
+            Text("Ablauf")
+        } footer: {
+            if let standVon {
+                Text("Server nicht erreichbar. Stand von \(standVon.formatted(date: .abbreviated, time: .shortened)).")
+            }
+        }
+    }
+
+    private func ortZeile(_ aufenthalt: Ortstag.Aufenthalt, tag: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: Abstand.kachel) {
+            Image(systemName: aufenthalt.ort == "Zuhause" ? "house.fill" : "mappin.circle.fill")
+                .foregroundStyle(Color.orte)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: Abstand.eng) {
+                    Text(aufenthalt.ort)
+                    if aufenthalt.neu == true {
+                        Text("neu")
+                            .font(.caption2.weight(.semibold))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 1)
+                            .background(Color.flaeche2, in: Capsule())
+                            .foregroundStyle(Color.text2)
+                    }
+                }
+                Text(Zeitpunkt.spanne(aufenthalt.beginn, aufenthalt.ende, tag: tag))
+                    .font(.footnote)
+                    .foregroundStyle(Color.text2)
+                    .monospacedDigit()
+            }
+            Spacer(minLength: Abstand.eng)
+            if let minuten = aufenthalt.minuten {
+                Text(Dauertext.minuten(minuten))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.text2)
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func fahrtZeile(_ fahrt: Ortstag.Fahrt) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: Abstand.kachel) {
+            Image(systemName: "car.fill")
+                .font(.footnote)
+                .foregroundStyle(Color.text3)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(fahrt.start) → \(fahrt.ziel)")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.text2)
+                Text(fahrtText(fahrt))
+                    .font(.footnote)
+                    .foregroundStyle(Color.text3)
+                    .monospacedDigit()
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func fahrtText(_ fahrt: Ortstag.Fahrt) -> String {
+        var teile: [String] = []
+        if let von = Zeitpunkt.lesen(fahrt.abfahrt) { teile.append(von.formatted(date: .omitted, time: .shortened)) }
+        if let dauer = fahrt.dauerMin { teile.append(Dauertext.minuten(dauer)) }
+        if let km = fahrt.streckeKm { teile.append(Dauertext.kilometer(km)) }
+        if fahrt.korrigiert == true { teile.append("von Hand korrigiert") }
+        return teile.joined(separator: " · ")
+    }
+
+    // MARK: Laden
+
+    private func laden() async {
+        if zustand.demo {
+            ortstag = Ortstag.demo(tag: tag)
+            return
+        }
+        let merkname = "orte-\(tag)"
+        do {
+            let neu = try await zustand.api().lesen(Ortstag.self, "GET", "/api/dashboard/karte?tag=\(tag)")
+            ortstag = neu
+            standVon = nil
+            fehler = nil
+            schlange.merken(neu, als: merkname)
+        } catch {
+            if Task.isCancelled { return }
+            if let (alt, wann) = schlange.gemerkt(Ortstag.self, merkname) {
+                ortstag = alt
+                standVon = wann
+            } else {
+                ortstag = nil
+                fehler = Api.text(error)
+            }
+        }
+    }
+}
+
+// MARK: Karte
+
+/// Die Offline-Karte des Servers (`/karte`): Kacheln, Strecken und Orte kommen vom eigenen Server, nichts von Apple
+/// oder anderen Kartendiensten. Eine eigene Seite, weil Wischen auf der Karte sonst den Tab wechseln würde.
+struct KarteView: View {
+    let tag: String
+
+    @EnvironmentObject private var zustand: AppZustand
+    @State private var fehler: String?
+    @State private var laedt = true
+
+    var body: some View {
+        ZStack {
+            Color.grund.ignoresSafeArea()
+            if zustand.demo {
+                hinweis("In der Demo gibt es keine Karte. Sie kommt von deinem eigenen Server.")
+            } else if let verbindung = zustand.verbindung, let adresse = try? Server.url(verbindung.adresse, "/karte?tag=\(tag)") {
+                Kartenfenster(adresse: adresse, fingerabdruck: verbindung.fingerabdruck, fehler: $fehler, laedt: $laedt)
+                    .ignoresSafeArea(edges: .bottom)
+                if let fehler {
+                    hinweis(fehler)
+                } else if laedt {
+                    ProgressView()
+                }
+            } else {
+                hinweis("Kein Server gekoppelt.")
+            }
+        }
+        .navigationTitle(Kalendertag.name(tag, heute: Kalendertag.heute()))
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func hinweis(_ text: String) -> some View {
+        Label(text, systemImage: "map")
+            .foregroundStyle(Color.text2)
+            .multilineTextAlignment(.center)
+            .padding(Abstand.abschnitt)
+    }
+}
+
+/// Zeigt die Kartenseite des Servers. Kopf und Leiste des Dashboards werden ausgeblendet, Links zu anderen Seiten
+/// bleiben zu: In der App gibt es dafür eigene Bildschirme. Bei HTTPS gilt nur der Fingerabdruck aus dem QR-Code.
+struct Kartenfenster: UIViewRepresentable {
+    let adresse: URL
+    let fingerabdruck: String?
+    @Binding var fehler: String?
+    @Binding var laedt: Bool
+
+    /// Blendet die Navigation des Dashboards aus, damit nur die Karte bleibt.
+    static let einbetten = """
+    (function () {
+      var stil = document.createElement("style");
+      stil.textContent = "#kopf, nav.leiste, #blatt-mehr { display: none !important; } " +
+        "body { padding-bottom: 0 !important; }";
+      document.documentElement.appendChild(stil);
+    })();
+    """
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(adresse: adresse, fingerabdruck: fingerabdruck, fehler: $fehler, laedt: $laedt)
+    }
+
+    func makeUIView(context: Context) -> WKWebView {
+        let einstellungen = WKWebViewConfiguration()
+        // Nichts auf dem iPhone speichern: Die Seite lädt jedes Mal frisch vom Server.
+        einstellungen.websiteDataStore = .nonPersistent()
+        einstellungen.userContentController.addUserScript(
+            WKUserScript(source: Self.einbetten, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        let fenster = WKWebView(frame: .zero, configuration: einstellungen)
+        fenster.navigationDelegate = context.coordinator
+        fenster.isOpaque = false
+        fenster.backgroundColor = UIColor(named: Farbe.grund.rawValue)
+        fenster.scrollView.bounces = false
+        fenster.allowsBackForwardNavigationGestures = false
+        fenster.load(URLRequest(url: adresse))
+        return fenster
+    }
+
+    func updateUIView(_ fenster: WKWebView, context: Context) {}
+
+    final class Coordinator: NSObject, WKNavigationDelegate {
+        let adresse: URL
+        let erwartet: String?
+        var fehler: Binding<String?>
+        var laedt: Binding<Bool>
+
+        init(adresse: URL, fingerabdruck: String?, fehler: Binding<String?>, laedt: Binding<Bool>) {
+            self.adresse = adresse
+            self.erwartet = fingerabdruck?.lowercased().replacingOccurrences(of: ":", with: "")
+            self.fehler = fehler
+            self.laedt = laedt
+        }
+
+        /// Nur die Kartenseite selbst; Links zu „Meine Orte“ und Co. bleiben zu.
+        func webView(_ webView: WKWebView, decidePolicyFor aktion: WKNavigationAction) async -> WKNavigationActionPolicy {
+            guard let ziel = aktion.request.url else { return .cancel }
+            let gleicherServer = ziel.host == adresse.host && ziel.port == adresse.port && ziel.scheme == adresse.scheme
+            return gleicherServer && ziel.path == adresse.path ? .allow : .cancel
+        }
+
+        func webView(_ webView: WKWebView,
+                     respondTo challenge: URLAuthenticationChallenge) async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
+            guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+                  let trust = challenge.protectionSpace.serverTrust else {
+                return (.performDefaultHandling, nil)
+            }
+            guard let erwartet, challenge.protectionSpace.host == adresse.host,
+                  let blatt = (SecTrustCopyCertificateChain(trust) as? [SecCertificate])?.first else {
+                return (.cancelAuthenticationChallenge, nil)
+            }
+            let abdruck = SHA256.hash(data: SecCertificateCopyData(blatt) as Data).map { String(format: "%02x", $0) }.joined()
+            return abdruck == erwartet ? (.useCredential, URLCredential(trust: trust)) : (.cancelAuthenticationChallenge, nil)
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            laedt.wrappedValue = false
+            fehler.wrappedValue = nil
+        }
+
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            gescheitert(error)
+        }
+
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            gescheitert(error)
+        }
+
+        private func gescheitert(_ error: Error) {
+            // Abgebrochene Links (siehe oben) sind kein Fehler.
+            if (error as NSError).code == NSURLErrorCancelled { return }
+            laedt.wrappedValue = false
+            fehler.wrappedValue = "Die Karte lässt sich nicht laden: \(Server.beschreibung(error))"
+        }
+    }
+}

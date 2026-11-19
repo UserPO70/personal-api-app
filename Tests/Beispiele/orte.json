@@ -1,0 +1,89 @@
+{
+ "adresse": "GET /api/orte",
+ "anfrage": {
+  "pfad": "/api/orte",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": [
+  {
+   "name": "Zuhause",
+   "lat": 50.10002,
+   "lon": 8.20001,
+   "name_id": null,
+   "automatischer_name": "Zuhause",
+   "benannt": true,
+   "oft": true,
+   "besuche": 68,
+   "minuten": 58914,
+   "erster_besuch": "2026-01-14T01:53:11.000000Z",
+   "letzter_besuch": "2026-03-15T17:00:00.000000Z"
+  },
+  {
+   "name": "Ort 1",
+   "lat": 50.118,
+   "lon": 8.231,
+   "name_id": null,
+   "automatischer_name": "Ort 1",
+   "benannt": false,
+   "oft": true,
+   "besuche": 43,
+   "minuten": 22436,
+   "erster_besuch": "2026-01-14T06:47:38.000000Z",
+   "letzter_besuch": "2026-03-13T17:00:14.000000Z"
+  },
+  {
+   "name": "Ort 2",
+   "lat": 50.10899,
+   "lon": 8.21503,
+   "name_id": null,
+   "automatischer_name": "Ort 2",
+   "benannt": false,
+   "oft": true,
+   "besuche": 16,
+   "minuten": 1273,
+   "erster_besuch": "2026-01-15T17:15:54.000000Z",
+   "letzter_besuch": "2026-03-13T18:44:42.000000Z"
+  },
+  {
+   "name": "Ort 5",
+   "lat": 50.12402,
+   "lon": 8.17599,
+   "name_id": null,
+   "automatischer_name": "Ort 5",
+   "benannt": false,
+   "oft": true,
+   "besuche": 5,
+   "minuten": 1220,
+   "erster_besuch": "2026-01-18T14:56:16.000000Z",
+   "letzter_besuch": "2026-03-08T18:57:22.000000Z"
+  },
+  {
+   "name": "Ort 3",
+   "lat": 50.10256,
+   "lon": 8.2071,
+   "name_id": null,
+   "automatischer_name": "Ort 3",
+   "benannt": false,
+   "oft": true,
+   "besuche": 21,
+   "minuten": 1029,
+   "erster_besuch": "2026-01-17T10:09:37.000000Z",
+   "letzter_besuch": "2026-03-14T10:57:08.000000Z"
+  },
+  {
+   "name": "Ort 4",
+   "lat": 50.09502,
+   "lon": 8.18795,
+   "name_id": null,
+   "automatischer_name": "Ort 4",
+   "benannt": false,
+   "oft": true,
+   "besuche": 8,
+   "minuten": 879,
+   "erster_besuch": "2026-01-17T12:16:49.000000Z",
+   "letzter_besuch": "2026-03-14T13:02:30.000000Z"
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "adresse": "GET /api/orte/namen",
+ "anfrage": {
+  "pfad": "/api/orte/namen",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": [
+  {
+   "id": 1,
+   "name": "Stammplatz",
+   "lat": 50.10002,
+   "lon": 8.20001,
+   "erstellt_am": "2026-03-15T17:00:00.000000Z",
+   "geaendert_am": "2026-03-15T17:00:00.000000Z",
+   "orte": 1
+  }
+ ]
+}

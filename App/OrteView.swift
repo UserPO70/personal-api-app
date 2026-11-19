@@ -6,10 +6,17 @@ import WebKit
 struct OrteView: View {
     @EnvironmentObject private var zustand: AppZustand
     @ObservedObject private var schlange = Warteschlange.shared
+    @ObservedObject private var fahrtenbuch = Fahrtenbuch.shared
+    @ObservedObject private var standort = Standort.shared
     @State private var tag = Kalendertag.heute()
     @State private var ortstag: Ortstag?
     @State private var standVon: Date?
     @State private var fehler: String?
+    /// Erkannte Orte des Servers (gemerkt): zum Benennen und für die Namen der eigenen Fahrten unterwegs.
+    @State private var bekannte: [BekannterOrt] = []
+    @State private var blatt: Ortstag.Aufenthalt?
+    /// Zählt hoch, wenn sich Orte geändert haben: Die Kartenvorschau lädt dann neu.
+    @State private var karteStand = 0
 
     var body: some View {
         NavigationStack {
@@ -27,7 +34,7 @@ struct OrteView: View {
                 }
                 Section {
                     Kartenvorschau(tag: tag)
-                        .id(tag)
+                        .id("\(tag)|\(karteStand)")
                         .frame(height: 220)
                         .listRowInsets(EdgeInsets())
                         // Ganze Vorschau antippbar, ohne den Pfeil einer Listenzeile.
@@ -45,6 +52,7 @@ struct OrteView: View {
                         .accessibilityHint("Öffnet die Karte zum Verschieben und Zoomen")
                         .accessibilityAddTraits(.isButton)
                 }
+                unterwegs()
                 if let ortstag {
                     ablauf(ortstag)
                 } else if let fehler {
@@ -57,9 +65,77 @@ struct OrteView: View {
                 }
             }
             .navigationTitle("Orte")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        MeineOrteView()
+                            .alsUnterseite()
+                    } label: {
+                        Label("Meine Orte", systemImage: "list.bullet")
+                    }
+                }
+            }
             .refreshable { await laden() }
             .task(id: tag) { await laden() }
+            .sheet(item: $blatt) { aufenthalt in
+                OrtBlatt(aufenthalt: aufenthalt, tag: tag,
+                         ort: Ortsdienst.ort(zu: aufenthalt.ort, in: bekannte)) {
+                    await laden()
+                    karteStand += 1
+                }
+                .environmentObject(zustand)
+            }
         }
+    }
+
+    // MARK: Unterwegs
+
+    /// Fahrten, die die App selbst erkannt hat und die der Server noch nicht kennt (unterwegs ohne Verbindung,
+    /// oder die Punkte sind noch unterwegs zum Server). Kommen sie dort an, ersetzt sie der Ablauf des Servers.
+    @ViewBuilder
+    private func unterwegs() -> some View {
+        let offen = zustand.demo ? [] : Fahrtregel.offen(fahrtenbuch.fahrten, server: ortstag, tag: tag)
+        if !offen.isEmpty {
+            Section {
+                ForEach(offen) { fahrt in
+                    eigeneFahrtZeile(fahrt)
+                }
+            } header: {
+                Text("Unterwegs erfasst")
+            } footer: {
+                Text("Erkannt von der App, noch nicht vom Server ausgewertet. Sobald die Standortpunkte dort sind, "
+                     + "stehen die Fahrten mit Strecke im Ablauf.")
+            }
+        }
+    }
+
+    private func eigeneFahrtZeile(_ fahrt: LokaleFahrt) -> some View {
+        let start = Fahrtregel.ortsname(lat: fahrt.startLat, lon: fahrt.startLon, orte: bekannte) ?? "Unbekannter Ort"
+        let ziel = fahrt.laeuft ? "…"
+            : Fahrtregel.ortsname(lat: fahrt.zielLat, lon: fahrt.zielLon, orte: bekannte) ?? "Neuer Ort"
+        var teile = [fahrt.beginn.formatted(date: .omitted, time: .shortened)]
+        if fahrt.laeuft {
+            teile[0] = "seit " + teile[0]
+        } else if let minuten = fahrt.minuten {
+            teile.append(Dauertext.minuten(minuten))
+        }
+        if fahrt.meter >= 100 { teile.append(Dauertext.kilometer(fahrt.meter / 1000)) }
+        return HStack(alignment: .firstTextBaseline, spacing: Abstand.kachel) {
+            Image(systemName: fahrt.laeuft ? "location.fill" : "car.fill")
+                .font(.footnote)
+                .foregroundStyle(fahrt.laeuft ? Color.orte : Color.text3)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(fahrt.laeuft ? "\(start) → unterwegs" : "\(start) → \(ziel)")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.text2)
+                Text(teile.joined(separator: " · "))
+                    .font(.footnote)
+                    .foregroundStyle(Color.text3)
+                    .monospacedDigit()
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: Ablauf
@@ -75,7 +151,18 @@ struct OrteView: View {
             ForEach(schritte) { schritt in
                 switch schritt {
                 case .ort(let aufenthalt):
-                    ortZeile(aufenthalt, tag: ortstag.tag)
+                    if !zustand.demo, aufenthalt.lat != nil {
+                        Button {
+                            blatt = aufenthalt
+                        } label: {
+                            ortZeile(aufenthalt, tag: ortstag.tag)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint("Benennen oder als „Kein Halt“ ausblenden")
+                    } else {
+                        ortZeile(aufenthalt, tag: ortstag.tag)
+                    }
                 case .fahrt(let fahrt):
                     fahrtZeile(fahrt)
                 }
@@ -83,8 +170,16 @@ struct OrteView: View {
         } header: {
             Text("Ablauf")
         } footer: {
-            if let standVon {
-                Text("Server nicht erreichbar. Stand von \(standVon.formatted(date: .abbreviated, time: .shortened)).")
+            VStack(alignment: .leading, spacing: Abstand.winzig) {
+                if let standVon {
+                    Text("Server nicht erreichbar. Stand von \(standVon.formatted(date: .abbreviated, time: .shortened)).")
+                }
+                if !zustand.demo, standort.wartend > 0, tag == Kalendertag.heute() {
+                    Text("\(standort.wartend) Standortpunkte warten auf den Server.")
+                }
+                if !zustand.demo, !ortstag.ablauf.isEmpty {
+                    Text("Einen Ort antippen, um ihn zu benennen oder als „Kein Halt“ auszublenden.")
+                }
             }
         }
     }
@@ -118,6 +213,7 @@ struct OrteView: View {
                     .foregroundStyle(Color.text2)
             }
         }
+        .foregroundStyle(Color.text)
         .accessibilityElement(children: .combine)
     }
 
@@ -157,6 +253,7 @@ struct OrteView: View {
             return
         }
         let merkname = "orte-\(tag)"
+        await bekannteLaden()
         do {
             let neu = try await zustand.api().lesen(Ortstag.self, "GET", "/api/dashboard/karte?tag=\(tag)")
             ortstag = neu
@@ -171,6 +268,18 @@ struct OrteView: View {
             } else {
                 ortstag = nil
                 fehler = Api.text(error)
+            }
+        }
+    }
+
+    private func bekannteLaden() async {
+        do {
+            let neu = try await zustand.api().lesen([BekannterOrt].self, "GET", "/api/orte")
+            bekannte = neu
+            schlange.merken(neu, als: "orte-liste")
+        } catch {
+            if bekannte.isEmpty, let (alt, _) = schlange.gemerkt([BekannterOrt].self, "orte-liste") {
+                bekannte = alt
             }
         }
     }

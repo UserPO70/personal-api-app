@@ -164,6 +164,8 @@ final class Standort: NSObject, ObservableObject {
     /// Der vorige Ort von iOS, auch wenn er nicht gespeichert wurde: für das Tempo.
     private var vorigerOrt: CLLocation?
     private var letzteProbe = Date.distantPast
+    /// Wo das iPhone vor dem Aufbruch war: Start der Fahrt im Fahrtenbuch.
+    private var abfahrtsort: CLLocation?
     private var anker: CLLocation?
     private var letzteBewegung = Date()
     private var sendet = false
@@ -248,6 +250,8 @@ final class Standort: NSObject, ObservableObject {
             probeSeit = nil
             fahrtSeit = beginn
             UserDefaults.standard.set(beginn.timeIntervalSince1970, forKey: Ablage.fahrtSeit)
+            Fahrtenbuch.shared.beginnen(beginn, ort: abfahrtsort ?? letzterOrt ?? vorigerOrt)
+            abfahrtsort = nil
         }
         genauAufzeichnen()
     }
@@ -269,6 +273,7 @@ final class Standort: NSObject, ObservableObject {
         guard an, automatisch, fahrtSeit == nil, probeSeit == nil,
               Standortregel.probeErlaubt(seitLetzter: Date().timeIntervalSince(letzteProbe)) else { return }
         probeSeit = Date()
+        abfahrtsort = letzterOrt ?? vorigerOrt
         genauAufzeichnen()
     }
 
@@ -298,6 +303,7 @@ final class Standort: NSObject, ObservableObject {
         guard fahrtSeit != nil else { return }
         fahrtSeit = nil
         UserDefaults.standard.removeObject(forKey: Ablage.fahrtSeit)
+        Fahrtenbuch.shared.beenden()
         dienst.stopUpdatingLocation()
         dienst.showsBackgroundLocationIndicator = false
         sichern()
@@ -342,6 +348,7 @@ final class Standort: NSObject, ObservableObject {
         guard Standortregel.aufnehmen(genauigkeit: ort.horizontalAccuracy, sekundenSeitLetztem: sekunden,
                                       meterSeitLetztem: meter, fahrt: genau) else { return }
         letzterOrt = ort
+        if fahrt { Fahrtenbuch.shared.punkt(ort, ziel: anker ?? ort, bewegt: letzteBewegung) }
         // Im sparsamen Betrieb liegt der Kreis immer um den letzten bekannten Ort.
         if !genau { zaunSetzen(ort) }
         aufnehmen(Standortpunkt(

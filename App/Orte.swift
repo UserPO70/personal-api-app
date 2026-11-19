@@ -12,6 +12,9 @@ struct Ortstag: Codable, Equatable {
         var neu: Bool?
         /// Kein echter Aufenthalt, sondern eine Zeit ohne Standortpunkte.
         var luecke: Bool?
+        /// Mitte des Aufenthalts.
+        var lat: Double?
+        var lon: Double?
 
         var id: String { "\(beginn)|\(ort)" }
     }

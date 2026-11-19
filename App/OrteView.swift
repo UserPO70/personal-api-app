@@ -284,12 +284,15 @@ struct Kartenfenster: UIViewRepresentable {
     })();
     """
 
-    /// In der Vorschau zusätzlich Zoom-Knöpfe und Maßstab weg. Der Hinweis auf OpenStreetMap bleibt (Lizenz).
+    /// In der Vorschau zusätzlich Zoom-Knöpfe und Maßstab weg. Der Hinweis auf OpenStreetMap bleibt (Lizenz),
+    /// aber klein, ohne Kasten und blass in der Ecke.
     static let vorschauStil = """
     (function () {
       var stil = document.createElement("style");
       stil.textContent = ".maplibregl-ctrl-top-right, .maplibregl-ctrl-bottom-left { display: none !important; } " +
-        ".maplibregl-ctrl-attrib { font-size: 9px !important; }";
+        ".maplibregl-ctrl.maplibregl-ctrl-attrib { background: none !important; font-size: 8px !important; " +
+        "line-height: 1.2 !important; padding: 0 8px 4px !important; margin: 0 !important; opacity: 0.75; } " +
+        ".maplibregl-ctrl-attrib a { color: inherit !important; }";
       document.documentElement.appendChild(stil);
     })();
     """

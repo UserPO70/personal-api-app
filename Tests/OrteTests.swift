@@ -97,5 +97,8 @@ final class OrteTests: XCTestCase {
         XCTAssertTrue(Kartenfenster.vorschauStil.contains("maplibregl-ctrl-top-right"))
         XCTAssertFalse(Kartenfenster.vorschauStil.contains("ctrl-bottom-right"))
         XCTAssertFalse(Kartenfenster.vorschauStil.contains("attrib {display"))
+        // Klein und ohne Kasten, aber nicht unsichtbar
+        XCTAssertTrue(Kartenfenster.vorschauStil.contains("background: none"))
+        XCTAssertFalse(Kartenfenster.vorschauStil.contains("opacity: 0;"))
     }
 }

@@ -87,8 +87,7 @@ final class RueckblickTests: XCTestCase {
 
     func testWocheUeberDenMonatswechsel() {
         let titel = Rueckblicktext.zeitraum(art: "woche", von: "2026-03-30", bis: "2026-04-05")
-        XCTAssertTrue(titel.hasPrefix("KW 14 · 30. "), titel)
-        XCTAssertTrue(titel.hasSuffix(" – 5. Apr. 2026"), titel)
+        XCTAssertEqual(titel, "KW 14 · 30. März – 5. April 2026")
     }
 
     /// Der Demo-Modus hat Daten, und was die App sich merkt, kommt unverändert zurück.

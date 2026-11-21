@@ -245,7 +245,7 @@ enum Rueckblicktext {
         String(format: "%.\(stellen)f", wert).replacingOccurrences(of: ".", with: ",")
     }
 
-    /// „KW 11 · 9.–15. März 2026“, „KW 5 · 30. Jan. – 5. Feb. 2026“ oder „März 2026“.
+    /// „KW 11 · 9.–15. März 2026“, „KW 14 · 30. März – 5. April 2026“ oder „März 2026“.
     static func zeitraum(art: String, von: String, bis: String) -> String {
         guard let anfang = Gewichtsverlauf.datum(von), let ende = Gewichtsverlauf.datum(bis) else { return "\(von) – \(bis)" }
         var kalender = Calendar(identifier: .iso8601)
@@ -259,11 +259,10 @@ enum Rueckblicktext {
         let woche = kalender.component(.weekOfYear, from: anfang)
         let tagA = kalender.component(.day, from: anfang), tagB = kalender.component(.day, from: ende)
         let jahr = kalender.component(.year, from: ende)
+        monat.dateFormat = "LLLL"
         if kalender.component(.month, from: anfang) == kalender.component(.month, from: ende) {
-            monat.dateFormat = "LLLL"
             return "KW \(woche) · \(tagA).–\(tagB). \(monat.string(from: ende)) \(jahr)"
         }
-        monat.dateFormat = "LLL"
         return "KW \(woche) · \(tagA). \(monat.string(from: anfang)) – \(tagB). \(monat.string(from: ende)) \(jahr)"
     }
 

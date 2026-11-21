@@ -20,6 +20,25 @@ struct AuswertungenView: View {
                             .foregroundStyle(Color.text2)
                     }
                 }
+                Section {
+                    NavigationLink {
+                        RueckblickView()
+                            .alsUnterseite()
+                    } label: {
+                        HStack(spacing: Abstand.kachel) {
+                            Image(systemName: "calendar")
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(Color.text2)
+                                .frame(width: 28)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Rückblick")
+                                Text("Woche oder Monat im Vergleich")
+                                    .font(.footnote)
+                                    .foregroundStyle(Color.text3)
+                            }
+                        }
+                    }
+                }
                 if let verlauf {
                     let gesundheit = Kennzahl.gesundheit.filter { verlauf.schnitt($0) != nil }
                     if !gesundheit.isEmpty {

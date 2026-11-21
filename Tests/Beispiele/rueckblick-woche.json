@@ -1,0 +1,1437 @@
+{
+ "adresse": "GET /api/rueckblick",
+ "anfrage": {
+  "pfad": "/api/rueckblick?art=woche&tag=2026-03-14",
+  "mit_schluessel": true
+ },
+ "status": 200,
+ "medientyp": "application/json",
+ "antwort": {
+  "art": "woche",
+  "von": "2026-03-09",
+  "bis": "2026-03-15",
+  "tage_gesamt": 7,
+  "tage_ausgewertet": 7,
+  "laeuft_noch": false,
+  "kennzahlen": [
+   {
+    "schluessel": "schritte",
+    "name": "Schritte",
+    "einheit": "",
+    "bereich": "schritte",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 47555,
+     "schnitt": 6793.6,
+     "tage": 7
+    },
+    "vorher": {
+     "summe": 61591,
+     "schnitt": 8798.7,
+     "tage": 7
+    },
+    "vergleich": {
+     "differenz": -2005.1,
+     "prozent": -23
+    }
+   },
+   {
+    "schluessel": "strecke_km",
+    "name": "Strecke",
+    "einheit": "km",
+    "bereich": "strecke",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 32.09,
+     "schnitt": 5.35,
+     "tage": 6
+    },
+    "vorher": {
+     "summe": 45.84,
+     "schnitt": 6.55,
+     "tage": 7
+    },
+    "vergleich": {
+     "differenz": -1.2,
+     "prozent": -18
+    }
+   },
+   {
+    "schluessel": "gehtempo_kmh",
+    "name": "Gehtempo",
+    "einheit": "km/h",
+    "bereich": "gehen",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": null,
+     "schnitt": 4.8,
+     "tage": 6
+    },
+    "vorher": {
+     "summe": null,
+     "schnitt": 4.8,
+     "tage": 6
+    },
+    "vergleich": {
+     "differenz": 0.0,
+     "prozent": 0
+    }
+   },
+   {
+    "schluessel": "schrittlaenge_cm",
+    "name": "Schrittlänge",
+    "einheit": "cm",
+    "bereich": "gehen",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": null,
+     "schnitt": 73.0,
+     "tage": 6
+    },
+    "vorher": {
+     "summe": null,
+     "schnitt": 73.3,
+     "tage": 6
+    },
+    "vergleich": {
+     "differenz": -0.3,
+     "prozent": 0
+    }
+   },
+   {
+    "schluessel": "pc_minuten",
+    "name": "PC-Zeit",
+    "einheit": "min",
+    "bereich": "pc",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 587,
+     "schnitt": 117.4,
+     "tage": 5
+    },
+    "vorher": {
+     "summe": 793,
+     "schnitt": 113.3,
+     "tage": 7
+    },
+    "vergleich": {
+     "differenz": 4.1,
+     "prozent": 4
+    }
+   },
+   {
+    "schluessel": "schlaf_minuten",
+    "name": "Schlaf",
+    "einheit": "min",
+    "bereich": "schlaf",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 2526,
+     "schnitt": 421.0,
+     "tage": 6
+    },
+    "vorher": {
+     "summe": 2966,
+     "schnitt": 423.7,
+     "tage": 7
+    },
+    "vergleich": {
+     "differenz": -2.7,
+     "prozent": -1
+    }
+   },
+   {
+    "schluessel": "gewicht_kg",
+    "name": "Gewicht",
+    "einheit": "kg",
+    "bereich": "gewicht",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": null,
+     "schnitt": 82.7,
+     "tage": 2
+    },
+    "vorher": {
+     "summe": null,
+     "schnitt": 83.7,
+     "tage": 2
+    },
+    "vergleich": {
+     "differenz": -1.0,
+     "prozent": -1
+    }
+   },
+   {
+    "schluessel": "unterwegs_minuten",
+    "name": "Unterwegs",
+    "einheit": "min",
+    "bereich": "standort",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 3606,
+     "schnitt": 515.1,
+     "tage": 7
+    },
+    "vorher": {
+     "summe": 3082,
+     "schnitt": 440.3,
+     "tage": 7
+    },
+    "vergleich": {
+     "differenz": 74.8,
+     "prozent": 17
+    }
+   },
+   {
+    "schluessel": "fahrten",
+    "name": "Fahrten",
+    "einheit": "",
+    "bereich": "standort",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 20,
+     "schnitt": 2.9,
+     "tage": 7
+    },
+    "vorher": {
+     "summe": 16,
+     "schnitt": 2.3,
+     "tage": 7
+    },
+    "vergleich": {
+     "differenz": 0.6,
+     "prozent": 26
+    }
+   },
+   {
+    "schluessel": "kcal",
+    "name": "Energie",
+    "einheit": "kcal",
+    "bereich": "essen",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 13394,
+     "schnitt": 1913.4,
+     "tage": 7
+    },
+    "vorher": {
+     "summe": 6737,
+     "schnitt": 1684.2,
+     "tage": 4
+    },
+    "vergleich": {
+     "differenz": 229.2,
+     "prozent": 14
+    }
+   },
+   {
+    "schluessel": "eiweiss_g",
+    "name": "Eiweiß",
+    "einheit": "g",
+    "bereich": "essen",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 642.6,
+     "schnitt": 91.8,
+     "tage": 7
+    },
+    "vorher": {
+     "summe": 352.1,
+     "schnitt": 88.0,
+     "tage": 4
+    },
+    "vergleich": {
+     "differenz": 3.8,
+     "prozent": 4
+    }
+   },
+   {
+    "schluessel": "kohlenhydrate_g",
+    "name": "Kohlenhydrate",
+    "einheit": "g",
+    "bereich": "essen",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 1660.8,
+     "schnitt": 237.3,
+     "tage": 7
+    },
+    "vorher": {
+     "summe": 756.9,
+     "schnitt": 189.2,
+     "tage": 4
+    },
+    "vergleich": {
+     "differenz": 48.1,
+     "prozent": 25
+    }
+   },
+   {
+    "schluessel": "fett_g",
+    "name": "Fett",
+    "einheit": "g",
+    "bereich": "essen",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 453.7,
+     "schnitt": 64.8,
+     "tage": 7
+    },
+    "vorher": {
+     "summe": 255.6,
+     "schnitt": 63.9,
+     "tage": 4
+    },
+    "vergleich": {
+     "differenz": 0.9,
+     "prozent": 1
+    }
+   },
+   {
+    "schluessel": "internet_mb",
+    "name": "Internet",
+    "einheit": "MB",
+    "bereich": "internet",
+    "jemals_daten": true,
+    "jetzt": {
+     "summe": 36626.0,
+     "schnitt": 6104.3,
+     "tage": 6
+    },
+    "vorher": {
+     "summe": 40898.0,
+     "schnitt": 5842.6,
+     "tage": 7
+    },
+    "vergleich": {
+     "differenz": 261.7,
+     "prozent": 4
+    }
+   }
+  ],
+  "gewicht": {
+   "messungen": 2,
+   "messungen_vorher": 2,
+   "veraenderung": {
+    "kg": -0.95,
+    "von_tag": "2026-03-08",
+    "von_kg": 83.65,
+    "bis_tag": "2026-03-15",
+    "bis_kg": 82.7
+   }
+  },
+  "jetzt": {
+   "von": "2026-03-09",
+   "bis": "2026-03-15",
+   "kennzahlen": {
+    "schritte": {
+     "summe": 47555,
+     "schnitt": 6793.6,
+     "tage": 7
+    },
+    "strecke_km": {
+     "summe": 32.09,
+     "schnitt": 5.35,
+     "tage": 6
+    },
+    "gehtempo_kmh": {
+     "summe": null,
+     "schnitt": 4.8,
+     "tage": 6
+    },
+    "schrittlaenge_cm": {
+     "summe": null,
+     "schnitt": 73.0,
+     "tage": 6
+    },
+    "pc_minuten": {
+     "summe": 587,
+     "schnitt": 117.4,
+     "tage": 5
+    },
+    "schlaf_minuten": {
+     "summe": 2526,
+     "schnitt": 421.0,
+     "tage": 6
+    },
+    "gewicht_kg": {
+     "summe": null,
+     "schnitt": 82.7,
+     "tage": 2
+    },
+    "unterwegs_minuten": {
+     "summe": 3606,
+     "schnitt": 515.1,
+     "tage": 7
+    },
+    "fahrten": {
+     "summe": 20,
+     "schnitt": 2.9,
+     "tage": 7
+    },
+    "kcal": {
+     "summe": 13394,
+     "schnitt": 1913.4,
+     "tage": 7
+    },
+    "eiweiss_g": {
+     "summe": 642.6,
+     "schnitt": 91.8,
+     "tage": 7
+    },
+    "kohlenhydrate_g": {
+     "summe": 1660.8,
+     "schnitt": 237.3,
+     "tage": 7
+    },
+    "fett_g": {
+     "summe": 453.7,
+     "schnitt": 64.8,
+     "tage": 7
+    },
+    "internet_mb": {
+     "summe": 36626.0,
+     "schnitt": 6104.3,
+     "tage": 6
+    }
+   },
+   "tage": [
+    {
+     "tag": "2026-03-09",
+     "schritte": 6245,
+     "strecke_km": 4.51,
+     "gehtempo_kmh": 4.5,
+     "schrittlaenge_cm": 73,
+     "pc_minuten": 87,
+     "schlaf_minuten": 410,
+     "unterwegs_minuten": 533,
+     "fahrten": 2,
+     "internet_mb": 7057.6,
+     "gewicht_kg": null,
+     "kcal": 2051,
+     "eiweiss_g": 107.0,
+     "kohlenhydrate_g": 237.7,
+     "fett_g": 74.8
+    },
+    {
+     "tag": "2026-03-10",
+     "schritte": 6660,
+     "strecke_km": 4.55,
+     "gehtempo_kmh": 5.2,
+     "schrittlaenge_cm": 73,
+     "pc_minuten": 103,
+     "schlaf_minuten": 381,
+     "unterwegs_minuten": 729,
+     "fahrten": 3,
+     "internet_mb": 4779.0,
+     "gewicht_kg": null,
+     "kcal": 1531,
+     "eiweiss_g": 78.7,
+     "kohlenhydrate_g": 192.2,
+     "fett_g": 49.8
+    },
+    {
+     "tag": "2026-03-11",
+     "schritte": 9887,
+     "strecke_km": 6.81,
+     "gehtempo_kmh": 4.9,
+     "schrittlaenge_cm": 73,
+     "pc_minuten": 81,
+     "schlaf_minuten": 360,
+     "unterwegs_minuten": 724,
+     "fahrten": 4,
+     "internet_mb": 3482.2,
+     "gewicht_kg": 83.8,
+     "kcal": 1618,
+     "eiweiss_g": 68.4,
+     "kohlenhydrate_g": 211.2,
+     "fett_g": 55.6
+    },
+    {
+     "tag": "2026-03-12",
+     "schritte": 7095,
+     "strecke_km": 5.0,
+     "gehtempo_kmh": 4.9,
+     "schrittlaenge_cm": 73,
+     "pc_minuten": 136,
+     "schlaf_minuten": 410,
+     "unterwegs_minuten": 708,
+     "fahrten": 3,
+     "internet_mb": 7391.8,
+     "gewicht_kg": null,
+     "kcal": 1890,
+     "eiweiss_g": 105.7,
+     "kohlenhydrate_g": 189.4,
+     "fett_g": 78.9
+    },
+    {
+     "tag": "2026-03-13",
+     "schritte": 6165,
+     "strecke_km": 4.68,
+     "gehtempo_kmh": 4.5,
+     "schrittlaenge_cm": 74,
+     "pc_minuten": 180,
+     "schlaf_minuten": 385,
+     "unterwegs_minuten": 722,
+     "fahrten": 5,
+     "internet_mb": 6494.5,
+     "gewicht_kg": null,
+     "kcal": 2054,
+     "eiweiss_g": 97.2,
+     "kohlenhydrate_g": 239.0,
+     "fett_g": 78.7
+    },
+    {
+     "tag": "2026-03-14",
+     "schritte": 9151,
+     "strecke_km": 6.54,
+     "gehtempo_kmh": 5.0,
+     "schrittlaenge_cm": 72,
+     "pc_minuten": null,
+     "schlaf_minuten": 580,
+     "unterwegs_minuten": 190,
+     "fahrten": 3,
+     "internet_mb": 7420.9,
+     "gewicht_kg": null,
+     "kcal": 2473,
+     "eiweiss_g": 135.1,
+     "kohlenhydrate_g": 298.3,
+     "fett_g": 81.1
+    },
+    {
+     "tag": "2026-03-15",
+     "schritte": 2352,
+     "strecke_km": null,
+     "gehtempo_kmh": null,
+     "schrittlaenge_cm": null,
+     "pc_minuten": null,
+     "schlaf_minuten": null,
+     "unterwegs_minuten": 0,
+     "fahrten": 0,
+     "internet_mb": null,
+     "gewicht_kg": 81.6,
+     "kcal": 1777,
+     "eiweiss_g": 50.5,
+     "kohlenhydrate_g": 293.0,
+     "fett_g": 34.8
+    }
+   ],
+   "orte": [
+    {
+     "name": "Zuhause",
+     "minuten": 6113
+    },
+    {
+     "name": "Ort 1",
+     "minuten": 2843
+    },
+    {
+     "name": "Ort 2",
+     "minuten": 361
+    },
+    {
+     "name": "Ort 3",
+     "minuten": 127
+    },
+    {
+     "name": "Ort 4",
+     "minuten": 117
+    }
+   ],
+   "orte_anzahl": 5,
+   "neue_orte": [],
+   "fahrten": {
+    "anzahl": 20,
+    "minuten": 191,
+    "strecke_km": 34.9,
+    "haeufigste": [
+     {
+      "strecke": "Zuhause → Ort 1",
+      "anzahl": 5
+     },
+     {
+      "strecke": "Ort 2 → Zuhause",
+      "anzahl": 4
+     },
+     {
+      "strecke": "Ort 1 → Ort 2",
+      "anzahl": 3
+     },
+     {
+      "strecke": "Ort 1 → Ort 3",
+      "anzahl": 1
+     },
+     {
+      "strecke": "Ort 1 → Zuhause",
+      "anzahl": 1
+     }
+    ]
+   }
+  },
+  "vorher": {
+   "von": "2026-03-02",
+   "bis": "2026-03-08",
+   "kennzahlen": {
+    "schritte": {
+     "summe": 61591,
+     "schnitt": 8798.7,
+     "tage": 7
+    },
+    "strecke_km": {
+     "summe": 45.84,
+     "schnitt": 6.55,
+     "tage": 7
+    },
+    "gehtempo_kmh": {
+     "summe": null,
+     "schnitt": 4.8,
+     "tage": 6
+    },
+    "schrittlaenge_cm": {
+     "summe": null,
+     "schnitt": 73.3,
+     "tage": 6
+    },
+    "pc_minuten": {
+     "summe": 793,
+     "schnitt": 113.3,
+     "tage": 7
+    },
+    "schlaf_minuten": {
+     "summe": 2966,
+     "schnitt": 423.7,
+     "tage": 7
+    },
+    "gewicht_kg": {
+     "summe": null,
+     "schnitt": 83.7,
+     "tage": 2
+    },
+    "unterwegs_minuten": {
+     "summe": 3082,
+     "schnitt": 440.3,
+     "tage": 7
+    },
+    "fahrten": {
+     "summe": 16,
+     "schnitt": 2.3,
+     "tage": 7
+    },
+    "kcal": {
+     "summe": 6737,
+     "schnitt": 1684.2,
+     "tage": 4
+    },
+    "eiweiss_g": {
+     "summe": 352.1,
+     "schnitt": 88.0,
+     "tage": 4
+    },
+    "kohlenhydrate_g": {
+     "summe": 756.9,
+     "schnitt": 189.2,
+     "tage": 4
+    },
+    "fett_g": {
+     "summe": 255.6,
+     "schnitt": 63.9,
+     "tage": 4
+    },
+    "internet_mb": {
+     "summe": 40898.0,
+     "schnitt": 5842.6,
+     "tage": 7
+    }
+   },
+   "tage": [
+    {
+     "tag": "2026-03-02",
+     "schritte": 7613,
+     "strecke_km": 5.48,
+     "gehtempo_kmh": 4.7,
+     "schrittlaenge_cm": 73,
+     "pc_minuten": 64,
+     "schlaf_minuten": 471,
+     "unterwegs_minuten": 515,
+     "fahrten": 2,
+     "internet_mb": 5222.4,
+     "gewicht_kg": null,
+     "kcal": 1539,
+     "eiweiss_g": 83.7,
+     "kohlenhydrate_g": 173.4,
+     "fett_g": 56.7
+    },
+    {
+     "tag": "2026-03-03",
+     "schritte": 10924,
+     "strecke_km": 8.41,
+     "gehtempo_kmh": 4.9,
+     "schrittlaenge_cm": 73,
+     "pc_minuten": 84,
+     "schlaf_minuten": 409,
+     "unterwegs_minuten": 546,
+     "fahrten": 2,
+     "internet_mb": 5911.9,
+     "gewicht_kg": null,
+     "kcal": 1782,
+     "eiweiss_g": 91.7,
+     "kohlenhydrate_g": 197.8,
+     "fett_g": 69.3
+    },
+    {
+     "tag": "2026-03-04",
+     "schritte": 8446,
+     "strecke_km": 6.36,
+     "gehtempo_kmh": null,
+     "schrittlaenge_cm": null,
+     "pc_minuten": 135,
+     "schlaf_minuten": 438,
+     "unterwegs_minuten": 522,
+     "fahrten": 2,
+     "internet_mb": 7679.2,
+     "gewicht_kg": 84.1,
+     "kcal": 1858,
+     "eiweiss_g": 98.5,
+     "kohlenhydrate_g": 220.7,
+     "fett_g": 64.6
+    },
+    {
+     "tag": "2026-03-05",
+     "schritte": 5263,
+     "strecke_km": 3.67,
+     "gehtempo_kmh": 4.9,
+     "schrittlaenge_cm": 74,
+     "pc_minuten": 117,
+     "schlaf_minuten": 415,
+     "unterwegs_minuten": 562,
+     "fahrten": 2,
+     "internet_mb": 5963.1,
+     "gewicht_kg": null,
+     "kcal": null,
+     "eiweiss_g": null,
+     "kohlenhydrate_g": null,
+     "fett_g": null
+    },
+    {
+     "tag": "2026-03-06",
+     "schritte": 7940,
+     "strecke_km": 5.93,
+     "gehtempo_kmh": 4.9,
+     "schrittlaenge_cm": 73,
+     "pc_minuten": 181,
+     "schlaf_minuten": 430,
+     "unterwegs_minuten": 628,
+     "fahrten": 4,
+     "internet_mb": 3580.1,
+     "gewicht_kg": null,
+     "kcal": 1558,
+     "eiweiss_g": 78.2,
+     "kohlenhydrate_g": 165.0,
+     "fett_g": 65.0
+    },
+    {
+     "tag": "2026-03-07",
+     "schritte": 8683,
+     "strecke_km": 6.2,
+     "gehtempo_kmh": 4.6,
+     "schrittlaenge_cm": 75,
+     "pc_minuten": 138,
+     "schlaf_minuten": 363,
+     "unterwegs_minuten": 46,
+     "fahrten": 2,
+     "internet_mb": 6554.4,
+     "gewicht_kg": 83.2,
+     "kcal": null,
+     "eiweiss_g": null,
+     "kohlenhydrate_g": null,
+     "fett_g": null
+    },
+    {
+     "tag": "2026-03-08",
+     "schritte": 12722,
+     "strecke_km": 9.79,
+     "gehtempo_kmh": 4.7,
+     "schrittlaenge_cm": 72,
+     "pc_minuten": 74,
+     "schlaf_minuten": 440,
+     "unterwegs_minuten": 263,
+     "fahrten": 2,
+     "internet_mb": 5986.9,
+     "gewicht_kg": null,
+     "kcal": null,
+     "eiweiss_g": null,
+     "kohlenhydrate_g": null,
+     "fett_g": null
+    }
+   ],
+   "orte": [
+    {
+     "name": "Zuhause",
+     "minuten": 6997
+    },
+    {
+     "name": "Ort 1",
+     "minuten": 2538
+    },
+    {
+     "name": "Ort 5",
+     "minuten": 230
+    },
+    {
+     "name": "Ort 2",
+     "minuten": 75
+    },
+    {
+     "name": "Ort 3",
+     "minuten": 44
+    }
+   ],
+   "orte_anzahl": 5,
+   "neue_orte": [],
+   "fahrten": {
+    "anzahl": 16,
+    "minuten": 218,
+    "strecke_km": 40.4,
+    "haeufigste": [
+     {
+      "strecke": "Ort 1 → Zuhause",
+      "anzahl": 5
+     },
+     {
+      "strecke": "Zuhause → Ort 1",
+      "anzahl": 5
+     },
+     {
+      "strecke": "Ort 2 → Zuhause",
+      "anzahl": 1
+     },
+     {
+      "strecke": "Ort 3 → Zuhause",
+      "anzahl": 1
+     },
+     {
+      "strecke": "Ort 5 → Zuhause",
+      "anzahl": 1
+     }
+    ]
+   }
+  },
+  "trends": {
+   "von": "2026-03-09",
+   "bis": "2026-03-15",
+   "fenster": 7,
+   "min_tage_fenster": 4,
+   "vergleich_von": "2026-02-16",
+   "kennzahlen": [
+    {
+     "schluessel": "schritte",
+     "name": "Schritte",
+     "einheit": "",
+     "gleitend": [
+      8603.3,
+      7994.1,
+      8200.0,
+      8461.7,
+      8208.1,
+      8275.0,
+      6793.6
+     ],
+     "gleich_prozent": 5,
+     "vergleich": {
+      "jetzt": {
+       "schnitt": 7301.9,
+       "tage": 28
+      },
+      "vorher": {
+       "schnitt": 6687.3,
+       "tage": 28
+      },
+      "prozent": 9,
+      "richtung": "hoeher",
+      "text": "Schritte: letzte 4 Wochen Ø 7.302 pro Tag (28 Tage) – 9 % über den 4 Wochen davor (Ø 6.687, 28 Tage)."
+     }
+    },
+    {
+     "schluessel": "pc_minuten",
+     "name": "PC-Zeit",
+     "einheit": "min",
+     "gleitend": [
+      116.6,
+      119.3,
+      111.6,
+      114.3,
+      114.1,
+      110.2,
+      117.4
+     ],
+     "gleich_prozent": 5,
+     "vergleich": {
+      "jetzt": {
+       "schnitt": 122.5,
+       "tage": 23
+      },
+      "vorher": {
+       "schnitt": 139.7,
+       "tage": 28
+      },
+      "prozent": -12,
+      "richtung": "niedriger",
+      "text": "PC-Zeit: letzte 4 Wochen Ø 2 h 03 min pro Tag (23 Tage) – 12 % unter den 4 Wochen davor (Ø 2 h 20 min, 28 Tage)."
+     }
+    },
+    {
+     "schluessel": "schlaf_minuten",
+     "name": "Schlaf",
+     "einheit": "min",
+     "gleitend": [
+      415.0,
+      411.0,
+      399.9,
+      399.1,
+      392.7,
+      423.7,
+      421.0
+     ],
+     "gleich_prozent": 5,
+     "vergleich": {
+      "jetzt": {
+       "schnitt": 427.5,
+       "tage": 27
+      },
+      "vorher": {
+       "schnitt": 434.8,
+       "tage": 28
+      },
+      "prozent": -2,
+      "richtung": "gleich",
+      "text": "Schlaf: letzte 4 Wochen Ø 7 h 07 min pro Tag (27 Tage) – etwa gleich wie den 4 Wochen davor (Ø 7 h 15 min, 28 Tage)."
+     }
+    },
+    {
+     "schluessel": "unterwegs_minuten",
+     "name": "Unterwegs",
+     "einheit": "min",
+     "gleitend": [
+      442.9,
+      469.0,
+      497.9,
+      518.7,
+      532.1,
+      552.7,
+      515.1
+     ],
+     "gleich_prozent": 5,
+     "vergleich": {
+      "jetzt": {
+       "schnitt": 481.2,
+       "tage": 28
+      },
+      "vorher": {
+       "schnitt": 457.7,
+       "tage": 28
+      },
+      "prozent": 5,
+      "richtung": "hoeher",
+      "text": "Unterwegs: letzte 4 Wochen Ø 8 h 01 min pro Tag (28 Tage) – 5 % über den 4 Wochen davor (Ø 7 h 38 min, 28 Tage)."
+     }
+    },
+    {
+     "schluessel": "kcal",
+     "name": "Energie",
+     "einheit": "kcal",
+     "gleitend": [
+      1812.2,
+      1749.5,
+      1689.5,
+      1729.6,
+      1828.8,
+      1936.2,
+      1913.4
+     ],
+     "gleich_prozent": 5,
+     "vergleich": {
+      "jetzt": {
+       "schnitt": 1720.3,
+       "tage": 23
+      },
+      "vorher": {
+       "schnitt": 1690.0,
+       "tage": 26
+      },
+      "prozent": 2,
+      "richtung": "gleich",
+      "text": "Energie: letzte 4 Wochen Ø 1.720 kcal pro Tag (23 Tage) – etwa gleich wie den 4 Wochen davor (Ø 1.690 kcal, 26 Tage)."
+     }
+    },
+    {
+     "schluessel": "gehtempo_kmh",
+     "name": "Gehtempo",
+     "einheit": "km/h",
+     "gleitend": [
+      4.8,
+      4.8,
+      4.8,
+      4.8,
+      4.8,
+      4.8,
+      4.8
+     ],
+     "gleich_prozent": 2,
+     "vergleich": {
+      "jetzt": {
+       "schnitt": 4.9,
+       "tage": 25
+      },
+      "vorher": {
+       "schnitt": 4.8,
+       "tage": 26
+      },
+      "prozent": 1,
+      "richtung": "gleich",
+      "text": "Gehtempo: letzte 4 Wochen Ø 4,9 km/h (25 Tage) – etwa gleich wie den 4 Wochen davor (Ø 4,8 km/h, 26 Tage)."
+     }
+    },
+    {
+     "schluessel": "schrittlaenge_cm",
+     "name": "Schrittlänge",
+     "einheit": "cm",
+     "gleitend": [
+      73.3,
+      73.3,
+      73.3,
+      73.1,
+      73.3,
+      72.9,
+      73.0
+     ],
+     "gleich_prozent": 2,
+     "vergleich": {
+      "jetzt": {
+       "schnitt": 73.0,
+       "tage": 25
+      },
+      "vorher": {
+       "schnitt": 72.9,
+       "tage": 26
+      },
+      "prozent": 0,
+      "richtung": "gleich",
+      "text": "Schrittlänge: letzte 4 Wochen Ø 73 cm (25 Tage) – etwa gleich wie den 4 Wochen davor (Ø 73 cm, 26 Tage)."
+     }
+    },
+    {
+     "schluessel": "gewicht_kg",
+     "name": "Gewicht",
+     "einheit": "kg",
+     "gleitend": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "gleich_prozent": 1,
+     "vergleich": {
+      "jetzt": {
+       "schnitt": 83.5,
+       "tage": 8
+      },
+      "vorher": {
+       "schnitt": 83.4,
+       "tage": 12
+      },
+      "prozent": 0,
+      "richtung": "gleich",
+      "text": "Gewicht: letzte 4 Wochen Ø 83,5 kg (8 Tage) – etwa gleich wie den 4 Wochen davor (Ø 83,4 kg, 12 Tage)."
+     }
+    }
+   ]
+  },
+  "pc": {
+   "tage": 5,
+   "tage_vorher": 7,
+   "kategorien": [
+    {
+     "name": "Programmieren",
+     "jetzt": {
+      "summe": 177,
+      "schnitt": 35.4,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 276,
+      "schnitt": 39.4,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": -4.0,
+      "prozent": -10
+     }
+    },
+    {
+     "name": "Surfen",
+     "jetzt": {
+      "summe": 137,
+      "schnitt": 27.4,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 118,
+      "schnitt": 16.9,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": 10.5,
+      "prozent": 62
+     }
+    },
+    {
+     "name": "Spiele",
+     "jetzt": {
+      "summe": 107,
+      "schnitt": 21.4,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 222,
+      "schnitt": 31.7,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": -10.3,
+      "prozent": -32
+     }
+    },
+    {
+     "name": "Wissen",
+     "jetzt": {
+      "summe": 63,
+      "schnitt": 12.6,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 41,
+      "schnitt": 5.9,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": 6.7,
+      "prozent": 114
+     }
+    },
+    {
+     "name": "Kommunikation",
+     "jetzt": {
+      "summe": 47,
+      "schnitt": 9.4,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 105,
+      "schnitt": 15.0,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": -5.6,
+      "prozent": -37
+     }
+    },
+    {
+     "name": "Video & Musik",
+     "jetzt": {
+      "summe": 33,
+      "schnitt": 6.6,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 13,
+      "schnitt": 1.9,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": 4.7,
+      "prozent": 247
+     }
+    },
+    {
+     "name": "System",
+     "jetzt": {
+      "summe": 12,
+      "schnitt": 2.4,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 12,
+      "schnitt": 1.7,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": 0.7,
+      "prozent": 41
+     }
+    },
+    {
+     "name": "Spiele-Plattform",
+     "jetzt": {
+      "summe": 10,
+      "schnitt": 2.0,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 6,
+      "schnitt": 0.9,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": 1.1,
+      "prozent": 122
+     }
+    }
+   ],
+   "spiele": [
+    {
+     "name": "Sternenfahrer",
+     "jetzt": {
+      "summe": 107,
+      "schnitt": 21.4,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 167,
+      "schnitt": 23.9,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": -2.5,
+      "prozent": -10
+     }
+    },
+    {
+     "name": "Rennfieber 3",
+     "jetzt": {
+      "summe": 0,
+      "schnitt": 0.0,
+      "tage": 5
+     },
+     "vorher": {
+      "summe": 55,
+      "schnitt": 7.9,
+      "tage": 7
+     },
+     "vergleich": {
+      "differenz": -7.9,
+      "prozent": -100
+     }
+    }
+   ]
+  },
+  "essen": {
+   "fenster": {
+    "jetzt": {
+     "tage": 6,
+     "tage_eine_mahlzeit": 0,
+     "erste": "07:35",
+     "letzte": "20:16",
+     "erste_minuten": 455,
+     "letzte_minuten": 1216,
+     "dauer_minuten": 762
+    },
+    "vorher": {
+     "tage": 4,
+     "tage_eine_mahlzeit": 0,
+     "erste": "08:25",
+     "letzte": "19:09",
+     "erste_minuten": 505,
+     "letzte_minuten": 1149,
+     "dauer_minuten": 644
+    },
+    "differenz": {
+     "erste_minuten": -50,
+     "letzte_minuten": 67,
+     "dauer_minuten": 118
+    }
+   },
+   "arten": [
+    {
+     "name": "Frühstück",
+     "jetzt": {
+      "summe": 2680,
+      "schnitt": 335.0,
+      "mahlzeiten": 8
+     },
+     "vorher": {
+      "summe": 1187,
+      "schnitt": 395.7,
+      "mahlzeiten": 3
+     },
+     "vergleich": {
+      "differenz": -60.7,
+      "prozent": -15
+     }
+    },
+    {
+     "name": "Mittag",
+     "jetzt": {
+      "summe": 4245,
+      "schnitt": 606.4,
+      "mahlzeiten": 7
+     },
+     "vorher": {
+      "summe": 2800,
+      "schnitt": 700.0,
+      "mahlzeiten": 4
+     },
+     "vergleich": {
+      "differenz": -93.6,
+      "prozent": -13
+     }
+    },
+    {
+     "name": "Abend",
+     "jetzt": {
+      "summe": 5097,
+      "schnitt": 637.1,
+      "mahlzeiten": 8
+     },
+     "vorher": {
+      "summe": 2341,
+      "schnitt": 585.2,
+      "mahlzeiten": 4
+     },
+     "vergleich": {
+      "differenz": 51.9,
+      "prozent": 9
+     }
+    },
+    {
+     "name": "Snack",
+     "jetzt": {
+      "summe": 1372,
+      "schnitt": 196.0,
+      "mahlzeiten": 7
+     },
+     "vorher": {
+      "summe": 409,
+      "schnitt": 204.5,
+      "mahlzeiten": 2
+     },
+     "vergleich": {
+      "differenz": -8.5,
+      "prozent": -4
+     }
+    }
+   ],
+   "ohne_naehrwerte": 3,
+   "ohne_naehrwerte_vorher": 0,
+   "luecken": {
+    "tage_erfasst": 6,
+    "tage_eine_mahlzeit": 0,
+    "tage_ohne_naehrwerte": 1,
+    "tage": [
+     {
+      "tag": "2026-03-09",
+      "grund": "ohne_naehrwerte"
+     }
+    ]
+   },
+   "luecken_vorher": {
+    "tage_erfasst": 4,
+    "tage_eine_mahlzeit": 0,
+    "tage_ohne_naehrwerte": 0,
+    "tage": []
+   },
+   "ziel": {
+    "zielbereich_prozent": 10,
+    "jetzt": {
+     "tage_mit_ziel": 7,
+     "ziel_schnitt_kcal": 1900.0,
+     "tage_vollstaendig": 5,
+     "tage_unvollstaendig": 1,
+     "tage_essen_ohne_ziel": 0,
+     "abweichung_schnitt_kcal": 12.0,
+     "abweichung_schnitt_prozent": 0.6,
+     "tage_im_zielbereich": 2,
+     "anteil_im_zielbereich_prozent": 40
+    },
+    "vorher": {
+     "tage_mit_ziel": 7,
+     "ziel_schnitt_kcal": 1901.0,
+     "tage_vollstaendig": 4,
+     "tage_unvollstaendig": 0,
+     "tage_essen_ohne_ziel": 0,
+     "abweichung_schnitt_kcal": -217.0,
+     "abweichung_schnitt_prozent": -11.4,
+     "tage_im_zielbereich": 2,
+     "anteil_im_zielbereich_prozent": 50
+    },
+    "differenz": {
+     "ziel_schnitt_kcal": -1.0,
+     "abweichung_schnitt_kcal": 229.0,
+     "abweichung_schnitt_prozent": 12.0,
+     "anteil_im_zielbereich_prozent": -10.0
+    }
+   }
+  },
+  "bereiche": {
+   "schritte": {
+    "name": "Schritte",
+    "jemals_daten": true,
+    "daten_im_zeitraum": true,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   },
+   "strecke": {
+    "name": "Strecke",
+    "jemals_daten": true,
+    "daten_im_zeitraum": true,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   },
+   "gehen": {
+    "name": "Gehen",
+    "jemals_daten": true,
+    "daten_im_zeitraum": true,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   },
+   "schlaf": {
+    "name": "Schlaf",
+    "jemals_daten": true,
+    "daten_im_zeitraum": true,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   },
+   "essen": {
+    "name": "Ernährung",
+    "jemals_daten": true,
+    "daten_im_zeitraum": true,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   },
+   "pc": {
+    "name": "Zeit am PC",
+    "jemals_daten": true,
+    "daten_im_zeitraum": true,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   },
+   "standort": {
+    "name": "Orte und Wege",
+    "jemals_daten": true,
+    "daten_im_zeitraum": true,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   },
+   "wetter": {
+    "name": "Wetter",
+    "jemals_daten": true,
+    "daten_im_zeitraum": false,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   },
+   "internet": {
+    "name": "Internet",
+    "jemals_daten": true,
+    "daten_im_zeitraum": true,
+    "leer_text": "keine Daten in diesem Zeitraum"
+   }
+  },
+  "noch_nicht_eingerichtet": [],
+  "zurueck": "2026-03-02",
+  "weiter": "2026-03-16"
+ }
+}
